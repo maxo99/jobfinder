@@ -1,0 +1,12 @@
+[project]
+name = "jobfinder"
+version = "0.1.0"
+description = "Utility for finding jobs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "jobfinder",
+]
