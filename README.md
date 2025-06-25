@@ -9,6 +9,7 @@
     2. Viewing the resulting pandas dataframe and filter out entries marked as viewed
     3. Focusing on individual entries with functionality to mark as viewed and add a note
     ```
+- DataModel generated with[datamodel-code-generator](https://docs.pydantic.dev/latest/integrations/datamodel_code_generator/)
 
 
 
