@@ -44,12 +44,18 @@ class FoundJob(BaseModel):
     work_from_home_type: str | None = None
     #
     viewed: bool | None = None
-    notes: str | None = None
+    pros: str | None = None
+    cons: str | None = None
+    score: int | None = None
     date_scraped: str | None = None
     #
     #
     status: str  = ""
-
+    # "✅" if row.get('viewed', False) else "⭕"
+#             # title = row.get('title', 'No Title')
+            # company = row.get('company', 'No Company')
+            
+            
     @property
     def name(self) -> str:
         return f"{self.status} {self.title} - {self.company}"

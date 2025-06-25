@@ -40,8 +40,17 @@ DISPLAY_COLS = [
     # 'vacancy_count',
     # 'work_from_home_type'
 ]
-display_columns = ['title', 'company', 'location',
-                   'job_type', 'date_posted', 'viewed', 'notes']
+display_columns = [
+    'title',
+    'company',
+    'location',
+    'job_type',
+    'date_posted',
+    'viewed',
+    'pros',
+    'cons',
+    'score',
+]
 
 
 def render():

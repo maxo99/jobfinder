@@ -3,7 +3,7 @@ import pandas as pd
 from jobspy import scrape_jobs
 
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data, update_results
+from jobfinder.utils.persistence import save_data, update_results, validate_defaults
 from jobfinder import st 
 
 SITES = ['indeed', 'linkedin']
@@ -16,20 +16,17 @@ def render():
     site_name = st.multiselect("Sites", SITES, default=SITES)
     results = st.number_input("Results", min_value=1, max_value=1000, value=2)
     hours_old = st.number_input("Age", min_value=1, max_value=480, value=72)
-    # location = st.text_input("Location", value="United States")
 
     # Scrape button
     if st.button("🚀 Scrape Jobs", type="primary"):
         new_jobs = _find_jobs(
-            # st=st,
             site_name=site_name,
             search_term=search_term,
-            # location=location,
             results_wanted=results,
             hours_old=hours_old,
         )
         if not new_jobs.empty:
-
+            
             if not st.session_state.jobs_df.empty:
                 update_results(new_jobs)
             else:
@@ -42,7 +39,6 @@ def render():
 def _find_jobs(
     site_name: list[str],
     search_term: str,
-    # location,
     results_wanted: int,
     hours_old: int,
 ):
@@ -53,7 +49,6 @@ def _find_jobs(
             jobs = scrape_jobs(
                 site_name=site_name,
                 search_term=search_term,
-                # location=location,
                 results_wanted=results_wanted,
                 hours_old=hours_old,
                 is_remote=True,
@@ -62,10 +57,7 @@ def _find_jobs(
             )
 
             if jobs is not None and not jobs.empty:
-                # Add tracking columns
-                jobs['viewed'] = False
-                jobs['notes'] = ''
-                jobs['date_scraped'] = get_now()
+                validate_defaults(jobs)
                 return jobs
             else:
                 st.warning("No jobs found with the specified criteria.")

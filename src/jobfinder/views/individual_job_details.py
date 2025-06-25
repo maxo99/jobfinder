@@ -1,29 +1,29 @@
 import pandas as pd
-
+import logging
 from jobfinder.model import FoundJob
 from jobfinder.utils.persistence import save_data
 from jobfinder import st
+
+logger = logging.getLogger(__name__)
 
 
 def render():
 
     if not st.session_state.jobs_df.empty:
-        # Job selection dropdown
+
+
+        # TODO: IMPROVE ORDERING/FILTERING
 
         job_options = []
-
-        # TODO: ADD ORDERING/FILTERING
-
         for idx, row in st.session_state.jobs_df.iterrows():
             try:
                 _found_job = FoundJob.model_validate(row.to_dict())
+                job_options.append(f"{idx}. {_found_job.name}")
             except Exception as e:
-                print(f"Failed to convert entry idx:{idx} e:{e}")
-            # status = "✅" if row.get('viewed', False) else "⭕"
-            # title = row.get('title', 'No Title')
-            # company = row.get('company', 'No Company')
-
-            job_options.append(f"{idx}. {_found_job.name}")
+                logging.error(f"Failed to convert entry idx:{idx} e:{e}")
+                
+                
+        # Job selection dropdown
         selected_job = st.selectbox("Select a Job", job_options)
 
         if selected_job:
@@ -67,21 +67,36 @@ def _details(job_row):
 def _actions(job_row, idx):
     st.subheader("Actions")
 
-    # Viewed status
-
+    # Viewed
     current_viewed = job_row.get("viewed", False)
     new_viewed = st.checkbox(
         "Mark as Viewed", value=current_viewed, key=f"viewed_{idx}"
     )
 
-    # Notes
-    current_notes = job_row.get("notes", "")
-    new_notes = st.text_area("Notes", value=current_notes, key=f"notes_{idx}")
+    # Pros
+    current_pros = job_row.get("pros", None)
+    new_pros = st.text_area("Pros", value=current_pros, key=f"pros_{idx}")
+
+    # Cons
+    current_cons = job_row.get("cons", "")
+    new_cons = st.text_area("Cons", value=current_cons, key=f"cons_{idx}")
+
+    # Score
+    current_score = job_row.get("score", None)
+    new_score = st.number_input(
+        "Score (0.0 - 10.0)",
+        value=current_score,
+        min_value=float(0),
+        max_value=float(10),
+        key=f"score_{idx}"
+    )
 
     # Update button
     if st.button("💾 Update Job", key=f"update_{idx}"):
         st.session_state.jobs_df.loc[idx, "viewed"] = new_viewed
-        st.session_state.jobs_df.loc[idx, "notes"] = new_notes
+        st.session_state.jobs_df.loc[idx, "pros"] = new_pros
+        st.session_state.jobs_df.loc[idx, "cons"] = new_cons
+        st.session_state.jobs_df.loc[idx, "score"] = new_score
         save_data(st.session_state.jobs_df)
         st.success("Job updated successfully!")
         st.rerun()
