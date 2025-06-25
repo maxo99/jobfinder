@@ -4,9 +4,29 @@ version = "0.1.0"
 description = "Utility for finding jobs"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "pandas>=2.3.0",
+    "python-jobspy>=1.1.80",
+    "streamlit>=1.46.0",
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ['src']
+include = ['jobfinder*']
 
 [tool.uv.workspace]
 members = [
+    "jobfinder",
+]
+
+[tool.uv.sources]
+jobfinder = { workspace = true }
+
+[dependency-groups]
+dev = [
     "jobfinder",
 ]
