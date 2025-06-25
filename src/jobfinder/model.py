@@ -55,6 +55,11 @@ class FoundJob(BaseModel):
         return f"{self.status} {self.title} - {self.company}"
 
 
+    @property
+    def salary(self) -> str:
+        return f"{self.min_amount} - {self.max_amount} {self.currency}"
+
+
     # Custom validator here
     @field_validator('*',mode='before')
     def allow_none(cls, v):
