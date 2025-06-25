@@ -1,11 +1,15 @@
 import pandas as pd
-from jobfinder import st
-from jobfinder.utils import get_data_dir
+from jobfinder import DATA_DIR, st
+import logging
 from jobfinder.views import data_management, find_jobs, individual_job_details
 from jobfinder.utils.persistence import load_existing_data, update_results
 
 
+logger = logging.getLogger(__name__)
+
+
 def main():
+    logging.info("Starting up main()")
     # Configure the page
     st.set_page_config(
         page_title="Job Scraper & Manager",
@@ -17,7 +21,7 @@ def main():
     if 'jobs_df' not in st.session_state:
         st.session_state.jobs_df = pd.DataFrame()
     if 'job_data_file' not in st.session_state:
-        st.session_state.job_data_file = f'{get_data_dir()}\jobs_data.csv'
+        st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
 
     # Main app
     st.title("💼 Job Scraper & Manager")
