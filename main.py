@@ -303,8 +303,7 @@ def main():
 
 
 
-def main():
-    print("Hello from jobfinder!")
+
 
 
 
