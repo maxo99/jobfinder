@@ -14,75 +14,57 @@ def render():
 
         # TODO: IMPROVE ORDERING/FILTERING
 
-        job_options = []
-        for idx, row in st.session_state.jobs_df.iterrows():
-            try:
-                _found_job = FoundJob.model_validate(row.to_dict())
-                job_options.append(f"{idx}. {_found_job.name}")
-            except Exception as e:
-                logging.error(f"Failed to convert entry idx:{idx} e:{e}")
-                
-                
-        # Job selection dropdown
-        selected_job = st.selectbox("Select a Job", job_options)
 
-        if selected_job:
+        _found_jobs = {i: FoundJob.from_dict(d.to_dict()) for i, d in st.session_state.jobs_df.iterrows()}
+        
+        _key = st.selectbox(
+            "Select a Job",
+            options=list(_found_jobs.keys()),
+            format_func=lambda x: _found_jobs[x].name  # Show display name but return key
+        )
+        
+        # Job selection dropdown
+        # selected_job = st.selectbox("Select a Job", job_options)
+
+        if _key:
             # Extract row index from selection
 
-            row_idx = int(selected_job.split(".")[0])
-            job_row = st.session_state.jobs_df.iloc[row_idx]
-
+            _selected_job = _found_jobs[_key]
+            logger.info(f"Selected job: {_selected_job.name} at index {_key}")
+            # try:
             col1, col2 = st.columns([2, 1])
             with col1:
-                _details(job_row)
+                _details(_selected_job)
             with col2:
-                _actions(job_row, row_idx)
+                _actions(_selected_job, _key)
 
 
-def _details(job_row):
-    st.subheader(f"📝 {job_row.get('title', 'No Title')}")
-    st.write(f"**Company:** {job_row.get('company', 'N/A')}")
-    st.write(f"**Location:** {job_row.get('location', 'N/A')}")
-    st.write(f"**Job Type:** {job_row.get('job_type', 'N/A')}")
-    st.write(f"**Date Posted:** {job_row.get('date_posted', 'N/A')}")
-    st.write(
-        f"**Salary:** {job_row.get('min_amount', 'N/A')} - {job_row.get('max_amount', 'N/A')} {job_row.get('currency', '')}"
-    )
-
-    # Job URL
-
-    if "job_url" in job_row and pd.notna(job_row["job_url"]):
-        st.markdown(f"**Job URL:** [View Job]({job_row['job_url']})")
-    # Job description
-
-    if "description" in job_row and pd.notna(job_row["description"]):
-        st.subheader("Job Description")
-        st.write(
-            job_row["description"][:1000] + "..."
-            if len(str(job_row["description"])) > 1000
-            else job_row["description"]
-        )
+def _details(job: FoundJob):
+    st.markdown(job.get_details())
 
 
-def _actions(job_row, idx):
+
+def _actions(job: FoundJob, idx: int):
     st.subheader("Actions")
 
     # Viewed
-    current_viewed = job_row.get("viewed", False)
+    current_viewed = job.viewed
     new_viewed = st.checkbox(
         "Mark as Viewed", value=current_viewed, key=f"viewed_{idx}"
     )
 
     # Pros
-    current_pros = job_row.get("pros", None)
+    current_pros = job.pros
     new_pros = st.text_area("Pros", value=current_pros, key=f"pros_{idx}")
 
     # Cons
-    current_cons = job_row.get("cons", "")
+    current_cons = job.cons
     new_cons = st.text_area("Cons", value=current_cons, key=f"cons_{idx}")
 
     # Score
-    current_score = job_row.get("score", None)
+    current_score = job.score
+    logger.info(f"Current job:{idx} score:{current_score} pros:{current_pros} cons:{current_cons}")
+    
     new_score = st.number_input(
         "Score (0.0 - 10.0)",
         value=current_score,

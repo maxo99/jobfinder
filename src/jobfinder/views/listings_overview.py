@@ -1,7 +1,7 @@
 from jobfinder import st
 
 
-DISPLAY_COLS = [
+JOBSPY_COLS = [
     'title',
     'company',
     'date_posted',
@@ -12,21 +12,24 @@ DISPLAY_COLS = [
     'job_url_direct',
 
     'location',
-
+    'is_remote',
     'job_type',
+
+    # Salary
     'salary_source',
     'interval',
     'min_amount',
     'max_amount',
     'currency',
-    'is_remote',
+
     'job_level',
     'job_function',
-    # 'listing_type',
-    # 'emails',
+
     'description',
     'company_industry',
     'company_url',
+    # 'listing_type',
+    # 'emails',
     # 'company_logo',
     # 'company_url_direct',
     # 'company_addresses',
@@ -40,17 +43,13 @@ DISPLAY_COLS = [
     # 'vacancy_count',
     # 'work_from_home_type'
 ]
-display_columns = [
-    'title',
-    'company',
-    'location',
-    'job_type',
-    'date_posted',
+CUSTOM_COLS = [
     'viewed',
     'pros',
     'cons',
     'score',
 ]
+DISPLAY_COLS = [*JOBSPY_COLS, *CUSTOM_COLS]
 
 
 def render():
@@ -87,7 +86,8 @@ def render():
         # Select columns to display
 
         available_columns = [
-            col for col in display_columns if col in filtered_df.columns]
+            col for col in DISPLAY_COLS if col in filtered_df.columns
+        ]
 
         st.dataframe(
             filtered_df[available_columns],
