@@ -36,10 +36,23 @@ logging.basicConfig(
     level=_level, handlers=[_file_handler, _console_handler]
 )
 
+def get_session():
+    if 'jobs_df' not in st.session_state:
+        st.session_state.jobs_df = pd.DataFrame()
+    if 'job_data_file' not in st.session_state:
+        st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
+    return st.session_state
+
+def get_jobs_df():
+    return get_session().jobs_df
+
+def set_jobs_df(df):
+    get_session().jobs_df = df
 
 __all__ = (
     "st",
     "PROJECT_ROOT",
     "DATA_DIR",
-    # "jobs_df"
+    "get_session"
+    "get_jobs_df"
 )
