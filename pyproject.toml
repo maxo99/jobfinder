@@ -41,7 +41,12 @@ version_variable = [
     "pyproject.toml:version",
     "src/jobfinder/__init__.py:__version__"
 ]
-branch = "release_versioning"
+branch = "main"
 upload_to_pypi = false
 upload_to_release = false
 build_command = "pip install -e . && uv build"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
