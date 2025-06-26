@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def render():
     st.subheader("Data File")
-    st.write(f"Current data file: `{st.session_state.job_data_file}`")
+    st.write(f"Current data file: `{get_job_data_file()}`")
 
     _manage_data()
     _bulk_actions()
@@ -34,8 +34,8 @@ def _manage_data():
         st.subheader("Clear Data")
         if st.button("🗑️ Clear All Data"):
             st.session_state.jobs_df = DataFrame()
-            if os.path.exists(st.session_state.job_data_file):
-                os.remove(st.session_state.job_data_file)
+            if os.path.exists(get_job_data_file()):
+                os.remove(get_job_data_file())
                 logger.info(f"Cleared : {get_job_data_file()}")
             else:
                 logger.warning(f"File not exists:{get_job_data_file()}")

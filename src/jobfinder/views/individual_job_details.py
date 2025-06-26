@@ -19,19 +19,21 @@ def render():
             if FoundJob.from_dict(d.to_dict())
         }
 
-        # Job selection dropdown
         _key = st.selectbox(
             "Select a Job",
             options=list(_found_jobs.keys()),
-            format_func=lambda x: _found_jobs[x].name
+            format_func=lambda x: _found_jobs[x].name,
+            index=0,
         )
         if _key:
             logger.info(f"Selected job:{_key}: {_found_jobs[_key].name}")
-            _col_details, _col_actions = st.columns([2, 1])
-            with _col_details:
-                _details(_found_jobs[_key])
-            with _col_actions:
-                _actions(_found_jobs[_key], _key)
+        else:
+            _key = 0
+        _col_details, _col_actions = st.columns([2, 1])
+        with _col_details:
+            _details(_found_jobs[_key])
+        with _col_actions:
+            _actions(_found_jobs[_key], _key)
 
 
 def _details(job: FoundJob):
