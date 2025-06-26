@@ -1,6 +1,6 @@
 import pandas as pd
 import logging
-from jobfinder.model import FoundJob
+from jobfinder.model import FoundJob, Status
 from jobfinder.utils.persistence import save_data
 from jobfinder import get_jobs_df, set_jobs_df, st
 
@@ -41,7 +41,13 @@ def _details(job: FoundJob):
 def _actions(job: FoundJob, idx: int):
     st.subheader("Actions")
 
-    new_viewed = st.checkbox("Mark as Viewed", value=job.viewed)
+    new_status = st.selectbox(
+        "Status",
+        options=[s.value for s in Status],
+        placeholder=job.status.value,
+        index=0,
+        key=f"status_{idx}"
+    )
     new_pros = st.text_area("Pros", value=job.pros)
     new_cons = st.text_area("Cons", value=job.cons)
 
@@ -53,9 +59,11 @@ def _actions(job: FoundJob, idx: int):
         key=f"score_{idx}"
     )
 
-    # Update button
     if st.button("💾 Update Job"):
-        get_jobs_df().loc[idx, "viewed"] = new_viewed
+        # Automatically set to VIEWED if NEW
+        if new_status == Status.NEW.value:
+            new_status = Status.VIEWED.value
+        get_jobs_df().loc[idx, "status"] = new_status
         get_jobs_df().loc[idx, "pros"] = new_pros
         get_jobs_df().loc[idx, "cons"] = new_cons
         get_jobs_df().loc[idx, "score"] = new_score

@@ -1,15 +1,22 @@
 import os
 import logging
 from pandas import DataFrame
-from jobfinder import st
+from jobfinder import get_jobs_df, get_job_data_file, st
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data
+from jobfinder.utils.persistence import save_data, validate_defaults
 
 logger = logging.getLogger(__name__)
 
 
-
 def render():
+    st.subheader("Data File")
+    st.write(f"Current data file: `{st.session_state.job_data_file}`")
+
+    _manage_data()
+    _bulk_actions()
+
+
+def _manage_data():
     _col_export_data, _col_clear_data = st.columns(2)
 
     with _col_export_data:
@@ -24,37 +31,26 @@ def render():
             )
 
     with _col_clear_data:
-        # TODO: Figure out issue with Clear Data
         st.subheader("Clear Data")
         if st.button("🗑️ Clear All Data"):
-            logger.info("Clearing all data")
             st.session_state.jobs_df = DataFrame()
             if os.path.exists(st.session_state.job_data_file):
                 os.remove(st.session_state.job_data_file)
-                logger.info(f"Cleared : {st.session_state.job_data_file}")
+                logger.info(f"Cleared : {get_job_data_file()}")
             else:
-                logger.warning(f"File not exists:{st.session_state.job_data_file}")
+                logger.warning(f"File not exists:{get_job_data_file()}")
             st.success("All data cleared!")
-            logger.info("All data cleared!")
             st.rerun()
 
-    # Data file management
-    st.subheader("Data File")
-    st.write(f"Current data file: `{st.session_state.job_data_file}`")
 
-    # Bulk actions
+def _bulk_actions():
     st.subheader("Bulk Actions")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Mark All as Viewed"):
-            st.session_state.jobs_df['viewed'] = True
-            save_data(st.session_state.jobs_df)
-            st.success("All jobs marked as viewed!")
-            st.rerun()
+    # TODO: Update to mark all as new (just clear status/pros/cons vs new date as well?)
 
-    with col2:
-        if st.button("Mark All as Unviewed"):
-            st.session_state.jobs_df['viewed'] = False
-            save_data(st.session_state.jobs_df)
-            st.success("All jobs marked as unviewed!")
+    col1, = st.columns(1)
+    with col1:
+        if st.button("Mark All as new"):
+            validate_defaults(get_jobs_df())
+            save_data(get_jobs_df())
+            st.success("All jobs marked as new!")
             st.rerun()

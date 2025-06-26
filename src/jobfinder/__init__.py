@@ -46,6 +46,9 @@ def get_session():
 def get_jobs_df():
     return get_session().jobs_df
 
+def get_job_data_file():
+    return get_session().job_data_file
+
 def set_jobs_df(df):
     get_session().jobs_df = df
 
@@ -53,6 +56,8 @@ __all__ = (
     "st",
     "PROJECT_ROOT",
     "DATA_DIR",
-    "get_session"
-    "get_jobs_df"
+    "get_session",
+    "get_jobs_df",
+    "set_jobs_df",
+    "get_job_data_file",
 )

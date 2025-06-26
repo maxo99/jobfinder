@@ -1,11 +1,14 @@
 from jobfinder import get_jobs_df, get_session, st
+from jobfinder.model import Status
 
-
-JOBSPY_COLS = [
+DEFAULT_COLS = [
     'date_posted',
     'site',
     'company',
     'title',
+]
+
+JOBSPY_COLS = [
 
     # 'id',
     # 'job_url',
@@ -42,48 +45,49 @@ JOBSPY_COLS = [
     # 'work_from_home_type'
 ]
 CUSTOM_COLS = [
-    'viewed',
+    'status',
     'score',
     'pros',
     'cons',
 ]
-DISPLAY_COLS = [*JOBSPY_COLS, *CUSTOM_COLS]
+DISPLAY_COLS = [*DEFAULT_COLS, *JOBSPY_COLS, *CUSTOM_COLS]
 
 
 def render():
     
-    # Display stats
     _display_stats()
     
-    # Filter controls
-    col1, col2, _col_refresh = st.columns(3)
-    with col1:
-        show_viewed = st.checkbox("Show Viewed Jobs", value=True)
-    with col2:
-        show_unviewed = st.checkbox("Show Unviewed Jobs", value=True)
+    _col_status_select, _col_display_columns, _col_refresh = st.columns(3)
+    with _col_status_select:
+        _selected_status = st.multiselect(
+            "Status",
+            options=[s.value for s in Status],
+            default=[s.value for s in Status if s != Status.EXCLUDED],
+        )
+    with _col_display_columns:
+         # TODO: Update default display cols
+        _display_columns = st.multiselect(
+            "Display Columns",
+            options=DISPLAY_COLS,
+            default=DISPLAY_COLS,
+        )
     with _col_refresh:
         if st.button("🔄 Refresh Data"):
             st.rerun()
 
 
     # Apply filters
-    filtered_df = st.session_state.jobs_df.copy()
-    if not show_viewed:
-        filtered_df = filtered_df[filtered_df['viewed'] == False]
-    if not show_unviewed:
-        filtered_df = filtered_df[filtered_df['viewed'] == True]
-
-
+    filtered_df = get_jobs_df().copy()
+    if _col_status_select:
+        filtered_df = filtered_df[filtered_df['status'].isin(_selected_status)]
 
     # Display dataframe
     if not filtered_df.empty:
-        # Select columns to display
-        # available_columns = [
-        #     col for col in  if col in filtered_df.columns
-        # ]
+        
+        # TODO: Select columns to display
 
         st.dataframe(
-            data=filtered_df[DISPLAY_COLS],
+            data=filtered_df[_display_columns],
             use_container_width=True,
             hide_index=True
         )
@@ -94,10 +98,13 @@ def render():
 def _display_stats():
     
     total_jobs = len(get_jobs_df())
-    viewed_jobs = len(get_jobs_df()[get_jobs_df()['viewed'] == True])
-    unviewed_jobs = total_jobs - viewed_jobs
+    
+    
+    # FIXME: Fix for status
+    # viewed_jobs = len(get_jobs_df()[get_jobs_df()['viewed'] == True])
+    # unviewed_jobs = total_jobs - viewed_jobs
 
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Jobs", total_jobs)
-    col2.metric("Viewed Jobs", viewed_jobs)
-    col3.metric("Unviewed Jobs", unviewed_jobs)
+    # col2.metric("Viewed Jobs", viewed_jobs)
+    # col3.metric("Unviewed Jobs", unviewed_jobs)

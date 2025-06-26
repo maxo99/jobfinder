@@ -40,8 +40,8 @@ def save_data(df):
 def validate_defaults(df):
     if 'date_scraped' not in df.columns:
         df['date_scraped'] = get_now()
-    if 'viewed' not in df.columns:
-        df['viewed'] = False
+    if 'status' not in df.columns:
+        df['status'] = 'new'
     if 'pros' not in df.columns:
         df['pros'] = ''
     if 'cons' not in df.columns:
