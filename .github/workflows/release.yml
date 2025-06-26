@@ -32,6 +32,6 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
     - name: Python Semantic Release
-      run: semantic-release publish --verbosity=DEBUG
+      run: semantic-release publish
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
