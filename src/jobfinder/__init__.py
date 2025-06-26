@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 import streamlit as st
 import pandas as pd
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR =  PROJECT_ROOT.joinpath("data")
