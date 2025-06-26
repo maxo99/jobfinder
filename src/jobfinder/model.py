@@ -100,7 +100,7 @@ class FoundJob(_FoundJob):
             logger.error(f"Failed to convert data:{data} e:{e}")
             return None
 
-    def get_details(self) -> str:
+    def get_details(self, long: bool = True) -> str:
         _d = [
             f"## 📝 **{self.name}**",
             f"**Company:** {self.company}",
@@ -116,8 +116,15 @@ class FoundJob(_FoundJob):
                 f"**{self.company} URL:** [{self.title}]({self.job_url_direct})")
         if self.description:
             _d.append(f"## **Description:** ")
-            # details.append(self.description[:1000] + "..." if len(self.description) > 1000 else self.description)
-            _d.append(self.description)
+            if long:
+                _d.append(self.description)
+                
+            else:
+                _d.append(
+                    self.description[:1000] + "..."
+                    if len(self.description) > 1000
+                    else self.description
+                )
         return "  \n  ".join(_d)
 
 
