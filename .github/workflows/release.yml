@@ -26,10 +26,12 @@ jobs:
     - name: Install python-semantic-release
       run: pip install python-semantic-release
 
-    - name: Use Python Semantic Release to publish release
+    - name: Git config
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-        semantic-release publish
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Python Semantic Release
+      run: semantic-release publish --verbosity=DEBUG
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
