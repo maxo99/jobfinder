@@ -45,6 +45,10 @@ branch = "main"
 upload_to_pypi = false
 upload_to_release = false
 build_command = "pip install -e . && uv build"
+tag_format = "v{version}"
+major_on_zero = false
+allow_zero_version = true
+
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test"]
