@@ -1,6 +1,6 @@
 [project]
 name = "jobfinder"
-version = "v0.0.0"
+version = "0.0.0"
 description = "Utility for finding jobs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -37,14 +37,13 @@ log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [tool.semantic_release]
-version_variable = [
-    "pyproject.toml:version",
-    "src/jobfinder/__init__.py:__version__"
-]
+version_toml = ["pyproject.toml:project.version"]
+version_variables = ["src/jobfinder/__init__.py:__version__"]
+
 branch = "main"
 upload_to_pypi = false
 upload_to_release = false
-build_command = "pip install -e . && uv build"
+build_command = "pip install uv && uv build"
 tag_format = "v{version}"
 major_on_zero = false
 allow_zero_version = true
