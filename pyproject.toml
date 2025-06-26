@@ -26,4 +26,7 @@ jobfinder = { workspace = true }
 # data = { workspace= true}
 
 [dependency-groups]
-dev = ["jobfinder"]
+dev = [
+    "jobfinder",
+    "pytest>=8.4.1",
+]

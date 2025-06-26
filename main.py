@@ -7,6 +7,14 @@ from jobfinder.utils.persistence import load_existing_data, update_results
 
 logger = logging.getLogger(__name__)
 
+def _init_session():
+    if 'jobs_df' not in st.session_state:
+        st.session_state.jobs_df = pd.DataFrame()
+    if 'job_data_file' not in st.session_state:
+        st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
+    if st.session_state.jobs_df.empty:
+        st.session_state.jobs_df = load_existing_data()
+
 
 def main():
     logging.info("Starting up main()")
@@ -18,18 +26,11 @@ def main():
     )
 
     # Initialize session state
-    if 'jobs_df' not in st.session_state:
-        st.session_state.jobs_df = pd.DataFrame()
-    if 'job_data_file' not in st.session_state:
-        st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
+    _init_session()
 
     # Main app
     st.title("💼 Job Scraper & Manager")
     st.markdown("---")
-
-    # Startup Load existing data on startup
-    if st.session_state.jobs_df.empty:
-        st.session_state.jobs_df = load_existing_data()
 
     # Sidebar for scraping configuration
     with st.sidebar:
