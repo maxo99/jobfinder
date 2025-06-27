@@ -15,6 +15,8 @@ class Status(Enum):
     APPLIED = "applied"
 # "✅""⭕"
 
+STATUS_OPTIONS = [s.value for s in Status]
+DEFAULT_STATUS_FILTERS = [s.value for s in Status if s != Status.EXCLUDED]
 
 class _FoundJob(BaseModel):
     listing_type: str | None = None
