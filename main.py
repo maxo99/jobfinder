@@ -14,6 +14,8 @@ def _init_session():
         st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
     if st.session_state.jobs_df.empty:
         st.session_state.jobs_df = load_existing_data()
+    if 'filtered_jobs' not in st.session_state:
+        st.session_state.filtered_jobs = st.session_state.jobs_df.copy()
 
 
 def main():
