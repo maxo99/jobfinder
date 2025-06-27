@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.2.1 (2025-06-27)
+
+### Bug Fixes
+
+- **stats**: Reintegrating statistics and updates to listings display
+  ([`b2217f3`](https://github.com/maxo99/jobfinder/commit/b2217f33e34e45a6a44236d1eee89f916706c6e6))
+
+
 ## v0.2.0 (2025-06-27)
 
 ### Chores
