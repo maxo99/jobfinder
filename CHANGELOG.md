@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.2.0 (2025-06-27)
+
+### Chores
+
+- Including vscode debug configuration for streamlit
+  ([`4d0ffe3`](https://github.com/maxo99/jobfinder/commit/4d0ffe3f1fd154f86990131c26fd9336b303cea2))
+
+
 ## v0.1.2 (2025-06-26)
 
 ### Bug Fixes
@@ -17,6 +25,11 @@
 
 - Updating readme with purpose
   ([`1da8de6`](https://github.com/maxo99/jobfinder/commit/1da8de6451aea397a735cdc08d684acf496967c0))
+
+### Features
+
+- **listings**: Support for bulk operations to update data of filtered listings
+  ([`d6329b9`](https://github.com/maxo99/jobfinder/commit/d6329b93a1e03bad4df14a931d0f4c885bf3c99f))
 
 
 ## v0.1.1 (2025-06-26)
