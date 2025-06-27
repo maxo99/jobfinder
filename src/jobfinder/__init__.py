@@ -1,12 +1,12 @@
+__version__ = "0.1.2"
 import os
 import sys
 import logging
 from pathlib import Path
 import streamlit as st
 import pandas as pd
-
 from jobfinder.model import DEFAULT_STATUS_FILTERS
-__version__ = "0.1.1"
+
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR =  PROJECT_ROOT.joinpath("data")

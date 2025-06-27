@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v0.1.2 (2025-06-26)
+
+### Bug Fixes
+
+- Displaying of first entry before any have been selected
+  ([`2641639`](https://github.com/maxo99/jobfinder/commit/26416391baed6e0ca9febb3ae6847a7c9f34f023))
+
+### Chores
+
+- Updating version in python definition
+  ([`fc8154e`](https://github.com/maxo99/jobfinder/commit/fc8154e96ead22c6cd94bfaf443cc32c7c41e6a8))
+
+### Documentation
+
+- Updating readme with purpose
+  ([`1da8de6`](https://github.com/maxo99/jobfinder/commit/1da8de6451aea397a735cdc08d684acf496967c0))
+
+
 ## v0.1.1 (2025-06-26)
 
 ### Bug Fixes
