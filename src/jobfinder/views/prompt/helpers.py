@@ -1,12 +1,10 @@
 
 import streamlit as st
-import json
-import pandas as pd
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 import hashlib
-from jinja2 import Template, Environment, BaseLoader
 
+VERSIONS_LIMIT = 10
 
 def save_prompt_version(prompt: str, description: str = ""):
     version = {
@@ -21,22 +19,25 @@ def save_prompt_version(prompt: str, description: str = ""):
     # Check if this exact prompt already exists
     if not any(v['content'] == prompt for v in st.session_state.prompt_history):
         st.session_state.prompt_history.insert(0, version)
-        # Keep only last 10 versions
-        st.session_state.prompt_history = st.session_state.prompt_history[:10]
+        st.session_state.prompt_history = st.session_state.prompt_history[:VERSIONS_LIMIT]
         return True
     return False
+
+
+def get_prompt_stats(prompt: str) -> Dict[str, int]:
+    return {
+        'word_count': len(prompt.split()),
+        'char_count': len(prompt),
+        'line_count': len(prompt.split('\n')),
+        'paragraph_count': len([p for p in prompt.split('\n\n') if p.strip()])
+    }
 
 
 def validate_prompt(prompt: str) -> Dict[str, any]:
     validation = {
         'is_valid': True,
         'warnings': [],
-        'stats': {
-            'word_count': len(prompt.split()),
-            'char_count': len(prompt),
-            'line_count': len(prompt.split('\n')),
-            'paragraph_count': len([p for p in prompt.split('\n\n') if p.strip()])
-        }
+        'stats': get_prompt_stats(prompt)
     }
 
     if len(prompt) < 50:

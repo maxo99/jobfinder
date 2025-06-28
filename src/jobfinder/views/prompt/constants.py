@@ -1,4 +1,4 @@
-
+import pandas as pd
 
 BASIC_LIST_TEMPLATE = """# System Instructions
 {% for instruction in instructions %}
@@ -37,3 +37,20 @@ PRESET_TEMPLATES = {
     "Priority Based": PRIORITY_BASED_TEMPLATE,
     "Detailed Format": DETAILED_FORMAT_TEMPLATE,
 }
+
+
+
+SAMPLE_DATA = pd.DataFrame({
+        'instruction_id': ['inst_001', 'inst_002', 'inst_003', 'inst_004', 'inst_005'],
+        'category': ['CATEGORY_1', 'CATEGORY_2', 'CATEGORY_3', 'CATEGORY_4', 'CATEGORY_5'],
+        'title': ['TITLE_1', 'TITLE_2', 'TITLE_3', 'TITLE_4', 'TITLE_5'],
+        'content': [
+            'CONTENT_1',
+            'CONTENT_2',
+            'CONTENT_3',
+            'CONTENT_4',
+            'CONTENT_5'
+        ],
+        'priority': [1, 2, 3, 2, 1],
+        'active': [True, True, False, True, True]
+    })

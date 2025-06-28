@@ -1,14 +1,9 @@
 import streamlit as st
-import json
 import pandas as pd
 from datetime import datetime
-from typing import Dict, List, Optional
-import hashlib
-from jinja2 import Template, Environment, BaseLoader
 
 from jobfinder.views.prompt import edit_prompt, prompt_analytics, template_builder
-from jobfinder.views.prompt.constants import PRESET_TEMPLATES
-from jobfinder.views.prompt.helpers import save_prompt_version
+from jobfinder.views.prompt.constants import PRESET_TEMPLATES, SAMPLE_DATA
 
 # Page configuration
 st.set_page_config(
@@ -31,21 +26,7 @@ if 'current_prompt' not in st.session_state:
     
     
 if 'template_data' not in st.session_state:
-    # Sample data - replace with your actual data source
-    st.session_state.template_data = pd.DataFrame({
-        'instruction_id': ['inst_001', 'inst_002', 'inst_003', 'inst_004', 'inst_005'],
-        'category': ['CATEGORY_1', 'CATEGORY_2', 'CATEGORY_3', 'CATEGORY_4', 'CATEGORY_5'],
-        'title': ['TITLE_1', 'TITLE_2', 'TITLE_3', 'TITLE_4', 'TITLE_5'],
-        'content': [
-            'CONTENT_1',
-            'CONTENT_2',
-            'CONTENT_3',
-            'CONTENT_4',
-            'CONTENT_5'
-        ],
-        'priority': [1, 2, 3, 2, 1],
-        'active': [True, True, False, True, True]
-    })
+    st.session_state.template_data = SAMPLE_DATA
 
 
 

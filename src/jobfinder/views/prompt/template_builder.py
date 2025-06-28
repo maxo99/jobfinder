@@ -1,11 +1,8 @@
 import streamlit as st
-import json
-import pandas as pd
-from typing import Dict, List, Optional
-import hashlib
-from jinja2 import Template, Environment, BaseLoader
+from typing import Dict
+from jinja2 import Template
 
-from jobfinder.views.prompt.helpers import get_selected_data, save_prompt_version
+from jobfinder.views.prompt.helpers import get_selected_data
 
 
 
@@ -209,21 +206,8 @@ def render():
             # Show preview
             st.code(rendered_prompt, language="markdown")
 
-            # Actions
-            action_col1, action_col2 = st.columns(2)
-
-            with action_col1:
-                if st.button("📋 Use as Current Prompt", use_container_width=True):
-                    st.session_state.current_prompt = rendered_prompt
-                    st.success("✅ Template applied to current prompt!")
-
-            with action_col2:
-                if st.button("💾 Save Template Version", use_container_width=True):
-                    description = f"Template with {len(st.session_state.selected_instructions)} instructions"
-                    if save_prompt_version(rendered_prompt, description):
-                        st.success("✅ Template version saved!")
-                    else:
-                        st.info("ℹ️ This template version already exists")
+            if st.button("📋 Use for run", use_container_width=True):
+                    st.markdown("Not yet implemented")
 
         else:
             st.info("Select instructions from the left panel to see template preview")
