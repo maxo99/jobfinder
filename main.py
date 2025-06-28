@@ -1,6 +1,7 @@
 import pandas as pd
-from jobfinder import DATA_DIR, st
+from jobfinder import DATA_DIR, st, __version__
 import logging
+from jobfinder.utils import get_now
 from jobfinder.views import data_management, find_jobs, individual_job_details, listings_overview
 from jobfinder.utils.persistence import load_existing_data, update_results
 
@@ -22,7 +23,7 @@ def main():
     logging.info("Starting up main()")
     # Configure the page
     st.set_page_config(
-        page_title="Job Scraper & Manager",
+        page_title="jobfinder",
         page_icon="💼",
         layout="wide"
     )
@@ -31,7 +32,7 @@ def main():
     _init_session()
 
     # Main app
-    st.title("💼 Job Scraper & Manager")
+    st.title("💼 jobfinder")
     st.markdown("---")
 
     # Sidebar for scraping configuration
@@ -83,8 +84,16 @@ def main():
         """)
 
     # Footer
+    _footer()
+
+
+def _footer():
     st.markdown("---")
-    st.markdown("Built with ❤️ using Streamlit and JobSpy")
+    _col_left, _col_right = st.columns([1, 2])
+    with _col_left:
+        st.markdown(f"jobfinder v{__version__}")
+    with _col_right:
+        st.markdown(f"Loaded:{get_now()}")
 
 
 if __name__ == "__main__":

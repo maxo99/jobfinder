@@ -97,12 +97,14 @@ def render():
 
     # Apply filters
     filtered_df = get_filtered_jobs_df()
-    if _col_1:
-        filtered_df = filtered_df[filtered_df['status'].isin(
-            get_status_filter())]
-    if _col_2:
-        filtered_df = filtered_df[filtered_df['title'].str.contains(
-            '|'.join(get_title_filters()), case=False, na=False)]
+    # if _col_1:
+    filtered_df = filtered_df[filtered_df['status'].isin(
+        get_status_filter())]
+    # if _col_2:
+    filtered_df = filtered_df[filtered_df['title'].str.contains(
+        '|'.join(get_title_filters()), case=False, na=False
+    )]
+    set_filtered_jobs_df(filtered_df)
 
     _display_columns = st.multiselect(
         "Display Columns",
