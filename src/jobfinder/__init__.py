@@ -29,21 +29,25 @@ logging.basicConfig(
 )
 
 def get_session():
-    # TODO: Remove defaults from here since they are set in main.py
-    if 'jobs_df' not in st.session_state:
-        st.session_state.jobs_df = pd.DataFrame()
-    if 'job_data_file' not in st.session_state:
-        st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
+    # # TODO: Remove defaults from here since they are set in main.py
+    # if 'jobs_df' not in st.session_state:
+    #     st.session_state.jobs_df = pd.DataFrame()
+    # if 'job_data_file' not in st.session_state:
+    #     st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
     
-    # TODO: Remove defaults from here since they are set in main.py
-    if 'title_filters' not in st.session_state:
-        st.session_state.title_filters = []
-    if 'status_filters' not in st.session_state:
-        st.session_state.status_filters = DEFAULT_STATUS_FILTERS
+    # # TODO: Remove defaults from here since they are set in main.py
+    # if 'title_filters' not in st.session_state:
+    #     st.session_state.title_filters = []
+    # if 'status_filters' not in st.session_state:
+    #     st.session_state.status_filters = DEFAULT_STATUS_FILTERS
     return st.session_state
 
 def get_jobs_df() -> pd.DataFrame:
     return get_session().jobs_df
+
+
+
+
 
 def get_filtered_jobs_df() -> pd.DataFrame:
     return get_session().filtered_jobs
