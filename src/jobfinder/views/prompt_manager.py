@@ -117,6 +117,31 @@ def get_selected_data() -> List[Dict]:
     
     return validation
 
+def validate_prompt(prompt: str) -> Dict[str, any]:
+    """Basic validation of the prompt"""
+    validation = {
+        'is_valid': True,
+        'warnings': [],
+        'stats': {
+            'word_count': len(prompt.split()),
+            'char_count': len(prompt),
+            'line_count': len(prompt.split('\n')),
+            'paragraph_count': len([p for p in prompt.split('\n\n') if p.strip()])
+        }
+    }
+    
+    # Check for common issues
+    if len(prompt) < 50:
+        validation['warnings'].append("Prompt seems very short")
+    if len(prompt) > 10000:
+        validation['warnings'].append("Prompt is very long - consider breaking it down")
+    if not prompt.strip():
+        validation['is_valid'] = False
+        validation['warnings'].append("Prompt cannot be empty")
+    
+    return validation
+
+
 # Main UI
 st.title("🤖 System Prompt Manager")
 st.markdown("Manage and update system prompts with version control and validation")
