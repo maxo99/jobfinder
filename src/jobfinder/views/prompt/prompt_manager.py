@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-from jobfinder.views.prompt import edit_prompt, prompt_analytics, template_builder
+from jobfinder.views.prompt import edit_prompt, prompt_analytics, prompt_executor
 from jobfinder.views.prompt.constants import PRESET_TEMPLATES, SAMPLE_DATA
 
 # Page configuration
@@ -106,4 +106,4 @@ with tab3:
         st.info("No versions saved yet. Save your first version in the Edit tab!")
 
 with tab4:
-    template_builder.render()
+    prompt_executor.render()

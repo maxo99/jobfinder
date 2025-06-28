@@ -1,10 +1,17 @@
 
 import streamlit as st
 
+from jobfinder.views.prompt.constants import TEMPLATE_HELP_MD
 from jobfinder.views.prompt.helpers import save_prompt_version, validate_prompt
 
 
 def render():
+    
+    
+    with st.expander("📖 Template Help & Variables"):
+
+        st.markdown(TEMPLATE_HELP_MD)
+    
     col1, col2 = st.columns([2, 1])
 
     with col1:

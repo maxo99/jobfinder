@@ -2,56 +2,16 @@ import streamlit as st
 from typing import Dict
 from jinja2 import Template
 
+from jobfinder.views.prompt.constants import TEMPLATE_HELP_MD
 from jobfinder.views.prompt.helpers import get_selected_data
 
 
-
-
-
-
-
-
-
-
-
 def render():
-    st.subheader("🔧 Template Builder")
+    st.subheader("🔧 Prompt Executor")
 
     st.markdown(
         "Select instructions from the data table and generate system prompts using Jinja2 templates"
     )
-    
-    with st.expander("📖 Template Help & Variables"):
-
-            st.markdown("""
-            **Available Variables:**
-            - `instructions`: List of selected instruction objects
-            **Object Properties:**
-            - `instruction.instruction_id`: Unique identifier
-            - `instruction.category`: Category name
-            - `instruction.title`: Instruction title
-            - `instruction.content`: Instruction content
-            - `instruction.priority`: Priority level (1-5)
-            - `instruction.active`: Boolean active status
-            **Example Templates:**
-            ```jinja2
-            {% for instruction in instructions %}
-            ## {{ instruction.title }}
-            {{ instruction.content }}
-            {% endfor %}
-            ```
-            **Conditional Logic:**
-            ```jinja2
-            {% for instruction in instructions %}
-            {% if instruction.priority >= 3 %}
-            ⭐ HIGH PRIORITY: {{ instruction.title }}
-            {% endif %}
-            {{ instruction.content }}
-            {% endfor %}
-            ```
-            """)
-
-
 
 
     col_data, col_template = st.columns([1, 1])
@@ -59,59 +19,8 @@ def render():
     with col_data:
         st.subheader("📊 Available Instructions")
 
-        # # Data management section
-        # with st.expander("🔧 Data Management"):
-        #     with st.form("add_instruction"):
-        #         new_id = st.text_input("Instruction ID")
-        #         new_category = st.text_input("Category")
-        #         new_title = st.text_input("Title")
-        #         new_content = st.text_area("Content", height=100)
-        #         new_priority = st.selectbox("Priority", [1, 2, 3, 4, 5])
-        #         new_active = st.checkbox("Active", value=True)
-
-        #         if st.form_submit_button("Add Instruction"):
-        #             if new_id and new_category and new_title and new_content:
-        #                 new_row = pd.DataFrame({
-        #                     'instruction_id': [new_id],
-        #                     'category': [new_category],
-        #                     'title': [new_title],
-        #                     'content': [new_content],
-        #                     'priority': [new_priority],
-        #                     'active': [new_active]
-        #                 })
-        #                 st.session_state.template_data = pd.concat([st.session_state.template_data, new_row], ignore_index=True)
-        #                 st.success("✅ Instruction added!")
-        #                 st.rerun()
-        #             else:
-        #                 st.error("Please fill in all required fields")
-
         # Display and selection
         df_display = st.session_state.template_data.copy()
-
-        # Filters
-        st.markdown("**Filters:**")
-        filter_col1, filter_col2 = st.columns(2)
-
-        with filter_col1:
-            category_filter = st.multiselect(
-                "Filter by Category",
-                options=df_display['category'].unique(),
-                default=df_display['category'].unique()
-            )
-
-        with filter_col2:
-            active_filter = st.selectbox(
-                "Filter by Status", ["All", "Active Only", "Inactive Only"])
-
-        # Apply filters
-        if category_filter:
-            df_display = df_display[df_display['category'].isin(
-                category_filter)]
-
-        if active_filter == "Active Only":
-            df_display = df_display[df_display['active'] == True]
-        elif active_filter == "Inactive Only":
-            df_display = df_display[df_display['active'] == False]
 
         # Selection interface
         st.markdown("**Select Instructions:**")
@@ -207,11 +116,11 @@ def render():
             st.code(rendered_prompt, language="markdown")
 
             if st.button("📋 Use for run", use_container_width=True):
-                    st.markdown("Not yet implemented")
+                st.markdown("Not yet implemented")
 
         else:
             st.info("Select instructions from the left panel to see template preview")
-            
+
 
 def _render_jinja(template_str: str, data: Dict) -> str:
     """Render Jinja2 template with provided data"""
@@ -220,5 +129,3 @@ def _render_jinja(template_str: str, data: Dict) -> str:
         return template.render(**data)
     except Exception as e:
         return f"Template Error: {str(e)}"
-
-

@@ -1,56 +1,99 @@
 import pandas as pd
 
-BASIC_LIST_TEMPLATE = """# System Instructions
-{% for instruction in instructions %}
-- {{ instruction.title }}: {{ instruction.content }}
-{% endfor %}"""
 
-CATEGORIZED_TEMPLATE = """# System Instructions
-{% set categories = instructions | groupby('category') %}
-{% for category, items in categories %}
-## {{ category }}
-{% for instruction in items %}
-- **{{ instruction.title }}**: {{ instruction.content }}
+PROMPT_V1 = """# 
+Review the following job listing for comparison against 
+user reviewed existing records. 
+## Listing:
+### Title: {{listing.title}}
+### Company: {{listing.company}}
+### Description: {{listing.description}}
+
+### Existing Records:
+{% for record in records %}
+### Title: {{record.title}}
+### Company: {{record.company}}
+### Description: {{record.description}}
+### Pros: {{record.pros}}
+### Cons: {{record.cons}}
+### Score: {{record.score}}
 {% endfor %}
-{% endfor %}"""
 
-PRIORITY_BASED_TEMPLATE = """# System Instructions
-{% for instruction in instructions | sort(attribute='priority', reverse=true) %}
-{% if instruction.priority >= 3 %}⭐ {% endif %}**{{ instruction.title }}**
-{{ instruction.content }}
-{% endfor %}"""
-
-DETAILED_FORMAT_TEMPLATE = """# System Instructions
-{% for instruction in instructions %}
-## {{ instruction.category }}: {{ instruction.title }}
-**Instruction ID:** {{ instruction.instruction_id }}
-**Priority:** {{ instruction.priority }}/5
-**Status:** {{ "Active" if instruction.active else "Inactive" }}
-### Content:
-{{ instruction.content }}
----
-{% endfor %}"""
+"""
 
 PRESET_TEMPLATES = {
-    "Basic List": BASIC_LIST_TEMPLATE,
-    "Categorized": CATEGORIZED_TEMPLATE,
-    "Priority Based": PRIORITY_BASED_TEMPLATE,
-    "Detailed Format": DETAILED_FORMAT_TEMPLATE,
+    "Prompt V1": PROMPT_V1,
 }
 
 
 
 SAMPLE_DATA = pd.DataFrame({
-        'instruction_id': ['inst_001', 'inst_002', 'inst_003', 'inst_004', 'inst_005'],
-        'category': ['CATEGORY_1', 'CATEGORY_2', 'CATEGORY_3', 'CATEGORY_4', 'CATEGORY_5'],
-        'title': ['TITLE_1', 'TITLE_2', 'TITLE_3', 'TITLE_4', 'TITLE_5'],
+        'instruction_id': [
+            'inst_001', 
+            'inst_002', 
+            'inst_003', 
+            'inst_004', 
+            'inst_005',
+            'inst_006',
+            'inst_007',
+            ],
+        'category': [
+            'CATEGORY_1', 
+            'CATEGORY_2',
+            'CATEGORY_3',
+            'CATEGORY_4', 
+            'CATEGORY_5',
+            'CATEGORY_6',
+            'CATEGORY_7',
+            ],
+        'title': [
+            'TITLE_1',
+            'TITLE_2',
+            'TITLE_3',
+            'TITLE_4',
+            'TITLE_5',
+            'TITLE_6',
+            'TITLE_7',
+            ],
         'content': [
             'CONTENT_1',
             'CONTENT_2',
             'CONTENT_3',
             'CONTENT_4',
-            'CONTENT_5'
+            'CONTENT_5',
+            'CONTENT_6',
+            'CONTENT_7'
         ],
-        'priority': [1, 2, 3, 2, 1],
-        'active': [True, True, False, True, True]
+        'priority': [1, 2, 3, 2, 1, 3, 4],
+        'active': [True, True, False, True, True, False, True]
     })
+
+
+
+TEMPLATE_HELP_MD = """
+            **Available Variables:**
+            - `instructions`: List of selected instruction objects
+            **Object Properties:**
+            - `instruction.instruction_id`: Unique identifier
+            - `instruction.category`: Category name
+            - `instruction.title`: Instruction title
+            - `instruction.content`: Instruction content
+            - `instruction.priority`: Priority level (1-5)
+            - `instruction.active`: Boolean active status
+            **Example Templates:**
+            ```jinja2
+            {% for instruction in instructions %}
+            ## {{ instruction.title }}
+            {{ instruction.content }}
+            {% endfor %}
+            ```
+            **Conditional Logic:**
+            ```jinja2
+            {% for instruction in instructions %}
+            {% if instruction.priority >= 3 %}
+            ⭐ HIGH PRIORITY: {{ instruction.title }}
+            {% endif %}
+            {{ instruction.content }}
+            {% endfor %}
+            ```
+            """
