@@ -24,14 +24,14 @@ if 'template_data' not in st.session_state:
     # Sample data - replace with your actual data source
     st.session_state.template_data = pd.DataFrame({
         'instruction_id': ['inst_001', 'inst_002', 'inst_003', 'inst_004', 'inst_005'],
-        'category': ['Safety', 'Coding', 'Analysis', 'Creative', 'Support'],
-        'title': ['Content Safety Guidelines', 'Code Review Standards', 'Data Analysis Protocol', 'Creative Writing Style', 'Customer Support Tone'],
+        'category': ['CATEGORY_1', 'CATEGORY_2', 'CATEGORY_3', 'CATEGORY_4', 'CATEGORY_5'],
+        'title': ['TITLE_1', 'TITLE_2', 'TITLE_3', 'TITLE_4', 'TITLE_5'],
         'content': [
-            'Always prioritize user safety and avoid generating harmful content.',
-            'Follow PEP 8 standards and include comprehensive comments in code.',
-            'Provide step-by-step analysis with clear reasoning and evidence.',
-            'Use vivid imagery and engaging narrative structure in creative writing.',
-            'Maintain professional, empathetic tone in all customer interactions.'
+            'CONTENT_1',
+            'CONTENT_2',
+            'CONTENT_3',
+            'CONTENT_4',
+            'CONTENT_5'
         ],
         'priority': [1, 2, 3, 2, 1],
         'active': [True, True, False, True, True]
@@ -117,6 +117,7 @@ def get_selected_data() -> List[Dict]:
     
     return validation
 
+
 def validate_prompt(prompt: str) -> Dict[str, any]:
     """Basic validation of the prompt"""
     validation = {
@@ -140,7 +141,6 @@ def validate_prompt(prompt: str) -> Dict[str, any]:
         validation['warnings'].append("Prompt cannot be empty")
     
     return validation
-
 
 # Main UI
 st.title("🤖 System Prompt Manager")
@@ -307,10 +307,6 @@ with tab3:
     else:
         st.info("No versions saved yet. Save your first version in the Edit tab!")
 
-# Footer
-st.markdown("---")
-st.markdown("💡 **Tips:** Save versions before making major changes • Use descriptive version names • Export important prompts as backups • Use Template Builder for dynamic prompts")
-
 with tab4:
     st.subheader("🔧 Template Builder")
     st.markdown("Select instructions from the data table and generate system prompts using Jinja2 templates")
@@ -457,6 +453,10 @@ with tab4:
                 st.session_state.selected_instructions = []
                 st.rerun()
     
+    
+    
+    
+    
     with col_template:
         st.subheader("📝 Template Configuration")
         
@@ -589,3 +589,4 @@ with tab4:
         if st.button("📥 Load Preset", use_container_width=True):
             st.session_state.prompt_template = preset_templates[selected_preset]
             st.rerun()
+
