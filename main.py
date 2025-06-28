@@ -2,7 +2,7 @@ import pandas as pd
 from jobfinder import DATA_DIR, st, __version__
 import logging
 from jobfinder.utils import get_now
-from jobfinder.views import data_management, find_jobs, individual_job_details, listings_overview
+from jobfinder.views import data_management, find_jobs, individual_job_details, listings_overview, scoring_util
 from jobfinder.utils.persistence import load_existing_data, update_results
 
 
@@ -43,10 +43,11 @@ def main():
     # Main content area
     if not st.session_state.jobs_df.empty:
         # Create tabs
-        tab1, tab2, tab3 = st.tabs(
+        tab1, tab2, tab3, tab4 = st.tabs(
             [
                 "📊 Job Overview",
                 "📋 Job Details",
+                "🤖 Scoring Util",
                 "⚙️ Data Management"
             ]
         )
@@ -60,6 +61,10 @@ def main():
             individual_job_details.render()
 
         with tab3:
+            st.header("Job Scoring Utility")
+            scoring_util.render()
+
+        with tab4:
             st.header("Data Management")
             data_management.render()
 
