@@ -1,5 +1,5 @@
 import pandas as pd
-from jobfinder import DATA_DIR, st, __version__
+from jobfinder import DATA_DIR, reset_filtered_jobs_df, st, __version__
 import logging
 from jobfinder.constants import PRESET_TEMPLATES
 from jobfinder.model import DEFAULT_STATUS_FILTERS
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def _init_session():
+    logger.info("Initializing session")
     if 'jobs_df' not in st.session_state:
         st.session_state.jobs_df = pd.DataFrame()
     if 'job_data_file' not in st.session_state:
@@ -20,8 +21,7 @@ def _init_session():
     if st.session_state.jobs_df.empty:
         st.session_state.jobs_df = load_existing_data()
 
-    if 'filtered_jobs' not in st.session_state:
-        st.session_state.filtered_jobs = st.session_state.jobs_df.copy()
+
 
     if 'saved_prompts' not in st.session_state:
         st.session_state.saved_prompts = PRESET_TEMPLATES
@@ -37,6 +37,10 @@ def _init_session():
         st.session_state.title_filters = []
     if 'status_filters' not in st.session_state:
         st.session_state.status_filters = DEFAULT_STATUS_FILTERS
+
+    if 'filtered_jobs' not in st.session_state:
+        reset_filtered_jobs_df()
+
 
 
 def main():

@@ -1,7 +1,7 @@
 from enum import Enum
 import pandas as pd
 import logging
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import date
 from typing import Optional, Self
 
@@ -50,7 +50,7 @@ class FoundJob(_FoundJob):
     status: Status | None = None
     pros: str | None = None
     cons: str | None = None
-    score: int | None = None
+    score: float | None = Field(min=0.0,max=10.0,default=None)
     date_scraped: str | None = None
     #
     #
@@ -93,13 +93,21 @@ class FoundJob(_FoundJob):
             return Status.NEW
         else:
             return Status(s)
+        
+    
+    # @field_validator('score')
+    # def validate_score(cls, s):
+    #     if s is None or pd.isna(s):
+    #         return 5.0
+    #     else:
+    #         return s
 
     @classmethod
     def from_dict(cls, data: dict) -> Self | None:
         try:
             return cls.model_validate(data)
         except Exception as e:
-            logger.error(f"Failed to convert data:{data} e:{e}")
+            logger.error(f"Failed to convert data e:{e}")
             return None
 
     def get_details(self, long: bool = True) -> str:

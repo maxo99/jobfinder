@@ -1,5 +1,5 @@
 import logging
-from jobfinder import get_filtered_jobs_df, get_jobs_df, get_session, get_status_filter, get_title_filters, set_filtered_jobs_df, set_status_filter, set_title_filters, st, update_jobs_df
+from jobfinder import apply_status_filters, apply_title_filters, get_filtered_jobs_df, get_jobs_df, get_session, get_status_filter, get_title_filters, set_filtered_jobs_df, set_status_filter, set_title_filters, st, update_jobs_df
 from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, Status
 from jobfinder.utils.persistence import save_data
 
@@ -58,7 +58,6 @@ def render():
     logger.info("Rendering Listings Overview")
 
     with st.expander("Filters"):
-        # Apply filters
 
         _selected_status = st.multiselect(
             "Status",
@@ -68,16 +67,12 @@ def render():
         if _selected_status:
             logger.info(f"Applying status filter: {_selected_status}")
             set_status_filter(_selected_status)
-            # filtered_df = filtered_df[filtered_df['status'].isin(
-            #     get_status_filter())]
-            # set_filtered_jobs_df(filtered_df)
+            apply_status_filters(get_filtered_jobs_df())
 
         if st.button("Reset Status Filters"):
             logger.info("Resetting status filters to defaults.")
             set_status_filter(DEFAULT_STATUS_FILTERS)
-            # filtered_df = filtered_df[filtered_df['status'].isin(
-            #     get_status_filter())]
-            # set_filtered_jobs_df(filtered_df)
+            apply_status_filters(get_filtered_jobs_df())
 
         new_titles = st.text_input(
             "Titles Filter (comma-separated)",
@@ -87,27 +82,28 @@ def render():
             logger.info(f"Adding title filters: {new_titles}")
             new_titles = [t.strip() for t in new_titles.split(',')]
             set_title_filters([*get_title_filters(), *new_titles])
-            # filtered_df = filtered_df[filtered_df['title'].str.contains(
-            #     '|'.join(get_title_filters()), case=False, na=False
-            # )]
+            apply_title_filters(get_filtered_jobs_df())
+
 
         if st.button("Clear Title Filters"):
             logger.info("Clearing title filters.")
             set_title_filters([])
-            # filtered_df = filtered_df[filtered_df['title'].str.contains(
-            #     '|'.join(get_title_filters()), case=False, na=False
-            # )]
-            # set_filtered_jobs_df(filtered_df)
-            st.success("Title filters cleared!")
+            apply_title_filters(get_filtered_jobs_df())
         st.write(f"Current Title Filters:{','.join(get_title_filters())}")
 
-    filtered_df = get_jobs_df().copy()
-    filtered_df = filtered_df[filtered_df['status'].isin(
-        get_status_filter())]
-    filtered_df = filtered_df[filtered_df['title'].str.contains(
-        '|'.join(get_title_filters()), case=False, na=False
-    )]
-    set_filtered_jobs_df(filtered_df)
+    # _df = get_filtered_jobs_df()
+    # # filtered_df = get_jobs_df().copy()
+    # # filtered_df = filtered_df[filtered_df['status'].isin(
+    # #     get_status_filter())]
+    # # filtered_df = filtered_df[filtered_df['title'].str.contains(
+    # #     '|'.join(get_title_filters()), case=False, na=False
+    # # )]
+    # # set_filtered_jobs_df(filtered_df)
+
+
+
+    _group_operations()
+
 
     _total, _filtered = st.columns(2)
     with _total:
@@ -119,7 +115,6 @@ def render():
 
     _display_stats()
 
-    _group_operations(filtered_df)
 
 
 def _display_data():
@@ -135,14 +130,14 @@ def _display_data():
         st.info("No jobs match the current filters.")
 
 
-def _group_operations(filtered_df):
+def _group_operations():
     st.subheader("Group Operations")
 
     _save_changes, _col_refresh = st.columns(2)
     with _save_changes:
         if st.button("💾 Save Changes"):
             # Update the original dataframe with the changes
-            update_jobs_df(filtered_df)
+            update_jobs_df(get_filtered_jobs_df())
             save_data(get_jobs_df())
             st.success("Changes saved successfully!")
             logger.info("Changes saved successfully!")
@@ -158,18 +153,20 @@ def _group_operations(filtered_df):
     with _set_status:
         new_status = st.selectbox("Select Status", options=STATUS_OPTIONS)
         if st.button("Set Status"):
-            filtered_df['status'] = new_status
             st.success(f"Status updated to {new_status} for selected jobs.")
+            filtered_df = get_filtered_jobs_df()
+            filtered_df['status'] = new_status
             set_filtered_jobs_df(filtered_df)
-            st.rerun()
+            # st.rerun()
 
     with _set_pros:
         new_pros = st.text_area("Enter Pros")
         if st.button("Set Pros"):
-            filtered_df['pros'] = new_pros
             st.success(f"Pros updated for selected jobs.")
+            filtered_df = get_filtered_jobs_df()
+            filtered_df['pros'] = new_pros
             set_filtered_jobs_df(filtered_df)
-            st.rerun()
+            # st.rerun()
 
     _set_score, _set_cons = st.columns([0.2, 0.8])
     with _set_score:
@@ -182,18 +179,20 @@ def _group_operations(filtered_df):
         )
 
         if st.button("Set Score"):
-            filtered_df['score'] = new_score
             st.success(f"Score updated to {new_score} for selected jobs.")
+            filtered_df = get_filtered_jobs_df()
+            filtered_df['score'] = new_score
             set_filtered_jobs_df(filtered_df)
-            st.rerun()
+            # st.rerun()
 
     with _set_cons:
         new_cons = st.text_area("Enter Cons")
         if st.button("Set Cons"):
+            filtered_df = get_filtered_jobs_df()
             filtered_df['cons'] = new_cons
             st.success(f"Cons updated for selected jobs.")
             set_filtered_jobs_df(filtered_df)
-            st.rerun()
+            # st.rerun()
 
 
 def _display_stats():

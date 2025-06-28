@@ -1,6 +1,7 @@
-
+import json
 
 from jobfinder import get_session, st, get_jobs_df
+from jobfinder.adapters.chat import completions
 from jobfinder.model import FoundJob
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
 from jinja2 import Template
@@ -62,7 +63,6 @@ def render():
             # Get selected data
             selected_data = get_selected_records()
 
-
             # selection_mode = st.radio(
             #     "Template Preview Mode",
             #     ["Populate All", "Ignore Description"],
@@ -72,15 +72,26 @@ def render():
             # Render template
             rendered_prompt = _render_jinja(
                 st.session_state.current_prompt,
-                {'records': selected_data,
-                 'listing': _found_jobs[_key].model_dump()}
+                {
+                    'records': selected_data,
+                    'listing': _found_jobs[_key].model_dump()
+                }
             )
 
             # Show preview
             st.code(rendered_prompt, language="markdown")
 
-            if st.button("📋 Use for run", use_container_width=True):
-                st.markdown("Not yet implemented")
+            if st.button("Generate Score", use_container_width=True):
+
+                _completion = completions(rendered_prompt)
+                _content=_completion.choices[0].message.content
+                st.code(_content)
+                _x = json.loads(_content)
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Prompt Tokens",_completion.usage.prompt_tokens)
+                with col2:
+                    st.metric("Total Tokens",_completion.usage.total_tokens)
 
         else:
             st.info("Select records from the left panel to see template preview")

@@ -75,6 +75,7 @@ def _actions(job: FoundJob, idx: int):
     # Delete button
     if st.button("🗑️ Delete Job", key=f"delete_{idx}", type="secondary"):
         _delete(idx)
+        st.rerun()
 
 
 def _delete(idx):

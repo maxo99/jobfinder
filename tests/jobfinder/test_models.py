@@ -2,7 +2,6 @@
 
 import pytest
 import pandas as pd
-
 from jobfinder import DATA_DIR
 from jobfinder.model import FoundJob
 from jobfinder.utils.persistence import validate_defaults

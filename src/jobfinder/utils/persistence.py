@@ -47,4 +47,4 @@ def validate_defaults(df):
     if 'cons' not in df.columns:
         df['cons'] = ''
     if 'score' not in df.columns:
-        df['score'] = ''
+        df['score'] = None
