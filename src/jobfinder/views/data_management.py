@@ -1,6 +1,6 @@
 import os
 import logging
-from pandas import DataFrame
+import pandas as pd
 from jobfinder import get_jobs_df, get_job_data_file, st
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data, validate_defaults
@@ -17,9 +17,23 @@ def render():
 
 
 def _manage_data():
-    _col_export_data, _col_clear_data = st.columns(2)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.subheader("Import Data")
+        uploaded_csv = st.file_uploader("Upload CSV file", type=['csv'])
+        if uploaded_csv is not None:
+            try:
+                # TODO: Verify logic, maybe append vs overwrite?
+                new_data = pd.DataFrame(pd.read_csv(uploaded_csv))
+                st.session_state.jobs_df = new_data
+                validate_defaults(st.session_state.jobs_df)
+                save_data(st.session_state.jobs_df)
+                st.success("✅ Data uploaded successfully!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error loading CSV: {str(e)}")
 
-    with _col_export_data:
+    with col2:
         st.subheader("Export Data")
         if st.button("📥 Download CSV"):
             csv_data = st.session_state.jobs_df.to_csv(index=False)
@@ -30,10 +44,10 @@ def _manage_data():
                 mime="text/csv"
             )
 
-    with _col_clear_data:
+    with col3:
         st.subheader("Clear Data")
         if st.button("🗑️ Clear All Data"):
-            st.session_state.jobs_df = DataFrame()
+            st.session_state.jobs_df = pd.DataFrame()
             if os.path.exists(get_job_data_file()):
                 os.remove(get_job_data_file())
                 logger.info(f"Cleared : {get_job_data_file()}")
