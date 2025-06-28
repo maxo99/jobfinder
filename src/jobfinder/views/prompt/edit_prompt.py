@@ -23,7 +23,22 @@ def render():
         st.session_state.current_prompt = prompt_text
 
         # Action buttons
-        col_save, col_load, col_clear = st.columns(3)
+        col_load, col_save = st.columns(2)
+
+        with col_load:
+
+            selected_preset = st.selectbox(
+                "Choose a preset template:",
+                list(st.session_state.saved_prompts.keys())
+            )
+
+            if st.button("📥 Load Preset", use_container_width=True):
+                st.session_state.current_prompt = st.session_state.saved_prompts[selected_preset]
+                st.rerun()
+
+            if st.button("🗑️ Clear", use_container_width=True):
+                st.session_state.current_prompt = ""
+                st.rerun()
 
         with col_save:
             description = st.text_input("Version Description (optional)",
@@ -34,20 +49,6 @@ def render():
                 else:
                     st.info("ℹ️ This prompt version already exists")
 
-        with col_load:
-            st.markdown("**Load from file:**")
-            uploaded_file = st.file_uploader(
-                "Choose a text file", type=['txt', 'md'])
-            if uploaded_file is not None:
-                content = uploaded_file.read().decode('utf-8')
-                st.session_state.current_prompt = content
-                st.rerun()
-
-        with col_clear:
-            st.markdown("**Actions:**")
-            if st.button("🗑️ Clear", use_container_width=True):
-                st.session_state.current_prompt = ""
-                st.rerun()
 
     with col2:
         st.subheader("Validation & Stats")

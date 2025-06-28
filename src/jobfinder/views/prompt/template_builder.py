@@ -5,11 +5,19 @@ from typing import Dict, List, Optional
 import hashlib
 from jinja2 import Template, Environment, BaseLoader
 
-from jobfinder.views.prompt.helpers import save_prompt_version
+from jobfinder.views.prompt.helpers import get_selected_data, save_prompt_version
 
 
 
-def render(get_selected_data):
+
+
+
+
+
+
+
+
+def render():
     st.subheader("🔧 Template Builder")
 
     st.markdown(
@@ -48,7 +56,7 @@ def render(get_selected_data):
 
 
 
-    # Split into columns
+
     col_data, col_template = st.columns([1, 1])
 
     with col_data:
@@ -185,22 +193,7 @@ def render(get_selected_data):
                 st.rerun()
 
     with col_template:
-        st.subheader("📝 Template Configuration")
 
-        # Template editor
-        template_text = st.text_area(
-            "Jinja2 Template",
-            value=st.session_state.prompt_template,
-            height=300,
-            help="Use Jinja2 syntax. Available variables: instructions (list of selected instruction objects)"
-        )
-
-        st.session_state.prompt_template = template_text
-
-
-
-
-        # Template preview
         st.subheader("👀 Template Preview")
 
         if st.session_state.selected_instructions:
@@ -208,8 +201,8 @@ def render(get_selected_data):
             selected_data = get_selected_data()
 
             # Render template
-            rendered_prompt = _render_template(
-                st.session_state.prompt_template,
+            rendered_prompt = _render_jinja(
+                st.session_state.current_prompt,
                 {'instructions': selected_data}
             )
 
@@ -234,19 +227,9 @@ def render(get_selected_data):
 
         else:
             st.info("Select instructions from the left panel to see template preview")
+            
 
-        # Template presets
-        st.subheader("📋 Template Presets")
-
-        selected_preset = st.selectbox(
-            "Choose a preset template:", list(PRESET_TEMPLATES.keys()))
-
-        if st.button("📥 Load Preset", use_container_width=True):
-            st.session_state.prompt_template = PRESET_TEMPLATES[selected_preset]
-            st.rerun()
-
-
-def _render_template(template_str: str, data: Dict) -> str:
+def _render_jinja(template_str: str, data: Dict) -> str:
     """Render Jinja2 template with provided data"""
     try:
         template = Template(template_str)
@@ -255,32 +238,3 @@ def _render_template(template_str: str, data: Dict) -> str:
         return f"Template Error: {str(e)}"
 
 
-PRESET_TEMPLATES = {
-    "Basic List": """# System Instructions
-{% for instruction in instructions %}
-- {{ instruction.title }}: {{ instruction.content }}
-{% endfor %}""",
-    "Categorized": """# System Instructions
-{% set categories = instructions | groupby('category') %}
-{% for category, items in categories %}
-## {{ category }}
-{% for instruction in items %}
-- **{{ instruction.title }}**: {{ instruction.content }}
-{% endfor %}
-{% endfor %}""",
-    "Priority Based": """# System Instructions
-{% for instruction in instructions | sort(attribute='priority', reverse=true) %}
-{% if instruction.priority >= 3 %}⭐ {% endif %}**{{ instruction.title }}**
-{{ instruction.content }}
-{% endfor %}""",
-    "Detailed Format": """# System Instructions
-{% for instruction in instructions %}
-## {{ instruction.category }}: {{ instruction.title }}
-**Instruction ID:** {{ instruction.instruction_id }}
-**Priority:** {{ instruction.priority }}/5
-**Status:** {{ "Active" if instruction.active else "Inactive" }}
-### Content:
-{{ instruction.content }}
----
-{% endfor %}"""
-}

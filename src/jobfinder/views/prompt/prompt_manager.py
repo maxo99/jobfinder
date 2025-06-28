@@ -6,7 +6,8 @@ from typing import Dict, List, Optional
 import hashlib
 from jinja2 import Template, Environment, BaseLoader
 
-from jobfinder.views.prompt import edit_prompt, template_builder
+from jobfinder.views.prompt import edit_prompt, prompt_analytics, template_builder
+from jobfinder.views.prompt.constants import PRESET_TEMPLATES
 from jobfinder.views.prompt.helpers import save_prompt_version
 
 # Page configuration
@@ -19,10 +20,16 @@ st.set_page_config(
 # Initialize session state
 if 'prompt_history' not in st.session_state:
     st.session_state.prompt_history = []
-if 'current_prompt' not in st.session_state:
-    st.session_state.current_prompt = ""
+    
 if 'saved_prompts' not in st.session_state:
-    st.session_state.saved_prompts = {}
+    st.session_state.saved_prompts = PRESET_TEMPLATES
+    
+if 'current_prompt' not in st.session_state:
+    st.session_state.current_prompt = next(
+        iter(st.session_state.saved_prompts.values()), ""
+    )
+    
+    
 if 'template_data' not in st.session_state:
     # Sample data - replace with your actual data source
     st.session_state.template_data = pd.DataFrame({
@@ -39,20 +46,13 @@ if 'template_data' not in st.session_state:
         'priority': [1, 2, 3, 2, 1],
         'active': [True, True, False, True, True]
     })
+
+
+
 if 'selected_instructions' not in st.session_state:
     st.session_state.selected_instructions = []
-if 'prompt_template' not in st.session_state:
-    st.session_state.prompt_template = """# System Instructions
 
-You are an AI assistant with the following guidelines:
 
-{% for instruction in instructions %}
-## {{ instruction.category }}: {{ instruction.title }}
-{{ instruction.content }}
-
-{% endfor %}
-
-Please follow these instructions carefully in all interactions."""
 
 
 
@@ -66,18 +66,6 @@ def load_prompt_from_history(version_id: str):
 
 
 
-def get_selected_data() -> List[Dict]:
-    """Get selected instruction data as list of dictionaries"""
-    if not st.session_state.selected_instructions:
-        return []
-
-    selected_df = st.session_state.template_data[
-        st.session_state.template_data['instruction_id'].isin(
-            st.session_state.selected_instructions)
-    ]
-    return selected_df.to_dict('records')
-
-
 
 
 # Main UI
@@ -88,45 +76,16 @@ st.markdown(
 
 # Create tabs
 tab1, tab2, tab3, tab4 = st.tabs(
-    ["📝 Edit Prompt", "📊 Analytics", "📚 History", "🔧 Template Builder"])
+    ["📝 Edit Prompt", 
+     "📊 Analytics", 
+     "📚 History", 
+     "🔧 Template Builder"]
+    )
 
 with tab1:
     edit_prompt.render()
 with tab2:
-    st.subheader("📊 Prompt Analytics")
-
-    if st.session_state.prompt_history:
-        # Create analytics data
-        history_data = []
-        for i, version in enumerate(st.session_state.prompt_history):
-            history_data.append({
-                'Version': f"v{len(st.session_state.prompt_history) - i}",
-                'Date': datetime.fromisoformat(version['timestamp']).strftime('%Y-%m-%d %H:%M'),
-                'Words': version['word_count'],
-                'Characters': version['char_count'],
-                'Description': version['description'] or 'No description'
-            })
-
-        # Display as dataframe
-        st.dataframe(history_data, use_container_width=True)
-
-        # Charts
-        if len(history_data) > 1:
-            col_chart1, col_chart2 = st.columns(2)
-
-            with col_chart1:
-                st.subheader("Word Count Trend")
-                st.line_chart(data=[v['word_count'] for v in reversed(
-                    st.session_state.prompt_history)])
-
-            with col_chart2:
-                st.subheader("Character Count Trend")
-                st.line_chart(data=[v['char_count'] for v in reversed(
-                    st.session_state.prompt_history)])
-    else:
-        st.info(
-            "No prompt versions saved yet. Save a version in the Edit tab to see analytics.")
-
+    prompt_analytics.render()
 with tab3:
     st.subheader("📚 Version History")
 
@@ -166,4 +125,4 @@ with tab3:
         st.info("No versions saved yet. Save your first version in the Edit tab!")
 
 with tab4:
-    template_builder.render(get_selected_data)
+    template_builder.render()

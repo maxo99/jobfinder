@@ -49,3 +49,18 @@ def validate_prompt(prompt: str) -> Dict[str, any]:
         validation['warnings'].append("Prompt cannot be empty")
 
     return validation
+
+
+
+
+
+def get_selected_data() -> List[Dict]:
+    """Get selected instruction data as list of dictionaries"""
+    if not st.session_state.selected_instructions:
+        return []
+
+    selected_df = st.session_state.template_data[
+        st.session_state.template_data['instruction_id'].isin(
+            st.session_state.selected_instructions)
+    ]
+    return selected_df.to_dict('records')
