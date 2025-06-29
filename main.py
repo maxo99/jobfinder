@@ -1,22 +1,46 @@
 import pandas as pd
-from jobfinder import DATA_DIR, st, __version__
+from jobfinder import DATA_DIR, reset_filtered_jobs_df, st, __version__
 import logging
+from jobfinder.constants import PRESET_TEMPLATES
+from jobfinder.model import DEFAULT_STATUS_FILTERS
 from jobfinder.utils import get_now
-from jobfinder.views import data_management, find_jobs, individual_job_details, listings_overview
+from jobfinder.views import data_management, find_jobs, individual_job_details, listings_overview, scoring_util
 from jobfinder.utils.persistence import load_existing_data, update_results
 
 
 logger = logging.getLogger(__name__)
 
+
 def _init_session():
+    logger.info("Initializing session")
     if 'jobs_df' not in st.session_state:
         st.session_state.jobs_df = pd.DataFrame()
     if 'job_data_file' not in st.session_state:
-        st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
+        st.session_state.job_data_file = str(
+            DATA_DIR.joinpath('jobs_data.csv'))
     if st.session_state.jobs_df.empty:
         st.session_state.jobs_df = load_existing_data()
+
+
+
+    if 'saved_prompts' not in st.session_state:
+        st.session_state.saved_prompts = PRESET_TEMPLATES
+
+    if 'current_prompt' not in st.session_state:
+        st.session_state.current_prompt = next(
+            iter(st.session_state.saved_prompts.values()), ""
+        )
+    if 'selected_records' not in st.session_state:
+        st.session_state.selected_records = []
+
+    if 'title_filters' not in st.session_state:
+        st.session_state.title_filters = []
+    if 'status_filters' not in st.session_state:
+        st.session_state.status_filters = DEFAULT_STATUS_FILTERS
+
     if 'filtered_jobs' not in st.session_state:
-        st.session_state.filtered_jobs = st.session_state.jobs_df.copy()
+        reset_filtered_jobs_df()
+
 
 
 def main():
@@ -43,10 +67,11 @@ def main():
     # Main content area
     if not st.session_state.jobs_df.empty:
         # Create tabs
-        tab1, tab2, tab3 = st.tabs(
+        tab1, tab2, tab3, tab4 = st.tabs(
             [
                 "📊 Job Overview",
                 "📋 Job Details",
+                "🤖 Scoring Util",
                 "⚙️ Data Management"
             ]
         )
@@ -60,6 +85,10 @@ def main():
             individual_job_details.render()
 
         with tab3:
+            st.header("Job Scoring Utility")
+            scoring_util.render()
+
+        with tab4:
             st.header("Data Management")
             data_management.render()
 

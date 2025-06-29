@@ -16,7 +16,6 @@ def render():
         _found_jobs = {
             i: FoundJob.from_dict(d.to_dict())
             for i, d in get_jobs_df().iterrows()
-            if FoundJob.from_dict(d.to_dict())
         }
 
         _key = st.selectbox(
@@ -76,6 +75,7 @@ def _actions(job: FoundJob, idx: int):
     # Delete button
     if st.button("🗑️ Delete Job", key=f"delete_{idx}", type="secondary"):
         _delete(idx)
+        st.rerun()
 
 
 def _delete(idx):
