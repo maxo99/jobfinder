@@ -15,6 +15,13 @@ can be managed and analyzed with [Streamlit](https://streamlit.io/).
 
 ## Usage
 
+### Configuration
+- To add additional configurations, create .env in root of repository directory.
+- To enable scoring using chat completions model, add to .env:
+` OPENAI_KEY = {YOUR_KEY} `
+- To set OpenAI chat completions model, add to .env:
+` OPENAI_MODEL = {MODEL } `
+
 ### Development
 #### Setup
 `uv add --editable --dev jobfinder`
