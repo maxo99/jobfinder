@@ -1,12 +1,65 @@
 # CHANGELOG
 
 
+## v0.3.0 (2025-06-29)
+
+### Bug Fixes
+
+- **prompt**: Adding missing validation method
+  ([`cd6dae2`](https://github.com/maxo99/jobfinder/commit/cd6dae2a60a88c96b0b5828c245633b0d5fb516d))
+
+### Code Style
+
+- Updating display organization and including version in footer
+  ([`20bc2d4`](https://github.com/maxo99/jobfinder/commit/20bc2d4be744cb77ad51b27d04a90caa5854db65))
+
+### Features
+
+- **prompt**: Cleanup
+  ([`d7195dd`](https://github.com/maxo99/jobfinder/commit/d7195ddb6731d840ea2fb6b5627af2debc073873))
+
+- **prompt**: Implementing prompt construction for automated scoring handled by OpenAI completions
+  ([`3c43a21`](https://github.com/maxo99/jobfinder/commit/3c43a21a503b086e9aff0582f224b95240bbd132))
+
+- **prompt**: Initial input
+  ([`6c2fb10`](https://github.com/maxo99/jobfinder/commit/6c2fb10509b5a76f88afd2bd81405ddafa340463))
+
+- **prompt**: Organization
+  ([`6c2e6d4`](https://github.com/maxo99/jobfinder/commit/6c2e6d49ffe5f8460a35af617b48e706b3f8c4a5))
+
+- **prompt**: Organization
+  ([`449eed9`](https://github.com/maxo99/jobfinder/commit/449eed997e185ffd586b32b87a7aa3ad0ebe2a46))
+
+- **prompt**: Rework progress
+  ([`c9ec28a`](https://github.com/maxo99/jobfinder/commit/c9ec28ada9400fbe77251782af9df3c9197ecd50))
+
+- **prompt**: Scoring util page
+  ([`2141b41`](https://github.com/maxo99/jobfinder/commit/2141b4135248d8ed976b553413e9fdd0a3a777e3))
+
+- **prompt**: Structure and organization
+  ([`92bb920`](https://github.com/maxo99/jobfinder/commit/92bb920ef6cca776485784ea6d411c7046434c58))
+
+- **prompt**: Style
+  ([`2636e8f`](https://github.com/maxo99/jobfinder/commit/2636e8f07b7ae9903eeecc98a24a58a84d083483))
+
+- **prompt**: Templating logic
+  ([`21879a3`](https://github.com/maxo99/jobfinder/commit/21879a3c63a9abab55b5e43868d74d525b36a0d1))
+
+
 ## v0.2.1 (2025-06-27)
 
 ### Bug Fixes
 
 - **stats**: Reintegrating statistics and updates to listings display
   ([`b2217f3`](https://github.com/maxo99/jobfinder/commit/b2217f33e34e45a6a44236d1eee89f916706c6e6))
+
+### Chores
+
+- Adding MIT License
+  ([`abd98c4`](https://github.com/maxo99/jobfinder/commit/abd98c437ee43aca74f9984caf1b19b027f1613a))
+
+- Adding VSCode launch config for debugging
+  ([`371217c`](https://github.com/maxo99/jobfinder/commit/371217c3a7f092e736dd8cfc0e829804d91cd9b5))
 
 
 ## v0.2.0 (2025-06-27)
