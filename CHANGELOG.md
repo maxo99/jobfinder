@@ -1,6 +1,25 @@
 # CHANGELOG
 
 
+## v0.4.0 (2025-06-30)
+
+### Chores
+
+- Using gitkeep for data dir
+  ([`8f704c8`](https://github.com/maxo99/jobfinder/commit/8f704c89fbdbeef0c501814f3dd0e160c984e636))
+
+### Documentation
+
+- Adding configuration of chat model to readme
+  ([`def729b`](https://github.com/maxo99/jobfinder/commit/def729b82873592295f0e239730f3672f99d5a9a))
+
+### Features
+
+- Inclusion of field classifier to track who scored + modified column for last edit + fixes to
+  loading in individual job details page
+  ([`3c2bbc8`](https://github.com/maxo99/jobfinder/commit/3c2bbc836c9b16f57f8c9573dff37c5f85a4f40d))
+
+
 ## v0.3.0 (2025-06-29)
 
 ### Bug Fixes
