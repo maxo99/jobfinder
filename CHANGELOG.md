@@ -1,6 +1,9 @@
 # CHANGELOG
 
 
+## v0.5.0 (2025-06-30)
+
+
 ## v0.4.0 (2025-06-30)
 
 ### Chores
@@ -14,6 +17,9 @@
   ([`def729b`](https://github.com/maxo99/jobfinder/commit/def729b82873592295f0e239730f3672f99d5a9a))
 
 ### Features
+
+- Adding exclusions to job pulling for is_remote & job_type
+  ([`353ff63`](https://github.com/maxo99/jobfinder/commit/353ff6351d356de952a46f48f0d520b472e0a4f4))
 
 - Inclusion of field classifier to track who scored + modified column for last edit + fixes to
   loading in individual job details page
