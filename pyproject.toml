@@ -7,8 +7,9 @@ requires-python = ">=3.11"
 dependencies = [
     "openai>=1.93.0",
     "pandas>=2.3.0",
- "python-jobspy>=1.1.80",
- "streamlit>=1.46.0",
+    "python-jobspy>=1.1.80",
+    "streamlit>=1.46.0",
+    "watchtower>=3.4.0",
 ]
 
 [build-system]

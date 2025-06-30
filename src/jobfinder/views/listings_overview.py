@@ -68,7 +68,7 @@ def render():
             default=DEFAULT_STATUS_FILTERS,
         )
         if _selected_status:
-            logger.info(f"Applying status filter: {_selected_status}")
+            # logger.info(f"Applying status filter: {_selected_status}")
             set_status_filter(_selected_status)
             apply_status_filters(get_filtered_jobs_df())
 

@@ -5,42 +5,45 @@ import logging
 from pathlib import Path
 import streamlit as st
 import pandas as pd
-from jobfinder.model import DEFAULT_STATUS_FILTERS
-
+import watchtower
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT.joinpath("data")
 
-_lvl_string = os.environ.get("LOG_LEVEL", 'DEBUG')
-_level = getattr(logging, _lvl_string)
-_log_formatter = logging.Formatter(
-    fmt="%(asctime)s %(levelname)s [%(name)-12s]:%(message)s",
-    datefmt="%m-%d %H:%M"
-)
 
-_file_handler = logging.FileHandler(DATA_DIR.joinpath('out.log'))
-_file_handler.setFormatter(_log_formatter)
+def _setup_logging():
+    
 
-_console_handler = logging.StreamHandler(sys.stdout)
-_console_handler.setFormatter(_log_formatter)
+    _lvl_string = os.environ.get("LOG_LEVEL", 'DEBUG')
+    _level = getattr(logging, _lvl_string)
+    _log_formatter = logging.Formatter(
+        fmt="%(asctime)s %(levelname)s [%(name)-12s]:%(message)s",
+        datefmt="%m-%d %H:%M"
+    )
+    st._update_logger
+    _file_handler = logging.FileHandler(DATA_DIR.joinpath('out.log'))
+    _file_handler.setFormatter(_log_formatter)
 
-logging.basicConfig(
-    level=_level, handlers=[_file_handler, _console_handler]
-)
+    _console_handler = logging.StreamHandler(sys.stdout)
+    _console_handler.setFormatter(_log_formatter)
+
+
+    # _access_key = os.environ.get('AWS_ACCESS_KEY_ID','')
+    # if _access_key:
+    #     _secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY",'')
+
+    logging.basicConfig(
+        level=_level, handlers=[
+            _file_handler, 
+            _console_handler,
+            watchtower.CloudWatchLogHandler()
+            ]
+    )
+
+_setup_logging()
 
 
 def get_session():
-    # # TODO: Remove defaults from here since they are set in main.py
-    # if 'jobs_df' not in st.session_state:
-    #     st.session_state.jobs_df = pd.DataFrame()
-    # if 'job_data_file' not in st.session_state:
-    #     st.session_state.job_data_file = str(DATA_DIR.joinpath('jobs_data.csv'))
-
-    # # TODO: Remove defaults from here since they are set in main.py
-    # if 'title_filters' not in st.session_state:
-    #     st.session_state.title_filters = []
-    # if 'status_filters' not in st.session_state:
-    #     st.session_state.status_filters = DEFAULT_STATUS_FILTERS
     return st.session_state
 
 
