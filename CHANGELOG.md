@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.6.0 (2025-06-30)
+
+### Features
+
+- **logging**: Inclusion of watchtower for posting logs to cloudwatch
+  ([`2e10ce2`](https://github.com/maxo99/jobfinder/commit/2e10ce2a2ed6ec66cb6cfadaa9135b5b1506fd51))
+
+
 ## v0.5.0 (2025-06-30)
 
 
