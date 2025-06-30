@@ -1,5 +1,5 @@
 import logging
-from jobfinder import apply_status_filters, apply_title_filters, get_filtered_jobs_df, get_jobs_df, get_session, get_status_filter, get_title_filters, set_filtered_jobs_df, set_status_filter, set_title_filters, st, update_jobs_df
+from jobfinder import apply_status_filters, apply_title_filters, get_filtered_jobs_df, get_jobs_df, get_session, get_status_filter, get_title_filters, set_filtered_jobs_df, set_status_filter, set_title_filters, st
 from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, Classifier, Status
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data
@@ -104,7 +104,10 @@ def render():
     # # set_filtered_jobs_df(filtered_df)
 
 
-
+    _filtered_df = get_filtered_jobs_df()
+    apply_status_filters(_filtered_df)
+    apply_title_filters(_filtered_df)
+    set_filtered_jobs_df(_filtered_df)
     _group_operations()
 
 
