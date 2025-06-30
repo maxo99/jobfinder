@@ -1,6 +1,7 @@
 import logging
 from jobfinder import apply_status_filters, apply_title_filters, get_filtered_jobs_df, get_jobs_df, get_session, get_status_filter, get_title_filters, set_filtered_jobs_df, set_status_filter, set_title_filters, st, update_jobs_df
-from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, Status
+from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, Classifier, Status
+from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data
 
 
@@ -8,16 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 DEFAULT_COLS = [
+    'modified',
     'date_posted',
     'site',
     'company',
     'title',
-    'is_remote',
-    'job_type',
     'status',
+    'classifier',
     'score',
     'pros',
     'cons',
+    'is_remote',
+    'job_type',
 ]
 
 JOBSPY_COLS = [
@@ -137,7 +140,9 @@ def _group_operations():
     with _save_changes:
         if st.button("💾 Save Changes"):
             # Update the original dataframe with the changes
-            update_jobs_df(get_filtered_jobs_df())
+            _df = get_filtered_jobs_df()
+            _df['classifier'] = Classifier.USER.value
+            _df['modified'] = get_now()
             save_data(get_jobs_df())
             st.success("Changes saved successfully!")
             logger.info("Changes saved successfully!")

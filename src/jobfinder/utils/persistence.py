@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from jobfinder import st
+from jobfinder.model import Classifier, Status
 from jobfinder.utils import get_now
 
 
@@ -40,11 +41,15 @@ def save_data(df):
 def validate_defaults(df):
     if 'date_scraped' not in df.columns:
         df['date_scraped'] = get_now()
+    if 'modified' not in df.columns:
+        df['modified'] = get_now()
     if 'status' not in df.columns:
-        df['status'] = 'new'
+        df['status'] = Status.NEW.value
     if 'pros' not in df.columns:
         df['pros'] = ''
     if 'cons' not in df.columns:
         df['cons'] = ''
     if 'score' not in df.columns:
         df['score'] = None
+    if 'classifier' not in df.columns:
+        df['classifier'] = Classifier.NA.value

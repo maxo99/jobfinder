@@ -1,38 +1,79 @@
 import pandas as pd
 import logging
-from jobfinder.model import FoundJob, Status
-from jobfinder.utils.persistence import save_data
-from jobfinder import get_jobs_df, set_jobs_df, st
+from jobfinder.model import Classifier, FoundJob, Status
+from jobfinder.utils import get_now
+from jobfinder.utils.persistence import save_data, update_results
+from jobfinder import get_jobs_df, set_jobs_df, st, update_jobs_df
 
 logger = logging.getLogger(__name__)
 
 
 def render():
+    selection_mode = st.radio(
+        "Indivudial Record Management",
+        ["Update Existing Records", "Add New Record"],
+        horizontal=True
+    )
+    if selection_mode == "Add User Record":
+        with st.form("my_form"):
+            
+            st.write("Manually create records to use for scoring context.")
+            title = st.text_area("title")
+            pros = st.text_area("pros")
+            cons = st.text_area("cons")
+            score = st.number_input(
+                "Score (0.0 - 10.0)",
+                value=5.0,
+                min_value=float(0),
+                max_value=float(10),
+                key=f"score_new_job"
+            )
+            submit = st.form_submit_button("Submit")
+            if submit:
+                st.text("Submitted")
+                
+                _new_record = pd.DataFrame(
+                    {
+                        'id': [f"USER_CLASSIFIED_{get_now()}"],
+                        'company': ['USER_ADDED'],
+                        'title': [title],
+                        'pros':[pros],
+                        'cons':[cons],
+                        'score':[score],
+                        'classifier':[Classifier.USER.value],
+                        'modified':[get_now()]
+                    },
 
-    if not get_jobs_df().empty:
+                )
+                update_results(_new_record)
+                save_data(get_jobs_df())
+                st.success("Record added successfully!")
+                st.rerun()
+    else:
+        if not get_jobs_df().empty:
+            logger.info(f"Displaying {len(get_jobs_df().index)} Jobs")
+            # TODO: IMPROVE ORDERING/FILTERING
 
-        # TODO: IMPROVE ORDERING/FILTERING
+            _found_jobs = {
+                i: FoundJob.from_dict(d.to_dict())
+                for i, d in get_jobs_df().iterrows()
+            }
 
-        _found_jobs = {
-            i: FoundJob.from_dict(d.to_dict())
-            for i, d in get_jobs_df().iterrows()
-        }
-
-        _key = st.selectbox(
-            "Select a Job",
-            options=list(_found_jobs.keys()),
-            format_func=lambda x: _found_jobs[x].name,
-            index=0,
-        )
-        if _key:
-            logger.info(f"Selected job:{_key}: {_found_jobs[_key].name}")
-        else:
-            _key = 0
-        _col_details, _col_actions = st.columns([2, 1])
-        with _col_details:
-            _details(_found_jobs[_key])
-        with _col_actions:
-            _actions(_found_jobs[_key], _key)
+            _key = st.selectbox(
+                "Select a Job",
+                options=list(_found_jobs.keys()),
+                format_func=lambda x: _found_jobs[x].name,
+                index=0,
+            )
+            if _key:
+                logger.info(f"Selected job:{_key}: {_found_jobs[_key].name}")
+            else:
+                _key = 0
+            _col_details, _col_actions = st.columns([2, 1])
+            with _col_details:
+                _details(_found_jobs[_key])
+            with _col_actions:
+                _actions(_found_jobs[_key], _key)
 
 
 def _details(job: FoundJob):
@@ -42,11 +83,11 @@ def _details(job: FoundJob):
 def _actions(job: FoundJob, idx: int):
     st.subheader("Actions")
 
+    _current_status = job.status.value
     new_status = st.selectbox(
-        "Status",
+        "Update Status",
         options=[s.value for s in Status],
-        placeholder=job.status.value,
-        index=0,
+        index=[s.value for s in Status].index(_current_status),
         key=f"status_{idx}"
     )
     new_pros = st.text_area("Pros", value=job.pros)
@@ -68,6 +109,8 @@ def _actions(job: FoundJob, idx: int):
         get_jobs_df().loc[idx, "pros"] = new_pros
         get_jobs_df().loc[idx, "cons"] = new_cons
         get_jobs_df().loc[idx, "score"] = new_score
+        get_jobs_df().loc[idx, "classifier"] = Classifier.USER.value
+        get_jobs_df().loc[idx, "modified"] = get_now()
         save_data(get_jobs_df())
         st.success("Job updated successfully!")
         st.rerun()
@@ -83,3 +126,7 @@ def _delete(idx):
     save_data(get_jobs_df())
     st.success("Job deleted successfully!")
     st.rerun()
+
+
+def get_user_record_count():
+    return 0

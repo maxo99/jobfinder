@@ -34,6 +34,7 @@ def _manage_data():
         st.subheader("Clear Data")
         if st.button("🗑️ Clear All Data"):
             st.session_state.jobs_df = DataFrame()
+            st.session_state.filtered_jobs_df = DataFrame()
             if os.path.exists(get_job_data_file()):
                 os.remove(get_job_data_file())
                 logger.info(f"Cleared : {get_job_data_file()}")

@@ -52,7 +52,6 @@ def set_jobs_df(df):
     get_session().jobs_df = df
 
 
-
 def get_filtered_jobs_df() -> pd.DataFrame:
     return get_session().filtered_jobs
 
@@ -63,22 +62,38 @@ def set_filtered_jobs_df(df: pd.DataFrame):
 
 def reset_filtered_jobs_df():
     _df = get_jobs_df().copy()
-    apply_status_filters(_df)
-    apply_title_filters(_df)
+    if not _df.empty:
+        apply_status_filters(_df)
+        apply_title_filters(_df)
     set_filtered_jobs_df(_df)
 
+
 def apply_title_filters(_df):
-   _df =  _df[_df['title'].str.contains(
-        '|'.join(get_title_filters()), case=False, na=False)
-    ] 
+    if not _df.empty:
+        _df = _df[_df['title'].str.contains(
+            '|'.join(get_title_filters()), case=False, na=False)
+        ]
+
 
 def apply_status_filters(_df):
-    _df = _df[_df['status'].isin(get_status_filter())]
+    if not _df.empty:
+        _df = _df[_df['status'].isin(get_status_filter())]
 
 
-def update_jobs_df(df: pd.DataFrame):
-    st.session_state.jobs_df.loc[df.index, [
-        'status', 'score', 'pros', 'cons']] = df[['status', 'score', 'pros', 'cons']]
+def update_jobs_df(
+    df: pd.DataFrame,
+    update_cols: list = [
+        'status',
+        'score',
+        'pros',
+        'cons',
+        'classifier',
+        'modified',
+        ]
+):
+    st.session_state.jobs_df.loc[
+        df.index, update_cols
+    ] = df[update_cols]
 
 
 def get_job_data_file():

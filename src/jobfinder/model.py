@@ -15,6 +15,12 @@ class Status(Enum):
     APPLIED = "applied"
 # "✅""⭕"
 
+
+class Classifier(Enum):
+    USER = "👤 (User)"
+    AI = "🤖 (AI)"
+    NA = "➖ (N/A)"
+
 STATUS_OPTIONS = [s.value for s in Status]
 DEFAULT_STATUS_FILTERS = [s.value for s in Status if s != Status.EXCLUDED]
 
@@ -48,10 +54,12 @@ class FoundJob(_FoundJob):
     #
     # Custom fields
     status: Status | None = None
+    classifier: Classifier | None = None
     pros: str | None = None
     cons: str | None = None
-    score: float | None = Field(min=0.0,max=10.0,default=None)
+    score: float | None = Field(default=None,json_schema_extra=dict(min=0.0,max=10.0))
     date_scraped: str | None = None
+    modified: str | None = None
     #
     #
     #
@@ -93,6 +101,14 @@ class FoundJob(_FoundJob):
             return Status.NEW
         else:
             return Status(s)
+    
+    
+    @field_validator('classifier', mode='after')
+    def validate_classifier(cls, c):
+        if c is None or pd.isna(c):
+            return Classifier.NA
+        else:
+            return Classifier(c)
         
     
     # @field_validator('score')
