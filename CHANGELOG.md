@@ -1,12 +1,29 @@
 # CHANGELOG
 
 
+## v0.7.0 (2025-07-07)
+
+
 ## v0.6.1 (2025-07-07)
 
 ### Bug Fixes
 
 - Proper filtering of excludeds + lint cleanups
   ([`910eb1a`](https://github.com/maxo99/jobfinder/commit/910eb1a8cc15aa1795a9d2e743af5d0f89ba6125))
+
+### Features
+
+- Including summarize jobs usertype
+  ([`2522ba3`](https://github.com/maxo99/jobfinder/commit/2522ba32fc3744bb03633f71cbd1f887158a840e))
+
+- Storing job pulls as raw data to enable reloading without additional scraping calls + moving add
+  record to separate tab
+  ([`91d686c`](https://github.com/maxo99/jobfinder/commit/91d686c59c72f2ff51ac8f9124a8cfec42cf0dd2))
+
+### Refactoring
+
+- Moving add record to separate tab
+  ([`a13c97d`](https://github.com/maxo99/jobfinder/commit/a13c97db335a9820b4246d3d52b5e3e314c71cd7))
 
 
 ## v0.6.0 (2025-06-30)
