@@ -10,6 +10,7 @@ from jobfinder.views import (
     individual_job_details,
     listings_overview,
     scoring_util,
+    add_record
 )
 from jobfinder.utils.persistence import load_existing_data
 
@@ -66,28 +67,33 @@ def main():
     # Main content area
     if not st.session_state.jobs_df.empty:
         # Create tabs
-        tab1, tab2, tab3, tab4 = st.tabs(
+        jo, jd, ar, su, dm = st.tabs(
             [
                 "📊 Job Overview",
                 "📋 Job Details",
+                "➕ Add Record",
                 "🤖 Scoring Util",
                 "⚙️ Data Management",
             ]
         )
 
-        with tab1:
+        with jo:
             st.header("Job Listings Overview")
             listings_overview.render()
 
-        with tab2:
+        with jd:
             st.header("Individual Job Details")
             individual_job_details.render()
 
-        with tab3:
+        with ar:
+            st.header("Add Record")
+            add_record.render()
+
+        with su:
             st.header("Job Scoring Utility")
             scoring_util.render()
 
-        with tab4:
+        with dm:
             st.header("Data Management")
             data_management.render()
 
