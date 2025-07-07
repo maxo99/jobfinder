@@ -32,7 +32,7 @@ jobfinder = { workspace = true }
 [dependency-groups]
 dev = [
     "jobfinder",
- "pytest>=8.4.1",
+    "pytest>=8.4.1",
 ]
 
 

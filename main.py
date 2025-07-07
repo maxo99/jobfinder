@@ -11,6 +11,8 @@ from jobfinder.views import (
     listings_overview,
     scoring_util,
     add_record,
+    summarization_util,
+    display_stats,
 )
 from jobfinder.utils.persistence import load_data2
 
@@ -56,7 +58,8 @@ def main():
     # Main app
     st.title("💼 jobfinder")
     st.markdown("---")
-
+    display_stats.render()
+    
     # Sidebar for scraping configuration
     with st.sidebar:
         st.header("🔍 Find Jobs")
@@ -65,11 +68,12 @@ def main():
     # Main content area
     if not st.session_state.jobs_df.empty:
         # Create tabs
-        jo, jd, ar, su, dm = st.tabs(
+        jo, jd, ar, summ, sco, dm = st.tabs(
             [
                 "📊 Job Overview",
                 "📋 Job Details",
                 "➕ Add Record",
+                "📝 Summarization Util",
                 "🤖 Scoring Util",
                 "⚙️ Data Management",
             ],
@@ -87,7 +91,10 @@ def main():
             st.header("Add Record")
             add_record.render()
 
-        with su:
+        with summ:
+            summarization_util.render()
+
+        with sco:
             st.header("Job Scoring Utility")
             scoring_util.render()
 

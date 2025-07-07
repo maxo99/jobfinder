@@ -38,7 +38,7 @@ def render():
 
             _new_record = pd.DataFrame(
                 {
-                    "id": [f"USER_CLASSIFIED_{get_now()}"],
+                    "id": [f"USER_CREATED_{get_now()}"],
                     "company": ["USER_ADDED"],
                     "title": [title],
                     "pros": [pros],

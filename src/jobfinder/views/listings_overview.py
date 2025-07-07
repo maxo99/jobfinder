@@ -10,9 +10,7 @@ from jobfinder import (
     set_title_filters,
     st,
 )
-from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, UserType, Status
-from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data2
+from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS
 
 
 logger = logging.getLogger(__name__)
@@ -115,9 +113,26 @@ def render():
 
     _display_data()
 
-    _display_stats()
 
-    _group_operations()
+
+    # _save_changes, _col_refresh = st.columns(2)
+    # with _save_changes:
+    #     if st.button("💾 Save Changes"):
+    #         # Update the original dataframe with the changes
+    #         _df = get_filtered_jobs_df()
+    #         _df["classifier"] = UserType.USER.value
+    #         _df["summarizer"] = UserType.USER.value
+    #         _df["modified"] = get_now()
+    #         save_data2(get_jobs_df())
+    #         st.success("Changes saved successfully!")
+    #         logger.info("Changes saved successfully!")
+    #         st.rerun()
+    # with _col_refresh:
+    #     if st.button("🔄 Refresh Data"):
+    #         set_status_filter(DEFAULT_STATUS_FILTERS)
+    #         set_title_filters([])
+    #         set_filtered_jobs_df(get_jobs_df().copy())
+    #         st.rerun()
 
 
 def _display_data():
@@ -133,91 +148,4 @@ def _display_data():
         st.info("No jobs match the current filters.")
 
 
-def _group_operations():
-    st.subheader("Group Operations")
 
-    _save_changes, _col_refresh = st.columns(2)
-    with _save_changes:
-        if st.button("💾 Save Changes"):
-            # Update the original dataframe with the changes
-            _df = get_filtered_jobs_df()
-            _df["classifier"] = UserType.USER.value
-            _df["summarizer"] = UserType.USER.value
-            _df["modified"] = get_now()
-            save_data2(get_jobs_df())
-            st.success("Changes saved successfully!")
-            logger.info("Changes saved successfully!")
-            st.rerun()
-    with _col_refresh:
-        if st.button("🔄 Refresh Data"):
-            set_status_filter(DEFAULT_STATUS_FILTERS)
-            set_title_filters([])
-            set_filtered_jobs_df(get_jobs_df().copy())
-            st.rerun()
-
-    new_summary = st.text_area("Enter Summary")
-    if st.button("Set Summary"):
-        st.success("Summary updated for selected jobs.")
-        filtered_df = get_filtered_jobs_df()
-        filtered_df["summary"] = new_summary
-        set_filtered_jobs_df(filtered_df)
-        # st.rerun()
-
-    _set_status, _set_pros = st.columns([0.2, 0.8])
-    with _set_status:
-        new_status = st.selectbox("Select Status", options=STATUS_OPTIONS)
-        if st.button("Set Status"):
-            st.success(f"Status updated to {new_status} for selected jobs.")
-            filtered_df = get_filtered_jobs_df()
-            filtered_df["status"] = new_status
-            set_filtered_jobs_df(filtered_df)
-            # st.rerun()
-
-    with _set_pros:
-        new_pros = st.text_area("Enter Pros")
-        if st.button("Set Pros"):
-            st.success("Pros updated for selected jobs.")
-            filtered_df = get_filtered_jobs_df()
-            filtered_df["pros"] = new_pros
-            set_filtered_jobs_df(filtered_df)
-            # st.rerun()
-
-    _set_score, _set_cons = st.columns([0.2, 0.8])
-    with _set_score:
-        new_score = st.number_input(
-            "Score (0.0 - 10.0)",
-            value=float(5.0),
-            min_value=float(0),
-            max_value=float(10),
-            key=f"bulk_set_score",
-        )
-
-        if st.button("Set Score"):
-            st.success(f"Score updated to {new_score} for selected jobs.")
-            filtered_df = get_filtered_jobs_df()
-            filtered_df["score"] = new_score
-            set_filtered_jobs_df(filtered_df)
-            # st.rerun()
-
-    with _set_cons:
-        new_cons = st.text_area("Enter Cons")
-        if st.button("Set Cons"):
-            filtered_df = get_filtered_jobs_df()
-            filtered_df["cons"] = new_cons
-            st.success(f"Cons updated for selected jobs.")
-            set_filtered_jobs_df(filtered_df)
-            # st.rerun()
-
-
-def _display_stats():
-    st.subheader("Statistics")
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("New Jobs", _get_count_for_status(Status.NEW))
-    col2.metric("Viewed Jobs", _get_count_for_status(Status.VIEWED))
-    col3.metric("Excluded Jobs", _get_count_for_status(Status.EXCLUDED))
-    col4.metric("Applied Jobs", _get_count_for_status(Status.APPLIED))
-
-
-def _get_count_for_status(status: Status) -> int:
-    """Get the count of jobs for a specific status."""
-    return len(get_jobs_df()[get_jobs_df()["status"] == status.value])

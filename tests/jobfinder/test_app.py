@@ -6,7 +6,6 @@ from main import _init_session
 
 def test_find_jobs():
     try:
-        """A user increments the number input, then clicks Add"""
         at = AppTest.from_file("main.py",default_timeout=30).run(timeout=60)
         _init_session()
         _starting_raw_count = len(os.listdir(RAW_DATA_DIR))
