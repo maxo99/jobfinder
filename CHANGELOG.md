@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.6.1 (2025-07-07)
+
+### Bug Fixes
+
+- Proper filtering of excludeds + lint cleanups
+  ([`910eb1a`](https://github.com/maxo99/jobfinder/commit/910eb1a8cc15aa1795a9d2e743af5d0f89ba6125))
+
+
 ## v0.6.0 (2025-06-30)
 
 ### Features
