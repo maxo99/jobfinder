@@ -53,3 +53,5 @@ def validate_defaults(df):
         df['score'] = None
     if 'classifier' not in df.columns:
         df['classifier'] = Classifier.NA.value
+    df['date_posted'] = df['date_posted'].astype(str)
+    

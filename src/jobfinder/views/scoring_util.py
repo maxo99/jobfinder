@@ -1,12 +1,12 @@
 import json
+import logging
+from jinja2 import Template
 
-from jobfinder import get_session, st, get_jobs_df
+from jobfinder import st, get_jobs_df
 from jobfinder.adapters import chat
 from jobfinder.adapters.chat import completions
-from jobfinder.model import FoundJob
+from jobfinder.model import found_jobs_from_df
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
-from jinja2 import Template
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,7 @@ def render():
         )
 
         st.subheader("Select Listing")
-        _found_jobs = {
-            i: FoundJob.from_dict(d.to_dict())
-            for i, d in get_jobs_df().iterrows()
-        }
+        _found_jobs = found_jobs_from_df(get_jobs_df())
 
         _key = st.selectbox(
             "Select a Listing",
@@ -44,19 +41,24 @@ def render():
         df_display = get_jobs_df().copy()
         selection_df = df_display[DISPLAY_COLS].copy()
 
-        selected_rows = st.dataframe(
-            selection_df,
-            use_container_width=True,
-            on_select="rerun",
-            column_order=DEFAULT_COLS,
-            selection_mode="multi-row"
-        )
-
-        if selected_rows and 'selection' in selected_rows and 'rows' in selected_rows['selection']:
-            selected_indices = selected_rows['selection']['rows']
-            set_selected_data(
-                [selection_df.iloc[i]['id'] for i in selected_indices]
+        try:
+            selected_rows = st.dataframe(
+                selection_df,
+                use_container_width=True,
+                on_select="rerun",
+                column_order=DEFAULT_COLS,
+                selection_mode="multi-row"
             )
+            
+            if selected_rows and 'selection' in selected_rows and 'rows' in selected_rows['selection']:
+                selected_indices = selected_rows['selection']['rows']
+                set_selected_data(
+                    [selection_df.iloc[i]['id'] for i in selected_indices]
+                )
+        except Exception as e:
+            logger.error("Error rendering dataframe: %s", e)
+            st.error("Error rendering dataframe. Please check the logs.")
+
 
         st.subheader("👀 Template Preview")
 

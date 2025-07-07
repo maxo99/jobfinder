@@ -1,4 +1,5 @@
 __version__ = "0.6.0"
+
 import os
 import sys
 import logging
@@ -12,33 +13,30 @@ DATA_DIR = PROJECT_ROOT.joinpath("data")
 
 
 def _setup_logging():
-    
-
-    _lvl_string = os.environ.get("LOG_LEVEL", 'DEBUG')
+    _lvl_string = os.environ.get("LOG_LEVEL", "INFO")
     _level = getattr(logging, _lvl_string)
     _log_formatter = logging.Formatter(
-        fmt="%(asctime)s %(levelname)s [%(name)-12s]:%(message)s",
-        datefmt="%m-%d %H:%M"
+        fmt="%(asctime)s %(levelname)s [%(name)-12s]:%(message)s", datefmt="%m-%d %H:%M"
     )
-    st._update_logger
-    _file_handler = logging.FileHandler(DATA_DIR.joinpath('out.log'))
+    _handlers = []
+    _file_handler = logging.FileHandler(DATA_DIR.joinpath("out.log"))
     _file_handler.setFormatter(_log_formatter)
-
+    _handlers.append(_file_handler)
     _console_handler = logging.StreamHandler(sys.stdout)
     _console_handler.setFormatter(_log_formatter)
-
-
-    # _access_key = os.environ.get('AWS_ACCESS_KEY_ID','')
-    # if _access_key:
-    #     _secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY",'')
-
-    logging.basicConfig(
-        level=_level, handlers=[
-            _file_handler, 
-            _console_handler,
-            watchtower.CloudWatchLogHandler()
-            ]
+    _handlers.append(_console_handler)
+    _handlers.extend(
+        [_file_handler, _console_handler, watchtower.CloudWatchLogHandler()]
     )
+
+    if os.environ.get("AWS_ACCESS_KEY_ID", "") and os.environ.get(
+        "AWS_SECRET_ACCESS_KEY", ""
+    ):
+        # If AWS credentials are set, we can use CloudWatch logging
+        _handlers.append(watchtower.CloudWatchLogHandler())
+
+    logging.basicConfig(level=_level, handlers=_handlers)
+
 
 _setup_logging()
 
@@ -73,30 +71,32 @@ def reset_filtered_jobs_df():
 
 def apply_title_filters(_df):
     if not _df.empty:
-        _df = _df[_df['title'].str.contains(
-            '|'.join(get_title_filters()), case=False, na=False)
-        ]
+        set_filtered_jobs_df(_df[
+            _df["title"].str.contains(
+                "|".join(get_title_filters()), case=False, na=False
+            )
+        ])
 
 
 def apply_status_filters(_df):
     if not _df.empty:
-        _df = _df[_df['status'].isin(get_status_filter())]
+        set_filtered_jobs_df(_df[_df["status"].isin(get_status_filter())])
 
 
-def update_jobs_df(
-    df: pd.DataFrame,
-    update_cols: list = [
-        'status',
-        'score',
-        'pros',
-        'cons',
-        'classifier',
-        'modified',
-        ]
-):
-    st.session_state.jobs_df.loc[
-        df.index, update_cols
-    ] = df[update_cols]
+_DEFAULT_UPDATE_COLS = [
+    "status",
+    "score",
+    "pros",
+    "cons",
+    "classifier",
+    "modified",
+]
+
+
+def update_jobs_df(df: pd.DataFrame, update_cols: list | None = None):
+    if update_cols is None:
+        update_cols = _DEFAULT_UPDATE_COLS
+    st.session_state.jobs_df.loc[df.index, update_cols] = df[update_cols]
 
 
 def get_job_data_file():

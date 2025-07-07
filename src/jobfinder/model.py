@@ -1,9 +1,9 @@
-from enum import Enum
-import pandas as pd
 import logging
-from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import date
-from typing import Optional, Self
+from enum import Enum
+from typing import Self
+import pandas as pd
+from pydantic import BaseModel, Field, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -13,16 +13,16 @@ class Status(Enum):
     VIEWED = "viewed"
     EXCLUDED = "excluded"
     APPLIED = "applied"
-# "✅""⭕"
-
 
 class Classifier(Enum):
     USER = "👤 (User)"
     AI = "🤖 (AI)"
     NA = "➖ (N/A)"
 
+
 STATUS_OPTIONS = [s.value for s in Status]
 DEFAULT_STATUS_FILTERS = [s.value for s in Status if s != Status.EXCLUDED]
+
 
 class _FoundJob(BaseModel):
     listing_type: str | None = None
@@ -46,18 +46,18 @@ class FoundJob(_FoundJob):
     job_url_direct: str | None = None
     title: str | None = None
     company: str | None = None
-    date_posted: date | None = None
-    description: str | None = None
+    date_posted: str | None = None
+    description: str | None = ""
     #
     location: str | None = None
     is_remote: bool | None = None
     #
     # Custom fields
-    status: Status | None = None
+    status: Status = Status.NEW
     classifier: Classifier | None = None
     pros: str | None = None
     cons: str | None = None
-    score: float | None = Field(default=None,json_schema_extra=dict(min=0.0,max=10.0))
+    score: float | None = Field(default=None, json_schema_extra=dict(min=0.0, max=10.0))
     date_scraped: str | None = None
     modified: str | None = None
     #
@@ -88,29 +88,46 @@ class FoundJob(_FoundJob):
     def salary(self) -> str:
         return f"{self.min_amount} - {self.max_amount} {self.currency}"
 
-    @field_validator('*', mode='before')
+    @field_validator("*", mode="before")
+    @classmethod
     def allow_none(cls, v):
         if v is None or pd.isna(v):
             return None
         else:
             return v
 
-    @field_validator('status', mode='after')
+    # @field_validator('status', mode='after')
+    # def validate_status(cls, s):
+    #     if s is None or pd.isna(s):
+    #         return Status.NEW
+    #     else:
+    #         return Status(s)
+
+    @field_validator("status", mode="after")
+    @classmethod
     def validate_status(cls, s):
         if s is None or pd.isna(s):
             return Status.NEW
         else:
             return Status(s)
-    
-    
-    @field_validator('classifier', mode='after')
+
+    @field_validator("date_posted", mode="after")
+    @classmethod
+    def validate_date_posted(cls, s):
+        if s is None or pd.isna(s):
+            return "N/A"
+        elif isinstance(s, date):
+            return s.strftime("%Y-%m-%d")
+        return s
+
+    @field_validator("classifier", mode="after")
+    @classmethod
     def validate_classifier(cls, c):
         if c is None or pd.isna(c):
             return Classifier.NA
         else:
             return Classifier(c)
-        
-    
+
     # @field_validator('score')
     # def validate_score(cls, s):
     #     if s is None or pd.isna(s):
@@ -124,7 +141,17 @@ class FoundJob(_FoundJob):
             return cls.model_validate(data)
         except Exception as e:
             logger.error(f"Failed to convert data e:{e}")
-            return None
+            return cls.model_validate(
+                dict(
+                    id=data.get("id"),
+                    site=data.get("site"),
+                    job_url=data.get("job_url"),
+                    job_url_direct=data.get("job_url_direct"),
+                    title=data.get("title"),
+                    company=data.get("company"),
+                    date_posted=data.get("date_posted"),
+                )
+            )
 
     def get_details(self, long: bool = True) -> str:
         _d = [
@@ -138,13 +165,12 @@ class FoundJob(_FoundJob):
         if self.job_url:
             _d.append(f"**{self.site} URL:** [ Job]({self.job_url})")
         if self.job_url_direct:
-            _d.append(
-                f"**{self.company} URL:** [{self.title}]({self.job_url_direct})")
+            _d.append(f"**{self.company} URL:** [{self.title}]({self.job_url_direct})")
         if self.description:
-            _d.append(f"## **Description:** ")
+            _d.append("## **Description:** ")
             if long:
                 _d.append(self.description)
-                
+
             else:
                 _d.append(
                     self.description[:1000] + "..."
@@ -154,52 +180,12 @@ class FoundJob(_FoundJob):
         return "  \n  ".join(_d)
 
 
-# class Compensation(BaseModel):
-#     interval: Optional[CompensationInterval] = None
-#     min_amount: float | None = None
-#     max_amount: float | None = None
-#     currency: Optional[str] = "USD"
+def found_jobs_from_df(df: pd.DataFrame) -> dict[int, FoundJob]:
+    """Convert a DataFrame to a list of FoundJob instances."""
+    jobs = dict()
+    for i, row in df.iterrows():
+        job = FoundJob.from_dict(row.to_dict())
+        if job:
+            jobs[i] = job
+    return jobs
 
-# class JobPost(BaseModel):
-#     id: str | None = None
-#     title: str
-#     company_name: str | None
-#     job_url: str
-#     job_url_direct: str | None = None
-#     location: Optional[str]
-
-#     description: str | None = None
-#     company_url: str | None = None
-#     company_url_direct: str | None = None
-
-#     job_type: list[str] | None = None
-#     compensation: Compensation | None = None
-#     date_posted: date | None = None
-#     emails: list[str] | None = None
-#     is_remote: bool | None = None
-#     listing_type: str | None = None
-
-#     # LinkedIn specific
-#     job_level: str | None = None
-
-#     # LinkedIn and Indeed specific
-#     company_industry: str | None = None
-
-#     # Indeed specific
-#     company_addresses: str | None = None
-#     company_num_employees: str | None = None
-#     company_revenue: str | None = None
-#     company_description: str | None = None
-#     company_logo: str | None = None
-#     banner_photo_url: str | None = None
-
-#     # LinkedIn only atm
-#     job_function: str | None = None
-
-#     # Naukri specific
-#     # skills: list[str] | None = None  #from tagsAndSkills
-#     # experience_range: str | None = None  #from experienceText
-#     # company_rating: float | None = None  #from ambitionBoxData.AggregateRating
-#     # company_reviews_count: int | None = None  #from ambitionBoxData.ReviewsCount
-#     # vacancy_count: int | None = None  #from vacancy
-#     # work_from_home_type: str | None = None  #from clusters.wfhType (e.g., "Hybrid", "Remote")

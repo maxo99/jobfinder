@@ -3,7 +3,6 @@ import pandas as pd
 from jobspy import scrape_jobs
 
 from jobfinder.model import Status
-from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data, update_results, validate_defaults
 from jobfinder import st
 
@@ -32,10 +31,11 @@ def render():
         if not new_jobs.empty:
             st.metric("Pulled Jobs",len(new_jobs.index))
             if exclude_remote:
-                
-                
-                new_jobs.loc[new_jobs.is_remote == False, 'status'] = Status.EXCLUDED.value
-                
+                new_jobs.loc[
+                    ~new_jobs.is_remote,
+                    'status'
+                ] = Status.EXCLUDED.value
+
                 # if not _rem_df.empty:
                 #     new_jobs = new_jobs.loc[~new_jobs.index.isin(_rem_df.index)]
                 #     st.metric("Excluded (remote)",len(_rem_df.index))

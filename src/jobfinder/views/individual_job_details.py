@@ -1,9 +1,9 @@
-import pandas as pd
 import logging
-from jobfinder.model import Classifier, FoundJob, Status
+import pandas as pd
+from jobfinder.model import Classifier, FoundJob, Status, found_jobs_from_df
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data, update_results
-from jobfinder import get_jobs_df, set_jobs_df, st, update_jobs_df
+from jobfinder import get_jobs_df, set_jobs_df, st
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ def render():
         ["Update Existing Records", "Add New Record"],
         horizontal=True
     )
-    if selection_mode == "Add User Record":
+    if selection_mode == "Add New Record":
         with st.form("my_form"):
             
             st.write("Manually create records to use for scoring context.")
@@ -26,7 +26,7 @@ def render():
                 value=5.0,
                 min_value=float(0),
                 max_value=float(10),
-                key=f"score_new_job"
+                key="score_new_job"
             )
             submit = st.form_submit_button("Submit")
             if submit:
@@ -54,10 +54,7 @@ def render():
             logger.info(f"Displaying {len(get_jobs_df().index)} Jobs")
             # TODO: IMPROVE ORDERING/FILTERING
 
-            _found_jobs = {
-                i: FoundJob.from_dict(d.to_dict())
-                for i, d in get_jobs_df().iterrows()
-            }
+            _found_jobs = found_jobs_from_df(get_jobs_df())
 
             _key = st.selectbox(
                 "Select a Job",
