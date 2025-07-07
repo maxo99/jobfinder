@@ -3,7 +3,7 @@ import pandas as pd
 from jobspy import scrape_jobs
 
 from jobfinder.model import Status
-from jobfinder.utils.persistence import save_data, update_results, validate_defaults
+from jobfinder.utils.persistence import save_data2, update_results, validate_defaults
 from jobfinder import st
 
 SITES = ['indeed', 'linkedin']
@@ -21,7 +21,7 @@ def render():
     fulltime_only = st.checkbox("Fulltime Only", value=True)
 
     # Scrape button
-    if st.button("🚀 Scrape Jobs", type="primary"):
+    if st.button("🚀 Scrape Jobs", type="primary", key='scrape_job'):
         new_jobs = _find_jobs(
             site_name=site_name,
             search_term=search_term,
@@ -30,6 +30,7 @@ def render():
         )
         if not new_jobs.empty:
             st.metric("Pulled Jobs",len(new_jobs.index))
+            save_data2(new_jobs, state="raw")
             if exclude_remote:
                 new_jobs.loc[
                     ~new_jobs.is_remote,
@@ -54,7 +55,7 @@ def render():
             else:
                 st.session_state.jobs_df = new_jobs
 
-            save_data(st.session_state.jobs_df)
+            save_data2(st.session_state.jobs_df)
             st.rerun()
 
 

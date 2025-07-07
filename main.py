@@ -1,6 +1,6 @@
 import logging
 import pandas as pd
-from jobfinder import DATA_DIR, reset_filtered_jobs_df, st, __version__
+from jobfinder import reset_filtered_jobs_df, st, __version__
 from jobfinder.constants import PRESET_TEMPLATES
 from jobfinder.model import DEFAULT_STATUS_FILTERS
 from jobfinder.utils import get_now
@@ -12,7 +12,7 @@ from jobfinder.views import (
     scoring_util,
     add_record
 )
-from jobfinder.utils.persistence import load_existing_data
+from jobfinder.utils.persistence import load_data2
 
 
 logger = logging.getLogger(__name__)
@@ -22,11 +22,9 @@ def _init_session():
     logger.info("Initializing session")
     if "jobs_df" not in st.session_state:
         st.session_state.jobs_df = pd.DataFrame()
-    if "job_data_file" not in st.session_state:
-        st.session_state.job_data_file = str(DATA_DIR.joinpath("jobs_data.csv"))
-    
+
     if st.session_state.jobs_df.empty:
-        st.session_state.jobs_df = load_existing_data()
+        st.session_state.jobs_df = load_data2()
 
     if "saved_prompts" not in st.session_state:
         st.session_state.saved_prompts = PRESET_TEMPLATES
@@ -74,7 +72,8 @@ def main():
                 "➕ Add Record",
                 "🤖 Scoring Util",
                 "⚙️ Data Management",
-            ]
+            ],
+            
         )
 
         with jo:

@@ -30,7 +30,10 @@ members = ["jobfinder"]
 jobfinder = { workspace = true }
 
 [dependency-groups]
-dev = ["jobfinder", "pytest>=8.4.1"]
+dev = [
+    "jobfinder",
+ "pytest>=8.4.1",
+]
 
 
 [tool.pytest.ini_options]

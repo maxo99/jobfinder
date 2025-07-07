@@ -4,8 +4,6 @@ from jobfinder import (
     apply_title_filters,
     get_filtered_jobs_df,
     get_jobs_df,
-    get_session,
-    get_status_filter,
     get_title_filters,
     set_filtered_jobs_df,
     set_status_filter,
@@ -14,7 +12,7 @@ from jobfinder import (
 )
 from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, Classifier, Status
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data
+from jobfinder.utils.persistence import save_data2
 
 
 logger = logging.getLogger(__name__)
@@ -108,7 +106,6 @@ def render():
     apply_status_filters(_filtered_df)
     apply_title_filters(_filtered_df)
     set_filtered_jobs_df(_filtered_df)
-    _group_operations()
 
     _total, _filtered = st.columns(2)
     with _total:
@@ -119,6 +116,9 @@ def render():
     _display_data()
 
     _display_stats()
+
+    _group_operations()
+
 
 
 def _display_data():
@@ -144,7 +144,7 @@ def _group_operations():
             _df = get_filtered_jobs_df()
             _df["classifier"] = Classifier.USER.value
             _df["modified"] = get_now()
-            save_data(get_jobs_df())
+            save_data2(get_jobs_df())
             st.success("Changes saved successfully!")
             logger.info("Changes saved successfully!")
             st.rerun()
@@ -168,7 +168,7 @@ def _group_operations():
     with _set_pros:
         new_pros = st.text_area("Enter Pros")
         if st.button("Set Pros"):
-            st.success(f"Pros updated for selected jobs.")
+            st.success("Pros updated for selected jobs.")
             filtered_df = get_filtered_jobs_df()
             filtered_df["pros"] = new_pros
             set_filtered_jobs_df(filtered_df)

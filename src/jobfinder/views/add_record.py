@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 from jobfinder.model import Classifier
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data, update_results
+from jobfinder.utils.persistence import save_data2, update_results,validate_defaults
 from jobfinder import get_jobs_df, st
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,8 @@ def render():
                     "modified": [get_now()],
                 },
             )
+            validate_defaults(_new_record)
             update_results(_new_record)
-            save_data(get_jobs_df())
+            save_data2(get_jobs_df())
             st.success("Record added successfully!")
             st.rerun()

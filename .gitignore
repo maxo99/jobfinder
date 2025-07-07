@@ -1,5 +1,5 @@
 ### CUSTOM
-*data/jobs_data.csv
+*data/**/*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

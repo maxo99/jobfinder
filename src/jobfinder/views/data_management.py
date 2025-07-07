@@ -1,16 +1,16 @@
 import os
 import logging
 from pandas import DataFrame
-from jobfinder import get_jobs_df, get_job_data_file, st
+from jobfinder import get_jobs_df, st, JOBS_DATA_FILE
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data, validate_defaults
+from jobfinder.utils.persistence import save_data2, validate_defaults,update_results
 
 logger = logging.getLogger(__name__)
 
 
 def render():
     st.subheader("Data File")
-    st.write(f"Current data file: `{get_job_data_file()}`")
+    st.write(f"Current data file: `{JOBS_DATA_FILE.name}`")
 
     _manage_data()
     _bulk_actions()
@@ -35,11 +35,11 @@ def _manage_data():
         if st.button("🗑️ Clear All Data"):
             st.session_state.jobs_df = DataFrame()
             st.session_state.filtered_jobs_df = DataFrame()
-            if os.path.exists(get_job_data_file()):
-                os.remove(get_job_data_file())
-                logger.info(f"Cleared : {get_job_data_file()}")
+            if os.path.exists(JOBS_DATA_FILE):
+                os.remove(JOBS_DATA_FILE)
+                logger.info(f"Cleared : {JOBS_DATA_FILE}")
             else:
-                logger.warning(f"File not exists:{get_job_data_file()}")
+                logger.warning(f"File not exists:{JOBS_DATA_FILE}")
             st.success("All data cleared!")
             st.rerun()
 
@@ -52,6 +52,7 @@ def _bulk_actions():
     with col1:
         if st.button("Mark All as new"):
             validate_defaults(get_jobs_df())
-            save_data(get_jobs_df())
+            update_results(get_jobs_df())
+            save_data2(get_jobs_df())
             st.success("All jobs marked as new!")
             st.rerun()

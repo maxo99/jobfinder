@@ -10,6 +10,13 @@ import watchtower
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT.joinpath("data")
+RAW_DATA_DIR = DATA_DIR.joinpath("raw")
+JOBS_DATA_FILE = DATA_DIR.joinpath("jobs_data.csv")
+if not DATA_DIR.exists():
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+if not RAW_DATA_DIR.exists():
+    RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 
 
 def _setup_logging():
@@ -99,8 +106,7 @@ def update_jobs_df(df: pd.DataFrame, update_cols: list | None = None):
     st.session_state.jobs_df.loc[df.index, update_cols] = df[update_cols]
 
 
-def get_job_data_file():
-    return get_session().job_data_file
+
 
 
 def get_title_filters():
@@ -126,5 +132,4 @@ __all__ = (
     "get_session",
     "get_jobs_df",
     "set_jobs_df",
-    "get_job_data_file",
 )
