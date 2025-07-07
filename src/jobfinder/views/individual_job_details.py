@@ -1,5 +1,5 @@
 import logging
-from jobfinder.model import Classifier, FoundJob, Status, found_jobs_from_df
+from jobfinder.model import UserType, FoundJob, Status, found_jobs_from_df
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
 from jobfinder import get_jobs_df, set_jobs_df, st
@@ -56,7 +56,8 @@ def _actions(job: FoundJob, idx: int):
     )
     new_pros = st.text_area("Pros", value=job.pros)
     new_cons = st.text_area("Cons", value=job.cons)
-
+    new_summary = st.text_area("Summary", value=job.summary)
+    
     new_score = st.number_input(
         "Score (0.0 - 10.0)",
         value=job.score,
@@ -64,6 +65,16 @@ def _actions(job: FoundJob, idx: int):
         max_value=float(10),
         key=f"score_{idx}"
     )
+    
+    if new_pros != job.pros or new_cons != job.cons or new_score != job.score:
+        _classifier = UserType.USER.value
+    else:
+        _classifier = UserType(job.classifier).value
+    if new_summary != job.summary:
+        _summarizer = UserType.USER.value
+    else:
+        _summarizer = UserType(job.summarizer).value
+    
 
     if st.button("💾 Update Job"):
         # Automatically set to VIEWED if NEW
@@ -73,7 +84,9 @@ def _actions(job: FoundJob, idx: int):
         get_jobs_df().loc[idx, "pros"] = new_pros
         get_jobs_df().loc[idx, "cons"] = new_cons
         get_jobs_df().loc[idx, "score"] = new_score
-        get_jobs_df().loc[idx, "classifier"] = Classifier.USER.value
+        get_jobs_df().loc[idx, "summary"] = new_summary
+        get_jobs_df().loc[idx, "classifier"] = _classifier
+        get_jobs_df().loc[idx, "summarizer"] = _summarizer
         get_jobs_df().loc[idx, "modified"] = get_now()
         save_data2(get_jobs_df())
         st.success("Job updated successfully!")

@@ -10,7 +10,7 @@ from jobfinder.views import (
     individual_job_details,
     listings_overview,
     scoring_util,
-    add_record
+    add_record,
 )
 from jobfinder.utils.persistence import load_data2
 
@@ -73,7 +73,6 @@ def main():
                 "🤖 Scoring Util",
                 "⚙️ Data Management",
             ],
-            
         )
 
         with jo:
@@ -98,9 +97,7 @@ def main():
 
     else:
         # Welcome screen
-        st.info(
-            "👋 Welcome! Use the sidebar to configure your job search and start scraping."
-        )
+        st.info("Configure your job search and start scraping.")
         st.markdown("""
         ### Getting Started:
         1. **Configure your search** in the sidebar

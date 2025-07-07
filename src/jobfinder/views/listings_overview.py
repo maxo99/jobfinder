@@ -10,7 +10,7 @@ from jobfinder import (
     set_title_filters,
     st,
 )
-from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, Classifier, Status
+from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS, UserType, Status
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
 
@@ -21,17 +21,17 @@ logger = logging.getLogger(__name__)
 DEFAULT_COLS = [
     "modified",
     "date_posted",
-    "site",
     "company",
     "title",
+    "site",
     "status",
+    "summarizer",
     "classifier",
     "score",
-    "pros",
-    "cons",
     "is_remote",
     "job_type",
 ]
+EXTRA_COLS = ["pros", "cons", "summary"]
 
 JOBSPY_COLS = [
     "id",
@@ -64,7 +64,7 @@ JOBSPY_COLS = [
     "work_from_home_type",
 ]
 
-DISPLAY_COLS = [*DEFAULT_COLS, *JOBSPY_COLS]
+DISPLAY_COLS = [*DEFAULT_COLS, *JOBSPY_COLS, *EXTRA_COLS]
 
 
 def render():
@@ -120,7 +120,6 @@ def render():
     _group_operations()
 
 
-
 def _display_data():
     if not get_filtered_jobs_df().empty:
         logger.info("Displaying Filtered Jobs DataFrame")
@@ -142,7 +141,8 @@ def _group_operations():
         if st.button("💾 Save Changes"):
             # Update the original dataframe with the changes
             _df = get_filtered_jobs_df()
-            _df["classifier"] = Classifier.USER.value
+            _df["classifier"] = UserType.USER.value
+            _df["summarizer"] = UserType.USER.value
             _df["modified"] = get_now()
             save_data2(get_jobs_df())
             st.success("Changes saved successfully!")
@@ -154,6 +154,14 @@ def _group_operations():
             set_title_filters([])
             set_filtered_jobs_df(get_jobs_df().copy())
             st.rerun()
+
+    new_summary = st.text_area("Enter Summary")
+    if st.button("Set Summary"):
+        st.success("Summary updated for selected jobs.")
+        filtered_df = get_filtered_jobs_df()
+        filtered_df["summary"] = new_summary
+        set_filtered_jobs_df(filtered_df)
+        # st.rerun()
 
     _set_status, _set_pros = st.columns([0.2, 0.8])
     with _set_status:

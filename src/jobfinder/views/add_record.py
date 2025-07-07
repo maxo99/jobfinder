@@ -1,6 +1,6 @@
 import logging
 import pandas as pd
-from jobfinder.model import Classifier
+from jobfinder.model import UserType
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2, update_results,validate_defaults
 from jobfinder import get_jobs_df, st
@@ -12,6 +12,7 @@ def render():
     with st.form("my_form"):
         st.write("Manually create records to use for scoring context.")
         title = st.text_area("title")
+        summary = st.text_area("summary")
         pros = st.text_area("pros")
         cons = st.text_area("cons")
         score = st.number_input(
@@ -25,15 +26,27 @@ def render():
         if submit:
             st.text("Submitted")
 
+            if summary:
+                _summarizer = UserType.USER.value
+            else:
+                _summarizer = UserType.NA.value
+
+            if pros or cons or score is not None:
+                _classifier = UserType.USER.value
+            else:
+                _classifier = UserType.NA.value
+
             _new_record = pd.DataFrame(
                 {
                     "id": [f"USER_CLASSIFIED_{get_now()}"],
                     "company": ["USER_ADDED"],
                     "title": [title],
                     "pros": [pros],
+                    "summary": [summary],
                     "cons": [cons],
                     "score": [score],
-                    "classifier": [Classifier.USER.value],
+                    "classifier": [_classifier],
+                    "summarizer": [_summarizer],
                     "modified": [get_now()],
                 },
             )

@@ -93,9 +93,11 @@ def apply_status_filters(_df):
 _DEFAULT_UPDATE_COLS = [
     "status",
     "score",
+    'summary'
     "pros",
     "cons",
     "classifier",
+    "summarizer",
     "modified",
 ]
 

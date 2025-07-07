@@ -1,3 +1,4 @@
+from abc import ABC
 import logging
 from datetime import date
 from enum import Enum
@@ -14,10 +15,11 @@ class Status(Enum):
     EXCLUDED = "excluded"
     APPLIED = "applied"
 
-class Classifier(Enum):
+class UserType(Enum):
     USER = "👤 (User)"
     AI = "🤖 (AI)"
     NA = "➖ (N/A)"
+
 
 
 STATUS_OPTIONS = [s.value for s in Status]
@@ -54,10 +56,12 @@ class FoundJob(_FoundJob):
     #
     # Custom fields
     status: Status = Status.NEW
-    classifier: Classifier | None = None
+    classifier: UserType | None = None
+    summarizer: UserType | None = None
     pros: str | None = None
     cons: str | None = None
     score: float | None = Field(default=None, json_schema_extra=dict(min=0.0, max=10.0))
+    summary: str | None = None
     date_scraped: str | None = None
     modified: str | None = None
     #
@@ -120,13 +124,13 @@ class FoundJob(_FoundJob):
             return s.strftime("%Y-%m-%d")
         return s
 
-    @field_validator("classifier", mode="after")
+    @field_validator("classifier", "summarizer", mode="after")
     @classmethod
-    def validate_classifier(cls, c):
+    def validate_usertype(cls, c):
         if c is None or pd.isna(c):
-            return Classifier.NA
+            return UserType.NA
         else:
-            return Classifier(c)
+            return UserType(c)
 
     # @field_validator('score')
     # def validate_score(cls, s):

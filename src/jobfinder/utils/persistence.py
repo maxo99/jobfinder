@@ -3,7 +3,7 @@ import logging
 from typing import Literal
 import pandas as pd
 from jobfinder import RAW_DATA_DIR, st, JOBS_DATA_FILE
-from jobfinder.model import Classifier, Status
+from jobfinder.model import UserType, Status
 from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)
@@ -82,6 +82,10 @@ def validate_defaults(df):
         df["cons"] = ""
     if "score" not in df.columns:
         df["score"] = None
+    if "summary" not in df.columns:
+        df["summary"] = None
     if "classifier" not in df.columns:
-        df["classifier"] = Classifier.NA.value
+        df["classifier"] = UserType.NA.value
+    if "summarizer" not in df.columns:
+        df["summarizer"] = UserType.NA.value
     df["date_posted"] = df["date_posted"].astype(str)
