@@ -110,21 +110,24 @@ def update_jobs_df(df: pd.DataFrame, update_cols: list | None = None):
 
 
 
+def get_data_filters():
+    return get_session().data_filters
+
 
 def get_title_filters():
-    return get_session().title_filters
+    return get_data_filters().title_filters
 
 
 def set_title_filters(filters):
-    get_session().title_filters = filters
+    get_data_filters().title_filters = filters
 
 
 def get_status_filter():
-    return get_session().status_filters
+    return get_data_filters().status_filters
 
 
 def set_status_filter(status):
-    get_session().status_filters = status
+    get_data_filters().status_filters = status
 
 
 __all__ = (

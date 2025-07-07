@@ -64,41 +64,43 @@ JOBSPY_COLS = [
 
 DISPLAY_COLS = [*DEFAULT_COLS, *JOBSPY_COLS, *EXTRA_COLS]
 
-
-def render():
-    logger.info("Rendering Listings Overview")
-
-    with st.expander("Filters"):
-        _selected_status = st.multiselect(
+def display_filters():
+    _selected_status = st.multiselect(
             "Status",
             options=STATUS_OPTIONS,
             default=DEFAULT_STATUS_FILTERS,
         )
-        if _selected_status:
-            # logger.info(f"Applying status filter: {_selected_status}")
-            set_status_filter(_selected_status)
-            apply_status_filters(get_filtered_jobs_df())
+    if _selected_status:
+        # logger.info(f"Applying status filter: {_selected_status}")
+        set_status_filter(_selected_status)
+        apply_status_filters(get_filtered_jobs_df())
 
-        if st.button("Reset Status Filters"):
-            logger.info("Resetting status filters to defaults.")
-            set_status_filter(DEFAULT_STATUS_FILTERS)
-            apply_status_filters(get_filtered_jobs_df())
+    if st.button("Reset Status Filters"):
+        logger.info("Resetting status filters to defaults.")
+        set_status_filter(DEFAULT_STATUS_FILTERS)
+        apply_status_filters(get_filtered_jobs_df())
 
-        new_titles = st.text_input(
-            "Titles Filter (comma-separated)",
-            placeholder="Enter titles to filter by, e.g. 'Software Engineer, Data Scientist'",
-        )
-        if new_titles:
-            logger.info(f"Adding title filters: {new_titles}")
-            new_titles = [t.strip() for t in new_titles.split(",")]
-            set_title_filters([*get_title_filters(), *new_titles])
-            apply_title_filters(get_filtered_jobs_df())
+    new_titles = st.text_input(
+        "Titles Filter (comma-separated)",
+        placeholder="Enter titles to filter by, e.g. 'Software Engineer, Data Scientist'",
+    )
+    if new_titles:
+        logger.info(f"Adding title filters: {new_titles}")
+        new_titles = [t.strip() for t in new_titles.split(",")]
+        set_title_filters([*get_title_filters(), *new_titles])
+        apply_title_filters(get_filtered_jobs_df())
 
-        if st.button("Clear Title Filters"):
-            logger.info("Clearing title filters.")
-            set_title_filters([])
-            apply_title_filters(get_filtered_jobs_df())
-        st.write(f"Current Title Filters:{','.join(get_title_filters())}")
+    if st.button("Clear Title Filters"):
+        logger.info("Clearing title filters.")
+        set_title_filters([])
+        apply_title_filters(get_filtered_jobs_df())
+    st.write(f"Current Title Filters:{','.join(get_title_filters())}")
+
+def render():
+    logger.info("Rendering Listings Overview")
+
+    # with st.expander("Filters"):
+
 
     _filtered_df = get_filtered_jobs_df()
     apply_status_filters(_filtered_df)

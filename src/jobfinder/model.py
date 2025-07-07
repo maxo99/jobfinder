@@ -25,6 +25,9 @@ class UserType(Enum):
 STATUS_OPTIONS = [s.value for s in Status]
 DEFAULT_STATUS_FILTERS = [s.value for s in Status if s != Status.EXCLUDED]
 
+class DataFilters(BaseModel):
+    status_filters: list[str] = DEFAULT_STATUS_FILTERS
+    title_filters: list[str] = []
 
 class _FoundJob(BaseModel):
     listing_type: str | None = None

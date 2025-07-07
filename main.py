@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 from jobfinder import reset_filtered_jobs_df, st, __version__
 from jobfinder.constants import PRESET_TEMPLATES
-from jobfinder.model import DEFAULT_STATUS_FILTERS
+from jobfinder.model import DEFAULT_STATUS_FILTERS, DataFilters
 from jobfinder.utils import get_now
 from jobfinder.views import (
     data_management,
@@ -38,10 +38,9 @@ def _init_session():
     if "selected_records" not in st.session_state:
         st.session_state.selected_records = []
 
-    if "title_filters" not in st.session_state:
-        st.session_state.title_filters = []
-    if "status_filters" not in st.session_state:
-        st.session_state.status_filters = DEFAULT_STATUS_FILTERS
+    if 'data_filters' not in st.session_state:
+        st.session_state.data_filters = DataFilters()
+
 
     if "filtered_jobs" not in st.session_state:
         reset_filtered_jobs_df()
