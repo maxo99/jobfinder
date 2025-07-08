@@ -3,5 +3,12 @@
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "workbench.colorCustomizations": {
+        "window.titleBarStyle": "custom",
+        "window.activeBorder": "#970606",
+        // "sideBar.background": "#444444"
+        "titleBar.activeBackground": "#130546", // Change this color to your desired color
+        "titleBar.inactiveBackground": "#FF0000" // Change this color to your desired color
+    }
 }
