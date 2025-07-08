@@ -88,6 +88,9 @@ class FoundJob(_FoundJob):
     job_function: str | None = None
     #
 
+    def __str__(self) -> str:
+        return f"FoundJob(ID: {self.id}, Name: {self.name})"
+
     @property
     def name(self) -> str:
         return f"{self.company}: {self.title}"

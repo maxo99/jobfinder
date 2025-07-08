@@ -6,7 +6,7 @@ from jobfinder.utils.persistence import update_results
 from jobfinder.session import st, get_jobs_df, set_selected_data, get_selected_records
 from jobfinder.adapters import chat
 from jobfinder.adapters.chat import completions
-from jobfinder.model import UserType, found_jobs_from_df, validate_defaults
+from jobfinder.model import UserType, found_jobs_from_df, FoundJob
 from jobfinder.utils import get_now
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
 
@@ -85,30 +85,8 @@ def render():
             if st.button(
                 "Generate Score", use_container_width=True, key="generate_score"
             ):
-                if chat.enabled:
-                    _completion = completions(rendered_prompt)
-                    _content = _completion.choices[0].message.content
-                    st.code(_content)
-                    _x = json.loads(_content)
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.metric("Prompt Tokens", _completion.usage.prompt_tokens)
-                    with col2:
-                        st.metric("Total Tokens", _completion.usage.total_tokens)
-
-                    _scoring_job.score = _x.get("score", 0.0)
-                    _scoring_job.summary = _x.get("summary", "")
-                    _scoring_job.pros = _x.get("pros", "")
-                    _scoring_job.cons = _x.get("cons", "")
-                    _scoring_job.modified = get_now()
-                    _scoring_job.classifier = UserType.AI
-                    _updated_entry = pd.DataFrame(
-                        [_scoring_job.model_dump(mode="json")]
-                    )
-                    validate_defaults(_updated_entry)
-                    update_results(_updated_entry)
-                    st.success("Score generated and updated successfully!")
-                    st.rerun()
+                if chat.ENABLED:
+                    _generate_score(_scoring_job, rendered_prompt)
                 else:
                     st.error("Chat not enabled, see README for configuration")
 
@@ -116,6 +94,43 @@ def render():
             st.subheader("👀 Template Preview")
             st.code(st.session_state.current_prompt, language="markdown")
             st.info("Select sample records from the panel to populate template")
+
+
+def _generate_score(scoring_job: FoundJob, rendered_prompt: str):
+    _completion = completions(rendered_prompt)
+    _content = str(_completion.choices[0].message.content)
+    if not _content:
+        st.error("No content returned from AI completion. Please check the prompt.")
+        return
+    
+    if _completion.usage:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Prompt Tokens", _completion.usage.prompt_tokens)
+        with col2:
+            st.metric("Total Tokens", _completion.usage.total_tokens)
+
+
+    _x = json.loads(_content)
+    scoring_job.score = _x.get("score", 0.0)
+    scoring_job.pros = _x.get("pros", "N/A")
+    scoring_job.cons = _x.get("cons", "N/A")
+    col1, col2, col3 = st.columns([0.2, 0.4, 0.4])
+    with col1:
+        st.metric("Score", scoring_job.score)
+    with col2:
+        st.markdown("## Pros:")
+        st.markdown(scoring_job.pros)
+    with col3:
+        st.markdown("## Cons:")
+        st.markdown(scoring_job.cons)
+        
+    scoring_job.modified = get_now()
+    scoring_job.classifier = UserType.AI
+    _updated_entry = pd.DataFrame([scoring_job.model_dump(mode="json")])
+    update_results(_updated_entry)
+    st.success("Score generated and updated successfully!")
+    st.rerun()
 
 
 def _render_jinja(template_str: str, data: dict) -> str:

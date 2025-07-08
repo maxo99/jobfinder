@@ -33,9 +33,6 @@ def render():
             if exclude_remote:
                 new_jobs.loc[~new_jobs.is_remote, "status"] = Status.EXCLUDED.value
 
-                # if not _rem_df.empty:
-                #     new_jobs = new_jobs.loc[~new_jobs.index.isin(_rem_df.index)]
-                #     st.metric("Excluded (remote)",len(_rem_df.index))
             if fulltime_only:
                 new_jobs.loc[
                     ~new_jobs["job_type"].str.contains(
@@ -44,13 +41,10 @@ def render():
                     "status",
                 ] = Status.EXCLUDED.value
 
-                #     if not _nonfull_df.empty:
-                #         new_jobs = new_jobs.loc[~new_jobs.index.isin(_nonfull_df.index)]
-                #         st.metric("Excluded (non-fulltime)",len(_nonfull_df.index))
-
             if not st.session_state.jobs_df.empty:
                 update_results(new_jobs)
             else:
+                validate_defaults(new_jobs)
                 st.session_state.jobs_df = new_jobs
 
             save_data2(st.session_state.jobs_df)

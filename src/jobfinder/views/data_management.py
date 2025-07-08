@@ -56,7 +56,6 @@ def _bulk_actions():
     (col1,) = st.columns(1)
     with col1:
         if st.button("Mark All as new"):
-            validate_defaults(get_jobs_df())
             update_results(get_jobs_df())
             save_data2(get_jobs_df())
             st.success("All jobs marked as new!")

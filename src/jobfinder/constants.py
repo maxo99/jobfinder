@@ -42,11 +42,25 @@ user reviewed existing records.
 ### Existing Records:
 {% for record in records %}
     ### Title: {{record.title}}
+    ### Summary: {{record.summary}}
     ### Pros: {{record.pros}}
     ### Cons: {{record.cons}}
     ### Score: {{record.score}}
 {% endfor %}
 
+"""
+
+
+SUMMARIZATION_TEMPLATE = """
+- Review the following job listing and summarize the qualifications and responsibilities.
+- Return json with single json list element 'summaries' where each object represents a provided job listing description.
+- For each object in the list there should be a string id and a 'summary' which should be a single string response of bullet points.
+
+{% for record in records %}
+# Record
+    ### ID: {{record.id}}
+    ### Description: {{record.description}}
+{% endfor %}
 """
 
 PRESET_TEMPLATES = {

@@ -3,6 +3,7 @@ import logging
 from typing import Literal
 import pandas as pd
 from jobfinder import RAW_DATA_DIR, JOBS_DATA_FILE
+from jobfinder.model import validate_defaults
 from jobfinder.utils import get_now
 from jobfinder.session import st
 
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def update_results(new_jobs):
+    validate_defaults(new_jobs)
     df = pd.concat([st.session_state.jobs_df, new_jobs], ignore_index=True)
     df = handle_duplicates(df)
     st.session_state.jobs_df = df

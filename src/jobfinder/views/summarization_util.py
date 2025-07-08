@@ -1,9 +1,16 @@
+import json
 import logging
+
+import pandas as pd
+from jinja2 import Template
+
+from jobfinder.adapters import chat
+from jobfinder.constants import SUMMARIZATION_TEMPLATE
 from jobfinder.session import get_jobs_df, st
 
 from jobfinder.model import UserType
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data2, update_results
+from jobfinder.utils.persistence import update_results
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
 
 logger = logging.getLogger(__name__)
@@ -47,6 +54,14 @@ def render():
 
         if summarization_mode == UserType.AI.value:
             st.info("AI will generate summaries for the selected jobs.")
+            if chat.ENABLED:
+                if st.button("Generate AI Summaries"):
+                    st.text("Generating summaries...")
+                    summarize_jobs(selection_df)
+                    st.success("Record added successfully!")
+                    st.rerun()
+                else:
+                    st.error("Chat not enabled, see README for configuration")
         elif summarization_mode == UserType.USER.value:
             st.info("You will provide a summary for the selected jobs.")
 
@@ -61,9 +76,35 @@ def render():
                     selection_df["summary"] = new_summary
                     selection_df["modified"] = get_now()
                     update_results(selection_df)
-                    save_data2(get_jobs_df())
                     st.success("Record added successfully!")
                     st.rerun()
+
+
+def summarize_jobs(selection_df: pd.DataFrame):
+    rendered_prompt = Template(SUMMARIZATION_TEMPLATE).render(
+        data={
+            "records": selection_df.to_dict("records"),
+        }
+    )
+    _completion = chat.completions(rendered_prompt)
+    _content = str(_completion.choices[0].message.content)
+    if not _content:
+        st.error("No content returned from AI completion. Please check the prompt.")
+        return
+    _x = json.loads(_content)
+    for x in _x['summaries']:
+        logger.info(f"ID:{x['id']} summary:{x['summary']}")
+        mask = selection_df['id'] == x['id']
+        if mask.any():
+            selection_df.loc[mask, 'summary'] = x['summary']
+
+
+    # Prepare the data for AI summarization
+    selection_df["summarizer"] = UserType.AI.value
+    selection_df["modified"] = get_now()
+    update_results(selection_df)
+
+
 
 
 # def _actions(job: FoundJob, idx: int):
