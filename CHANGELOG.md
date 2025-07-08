@@ -1,6 +1,35 @@
 # CHANGELOG
 
 
+## v0.8.0 (2025-07-08)
+
+### Chores
+
+- Updating vscode settings
+  ([`933b867`](https://github.com/maxo99/jobfinder/commit/933b867a34bc42a19807635a79b6bbb0cfed705e))
+
+### Documentation
+
+- Updating readme with sequence diagram
+  ([`efb22c3`](https://github.com/maxo99/jobfinder/commit/efb22c385663a3554f3331ba196364568af93f4f))
+
+### Features
+
+- Incorporating AI summarization for jobs
+  ([`4030f66`](https://github.com/maxo99/jobfinder/commit/4030f66ec2af13cd6aa8a1f9403417411c6a1cfa))
+
+### Refactoring
+
+- Application restructuring for better session import
+  ([`69d926c`](https://github.com/maxo99/jobfinder/commit/69d926c1bdea028ae5a199f81b11ecd737a52916))
+
+- Moving tab organization
+  ([`af19be5`](https://github.com/maxo99/jobfinder/commit/af19be5d4c781869e65454faec059c2c4b2e696a))
+
+- Using datafilter object
+  ([`61b8a0a`](https://github.com/maxo99/jobfinder/commit/61b8a0af8dfec113683b8744678b7581f3c3d455))
+
+
 ## v0.7.0 (2025-07-07)
 
 
