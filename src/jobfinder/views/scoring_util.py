@@ -1,25 +1,27 @@
 import json
 import logging
 from jinja2 import Template
-
-from jobfinder import st, get_jobs_df
+import pandas as pd
+from jobfinder.utils.persistence import update_results
+from jobfinder.session import st, get_jobs_df, set_selected_data, get_selected_records
 from jobfinder.adapters import chat
 from jobfinder.adapters.chat import completions
-from jobfinder.model import found_jobs_from_df
+from jobfinder.model import UserType, found_jobs_from_df, validate_defaults
+from jobfinder.utils import get_now
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
 
 logger = logging.getLogger(__name__)
+
+SCORING_UTIL_DESCRIPTION = """
+    Select a listing to use for evaluation.
+    Select records to populate as prompt context using Jinja2 templates.
+"""
 
 
 def render():
     if not get_jobs_df().empty:
         st.subheader("Scoring Utility")
-        st.markdown(
-            """
-            This section is intended to provide tools and utilities for scoring and evaluating job listings.
-            Select records from the data table and generate system prompts using Jinja2 templates
-            """
-        )
+        st.markdown(SCORING_UTIL_DESCRIPTION)
 
         st.subheader("Select Listing")
         _found_jobs = found_jobs_from_df(get_jobs_df())
@@ -63,21 +65,26 @@ def render():
             logger.error("Error rendering dataframe: %s", e)
             st.error("Error rendering dataframe. Please check the logs.")
 
-        if get_selected_records():
-            # Get selected data
-            selected_data = get_selected_records()
+        _current_prompt = st.session_state.get("current_prompt", "")
+        _selected_data = get_selected_records()
 
-
+        if _selected_data and _current_prompt:
             # Render template
+            _scoring_job = _found_jobs[_key]
             rendered_prompt = _render_jinja(
-                st.session_state.current_prompt,
-                {"records": selected_data, "listing": _found_jobs[_key].model_dump()},
+                template_str=_current_prompt,
+                data={
+                    "records": _selected_data,
+                    "listing": _scoring_job.model_dump(),
+                },
             )
 
             # Show preview
             st.code(rendered_prompt, language="markdown")
 
-            if st.button("Generate Score", use_container_width=True):
+            if st.button(
+                "Generate Score", use_container_width=True, key="generate_score"
+            ):
                 if chat.enabled:
                     _completion = completions(rendered_prompt)
                     _content = _completion.choices[0].message.content
@@ -88,6 +95,20 @@ def render():
                         st.metric("Prompt Tokens", _completion.usage.prompt_tokens)
                     with col2:
                         st.metric("Total Tokens", _completion.usage.total_tokens)
+
+                    _scoring_job.score = _x.get("score", 0.0)
+                    _scoring_job.summary = _x.get("summary", "")
+                    _scoring_job.pros = _x.get("pros", "")
+                    _scoring_job.cons = _x.get("cons", "")
+                    _scoring_job.modified = get_now()
+                    _scoring_job.classifier = UserType.AI
+                    _updated_entry = pd.DataFrame(
+                        [_scoring_job.model_dump(mode="json")]
+                    )
+                    validate_defaults(_updated_entry)
+                    update_results(_updated_entry)
+                    st.success("Score generated and updated successfully!")
+                    st.rerun()
                 else:
                     st.error("Chat not enabled, see README for configuration")
 
@@ -103,17 +124,3 @@ def _render_jinja(template_str: str, data: dict) -> str:
         return template.render(**data)
     except Exception as e:
         return f"Template Error: {str(e)}"
-
-
-def get_selected_records() -> list[dict]:
-    if not st.session_state.selected_records:
-        return []
-
-    selected_df = get_jobs_df()[
-        get_jobs_df()["id"].isin(st.session_state.selected_records)
-    ]
-    return selected_df.to_dict("records")
-
-
-def set_selected_data(record_ids: list[str]):
-    st.session_state.selected_records = record_ids

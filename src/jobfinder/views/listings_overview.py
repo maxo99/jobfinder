@@ -1,5 +1,5 @@
 import logging
-from jobfinder import (
+from jobfinder.session import (
     apply_status_filters,
     apply_title_filters,
     get_filtered_jobs_df,
@@ -82,7 +82,7 @@ def display_filters():
 
     new_titles = st.text_input(
         "Titles Filter (comma-separated)",
-        placeholder="Enter titles to filter by, e.g. 'Software Engineer, Data Scientist'",
+        placeholder="e.g. 'Engineer, Scientist'",
     )
     if new_titles:
         logger.info(f"Adding title filters: {new_titles}")
@@ -148,6 +148,3 @@ def _display_data():
         )
     else:
         st.info("No jobs match the current filters.")
-
-
-

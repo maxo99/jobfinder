@@ -1,4 +1,4 @@
-from jobfinder import get_jobs_df, st
+from jobfinder.session import get_jobs_df, st
 from jobfinder.model import Status
 
 
@@ -13,4 +13,6 @@ def render():
 
 def _get_count_for_status(status: Status) -> int:
     """Get the count of jobs for a specific status."""
+    if get_jobs_df().empty:
+        return 0
     return len(get_jobs_df()[get_jobs_df()["status"] == status.value])

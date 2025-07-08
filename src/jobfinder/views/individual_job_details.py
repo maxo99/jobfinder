@@ -2,7 +2,7 @@ import logging
 from jobfinder.model import UserType, FoundJob, Status, found_jobs_from_df
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
-from jobfinder import get_jobs_df, set_jobs_df, st
+from jobfinder.session import get_jobs_df, set_jobs_df, st
 
 logger = logging.getLogger(__name__)
 
@@ -14,12 +14,11 @@ def render():
     #     horizontal=True
     # )
     # if selection_mode == "Add New Record":
-        
-          
+
     # else:
     if not get_jobs_df().empty:
         logger.info(f"Displaying {len(get_jobs_df().index)} Jobs")
-        # TODO: IMPROVE ORDERING/FILTERING
+        #  TODO: IMPROVE ORDERING/FILTERING
 
         _found_jobs = found_jobs_from_df(get_jobs_df())
 
@@ -52,20 +51,20 @@ def _actions(job: FoundJob, idx: int):
         "Update Status",
         options=[s.value for s in Status],
         index=[s.value for s in Status].index(_current_status),
-        key=f"status_{idx}"
+        key=f"status_{idx}",
     )
     new_pros = st.text_area("Pros", value=job.pros)
     new_cons = st.text_area("Cons", value=job.cons)
     new_summary = st.text_area("Summary", value=job.summary)
-    
+
     new_score = st.number_input(
         "Score (0.0 - 10.0)",
         value=job.score,
         min_value=float(0),
         max_value=float(10),
-        key=f"score_{idx}"
+        key=f"score_{idx}",
     )
-    
+
     if new_pros != job.pros or new_cons != job.cons or new_score != job.score:
         _classifier = UserType.USER.value
     else:
@@ -74,7 +73,6 @@ def _actions(job: FoundJob, idx: int):
         _summarizer = UserType.USER.value
     else:
         _summarizer = UserType(job.summarizer).value
-    
 
     if st.button("💾 Update Job"):
         # Automatically set to VIEWED if NEW

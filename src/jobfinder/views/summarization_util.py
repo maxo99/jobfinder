@@ -1,5 +1,5 @@
 import logging
-from jobfinder import get_jobs_df, st
+from jobfinder.session import get_jobs_df, st
 
 from jobfinder.model import UserType
 from jobfinder.utils import get_now
@@ -13,7 +13,6 @@ def render():
     st.subheader("Summarize Jobs")
     df_display = get_jobs_df().copy()
     selection_df = df_display[DISPLAY_COLS].copy()
-
 
     selected_rows = st.dataframe(
         selection_df,
@@ -39,20 +38,17 @@ def render():
     if not _selected_data:
         st.warning("Please select one or more jobs to summarize.")
     else:
-        
         summarization_mode = st.radio(
             "Summarization Mode",
             [UserType.AI.value, UserType.USER.value],
             horizontal=True,
             key="summarize_jobs_mode",
         )
-        
+
         if summarization_mode == UserType.AI.value:
             st.info("AI will generate summaries for the selected jobs.")
         elif summarization_mode == UserType.USER.value:
             st.info("You will provide a summary for the selected jobs.")
-
-            
 
             with st.form("user summarization form"):
                 st.write("Set summary for one or many jobs at once.")
@@ -61,15 +57,13 @@ def render():
                 submit = st.form_submit_button("Submit")
                 if submit:
                     st.text("Submitted")
-                    selection_df['summarizer'] = UserType.USER.value
-                    selection_df['summary'] = new_summary
-                    selection_df['modified'] = get_now()
+                    selection_df["summarizer"] = UserType.USER.value
+                    selection_df["summary"] = new_summary
+                    selection_df["modified"] = get_now()
                     update_results(selection_df)
                     save_data2(get_jobs_df())
                     st.success("Record added successfully!")
                     st.rerun()
-
-
 
 
 # def _actions(job: FoundJob, idx: int):

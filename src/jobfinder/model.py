@@ -1,10 +1,11 @@
-from abc import ABC
 import logging
 from datetime import date
 from enum import Enum
 from typing import Self
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
+
+from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)
 
@@ -196,3 +197,27 @@ def found_jobs_from_df(df: pd.DataFrame) -> dict[int, FoundJob]:
             jobs[i] = job
     return jobs
 
+
+def validate_defaults(df):
+    if "date_scraped" not in df.columns:
+        df["date_scraped"] = get_now()
+    if "modified" not in df.columns:
+        df["modified"] = get_now()
+    if "status" not in df.columns:
+        df["status"] = Status.NEW.value
+    if "pros" not in df.columns:
+        df["pros"] = ""
+    df['pros'] = df['pros'].astype(str)  # Ensure pros is string type
+    if "cons" not in df.columns:
+        df["cons"] = ""
+    df['cons'] = df['cons'].astype(str)  # Ensure cons is string type
+    if "score" not in df.columns:
+        df["score"] = None
+    if "summary" not in df.columns:
+        df["summary"] = None
+    df['summary'] = df['summary'].astype(str)  # Ensure summary is string type
+    if "classifier" not in df.columns:
+        df["classifier"] = UserType.NA.value
+    if "summarizer" not in df.columns:
+        df["summarizer"] = UserType.NA.value
+    df["date_posted"] = df["date_posted"].astype(str)

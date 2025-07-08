@@ -1,9 +1,9 @@
 import logging
 import pandas as pd
-from jobfinder.model import UserType
+from jobfinder.model import UserType,validate_defaults
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data2, update_results,validate_defaults
-from jobfinder import get_jobs_df, st
+from jobfinder.utils.persistence import save_data2, update_results
+from jobfinder.session import get_jobs_df, st
 
 logger = logging.getLogger(__name__)
 

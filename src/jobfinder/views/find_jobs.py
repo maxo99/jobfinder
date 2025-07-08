@@ -2,15 +2,14 @@ import pandas as pd
 
 from jobspy import scrape_jobs
 
-from jobfinder.model import Status
-from jobfinder.utils.persistence import save_data2, update_results, validate_defaults
-from jobfinder import st
+from jobfinder.model import Status, validate_defaults
+from jobfinder.utils.persistence import save_data2, update_results
+from jobfinder.session import st
 
-SITES = ['indeed', 'linkedin']
+SITES = ["indeed", "linkedin"]
 
 
 def render():
-
     # Search parameters
     search_term = st.text_input("Search Term", value="python developer")
     site_name = st.multiselect("Sites", SITES, default=SITES)
@@ -21,7 +20,7 @@ def render():
     fulltime_only = st.checkbox("Fulltime Only", value=True)
 
     # Scrape button
-    if st.button("🚀 Scrape Jobs", type="primary", key='scrape_job'):
+    if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
         new_jobs = _find_jobs(
             site_name=site_name,
             search_term=search_term,
@@ -29,23 +28,22 @@ def render():
             hours_old=hours_old,
         )
         if not new_jobs.empty:
-            st.metric("Pulled Jobs",len(new_jobs.index))
+            st.metric("Pulled Jobs", len(new_jobs.index))
             save_data2(new_jobs, state="raw")
             if exclude_remote:
-                new_jobs.loc[
-                    ~new_jobs.is_remote,
-                    'status'
-                ] = Status.EXCLUDED.value
+                new_jobs.loc[~new_jobs.is_remote, "status"] = Status.EXCLUDED.value
 
                 # if not _rem_df.empty:
                 #     new_jobs = new_jobs.loc[~new_jobs.index.isin(_rem_df.index)]
                 #     st.metric("Excluded (remote)",len(_rem_df.index))
             if fulltime_only:
-                new_jobs.loc[~new_jobs['job_type'].str.contains(
-                    '|'.join(['fulltime', 'full-time']), case=False, na=False)
-                ,'status'] = Status.EXCLUDED.value
-                
-                
+                new_jobs.loc[
+                    ~new_jobs["job_type"].str.contains(
+                        "|".join(["fulltime", "full-time"]), case=False, na=False
+                    ),
+                    "status",
+                ] = Status.EXCLUDED.value
+
                 #     if not _nonfull_df.empty:
                 #         new_jobs = new_jobs.loc[~new_jobs.index.isin(_nonfull_df.index)]
                 #         st.metric("Excluded (non-fulltime)",len(_nonfull_df.index))
@@ -65,10 +63,8 @@ def _find_jobs(
     results_wanted: int,
     hours_old: int,
 ):
-
     try:
         with st.spinner(f"Scraping {results_wanted} jobs from {site_name}..."):
-
             jobs = scrape_jobs(
                 site_name=site_name,
                 search_term=search_term,

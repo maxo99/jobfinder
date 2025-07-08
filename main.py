@@ -1,8 +1,7 @@
 import logging
-import pandas as pd
-from jobfinder import reset_filtered_jobs_df, st, __version__
-from jobfinder.constants import PRESET_TEMPLATES
-from jobfinder.model import DEFAULT_STATUS_FILTERS, DataFilters
+
+from jobfinder import __version__, _setup_logging
+from jobfinder.session import st, _init_session
 from jobfinder.utils import get_now
 from jobfinder.views import (
     data_management,
@@ -14,51 +13,36 @@ from jobfinder.views import (
     summarization_util,
     display_stats,
 )
-from jobfinder.utils.persistence import load_data2
 
 
 logger = logging.getLogger(__name__)
 
 
-def _init_session():
-    logger.info("Initializing session")
-    if "jobs_df" not in st.session_state:
-        st.session_state.jobs_df = pd.DataFrame()
-
-    if st.session_state.jobs_df.empty:
-        st.session_state.jobs_df = load_data2()
-
-    if "saved_prompts" not in st.session_state:
-        st.session_state.saved_prompts = PRESET_TEMPLATES
-
-    if "current_prompt" not in st.session_state:
-        st.session_state.current_prompt = next(
-            iter(st.session_state.saved_prompts.values()), ""
-        )
-    if "selected_records" not in st.session_state:
-        st.session_state.selected_records = []
-
-    if 'data_filters' not in st.session_state:
-        st.session_state.data_filters = DataFilters()
 
 
-    if "filtered_jobs" not in st.session_state:
-        reset_filtered_jobs_df()
+MAIN_TABS = [
+    "📊 Job Overview",
+    "📋 Job Details",
+    "➕ Add Record",
+    "📝 Summarization Util",
+    "🤖 Scoring Util",
+    "⚙️ Data Management",
+]
 
 
 def main():
     logging.info("Starting up main()")
-    # Configure the page
+
     st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide")
 
-    # Initialize session state
+    _setup_logging()
     _init_session()
 
     # Main app
     st.title("💼 jobfinder")
     st.markdown("---")
     display_stats.render()
-    
+
     # Sidebar for scraping configuration
     with st.sidebar:
         st.header("🔍 Find Jobs")
@@ -66,17 +50,9 @@ def main():
 
     # Main content area
     if not st.session_state.jobs_df.empty:
-        # Create tabs
-        jo, jd, ar, summ, sco, dm = st.tabs(
-            [
-                "📊 Job Overview",
-                "📋 Job Details",
-                "➕ Add Record",
-                "📝 Summarization Util",
-                "🤖 Scoring Util",
-                "⚙️ Data Management",
-            ],
-        )
+
+
+        jo, jd, ar, summ, sco, dm = st.tabs(MAIN_TABS)
 
         with jo:
             st.header("Job Listings Overview")
