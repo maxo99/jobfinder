@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  jobfinder:
+    build: .
+    image: jobfinder
+    container_name: jobfinder
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - OPENAI_KEY=${OPENAI_KEY:-}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 120s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
