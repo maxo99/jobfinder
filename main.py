@@ -5,6 +5,7 @@ from jobfinder.session import st, _init_session
 from jobfinder.utils import get_now
 from jobfinder.views import (
     data_management,
+    display_filters,
     find_jobs,
     individual_job_details,
     listings_overview,
@@ -43,10 +44,13 @@ def main():
     st.markdown("---")
     display_stats.render()
 
+
     # Sidebar for scraping configuration
     with st.sidebar:
-        st.header("🔍 Find Jobs")
-        find_jobs.render()
+        with st.expander("🔍 Find Jobs", expanded=True):
+            find_jobs.render()
+        with st.expander("🔧 Display Filters", expanded=False):
+            display_filters.render()
 
     # Main content area
     if not st.session_state.jobs_df.empty:
