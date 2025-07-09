@@ -1,6 +1,6 @@
 import logging
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from typing import Self
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -10,16 +10,16 @@ from jobfinder.utils import get_now
 logger = logging.getLogger(__name__)
 
 
-class Status(Enum):
+class Status(StrEnum):
     NEW = "new"
     VIEWED = "viewed"
     EXCLUDED = "excluded"
     APPLIED = "applied"
 
-class UserType(Enum):
-    USER = "👤 (User)"
-    AI = "🤖 (AI)"
-    NA = "➖ (N/A)"
+class UserType(StrEnum):
+    USER = "User"
+    AI = "AI"
+    NA = "N/A"
 
 
 
