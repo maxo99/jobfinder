@@ -4,7 +4,6 @@ import os
 import sys
 import logging
 from pathlib import Path
-import watchtower
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT.joinpath("data")
@@ -33,12 +32,14 @@ def _setup_logging():
     _console_handler.setFormatter(_log_formatter)
     _handlers.append(_console_handler)
     _handlers.extend(
-        [_file_handler, _console_handler, watchtower.CloudWatchLogHandler()]
+        [_file_handler, _console_handler]
     )
 
     if os.environ.get("AWS_ACCESS_KEY_ID", "") and os.environ.get(
         "AWS_SECRET_ACCESS_KEY", ""
     ):
+        import watchtower
+
         # If AWS credentials are set, we can use CloudWatch logging
         _handlers.append(watchtower.CloudWatchLogHandler())
 

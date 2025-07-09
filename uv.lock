@@ -362,20 +362,20 @@ wheels = [
 
 [[package]]
 name = "jobfinder"
-version = "0.7.0"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "openai" },
     { name = "pandas" },
     { name = "python-jobspy" },
     { name = "streamlit" },
-    { name = "watchtower" },
 ]
 
 [package.dev-dependencies]
 dev = [
     { name = "jobfinder" },
     { name = "pytest" },
+    { name = "watchtower" },
 ]
 
 [package.metadata]
@@ -384,14 +384,15 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.0" },
     { name = "python-jobspy", specifier = ">=1.1.80" },
     { name = "streamlit", specifier = ">=1.46.0" },
-    { name = "watchtower", specifier = ">=3.4.0" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "jobfinder", editable = "." },
     { name = "pytest", specifier = ">=8.4.1" },
+    { name = "watchtower", specifier = ">=3.4.0" },
 ]
+streamlit-cloud = []
 
 [[package]]
 name = "jsonschema"
