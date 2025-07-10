@@ -201,6 +201,9 @@ def found_jobs_from_df(df: pd.DataFrame) -> dict[int, FoundJob]:
             jobs[i] = job
     return jobs
 
+def found_jobs_to_df(found_jobs: dict[int, FoundJob]) -> pd.DataFrame:
+    return pd.DataFrame([job.model_dump() for job in found_jobs.values()])
+
 
 def validate_defaults(df):
     if "date_scraped" not in df.columns:

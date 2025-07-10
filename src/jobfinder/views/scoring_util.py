@@ -4,8 +4,7 @@ from jinja2 import Template
 import pandas as pd
 from jobfinder.utils.persistence import update_results
 from jobfinder.session import st, get_jobs_df, set_selected_data, get_selected_records
-from jobfinder.adapters import chat
-from jobfinder.adapters.chat import completions
+from jobfinder.bootstrap import backend
 from jobfinder.model import UserType, found_jobs_from_df, FoundJob
 from jobfinder.utils import get_now
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
@@ -85,7 +84,7 @@ def render():
             if st.button(
                 "Generate Score", use_container_width=True, key="generate_score"
             ):
-                if chat.ENABLED:
+                if backend.chat_enabled:
                     _generate_score(_scoring_job, rendered_prompt)
                 else:
                     st.error("Chat not enabled, see README for configuration")
@@ -97,7 +96,7 @@ def render():
 
 
 def _generate_score(scoring_job: FoundJob, rendered_prompt: str):
-    _completion = completions(rendered_prompt)
+    _completion = backend.chat_client.completions(rendered_prompt)
     _content = str(_completion.choices[0].message.content)
     if not _content:
         st.error("No content returned from AI completion. Please check the prompt.")

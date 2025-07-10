@@ -1,6 +1,7 @@
 import logging
 
 from jobfinder import __version__, _setup_logging
+from jobfinder.bootstrap import load_backend
 from jobfinder.session import st, _init_session
 from jobfinder.utils import get_now
 from jobfinder.views import (
@@ -37,6 +38,7 @@ def main():
     st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide")
 
     _setup_logging()
+    load_backend()
     _init_session()
 
     # Main app
@@ -111,6 +113,7 @@ def _footer():
         st.markdown(f"jobfinder v{__version__}")
     with _col_right:
         st.markdown(f"Loaded:{get_now()}")
+
 
 
 if __name__ == "__main__":

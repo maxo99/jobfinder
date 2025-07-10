@@ -1,24 +1,22 @@
 
 
-from jobfinder.adapters.elasticsearch_client import ElastiSearchClient
+import json
 
 
-def test_connection():
-    client = ElastiSearchClient()
+def test_connection(fix_elasticsearchclient):
     try:
-        assert client.client.ping()
+        assert fix_elasticsearchclient.client.ping()
     except Exception as e:
-        client.client.info()
+        fix_elasticsearchclient.client.info()
         print("Elasticsearch connection failed:", e)
         raise e
 
-def test_create_index():
-    client = ElastiSearchClient()
-    response = client.create_index(index_name='jobfinder_test')
+def test_create_index(fix_elasticsearchclient):
+    response = fix_elasticsearchclient.create_index(index_name='jobfinder_test')
     assert response.get('acknowledged', False), "Index creation failed or index already exists."
     
     
     
-# def test_populate_index():
-#     for doc in df.apply(lambda x: x.to_dict(), axis=1):
-#         self.es_client.index(index=index_name, body=json.dumps(doc))
+def test_populate_index(fix_elasticsearchclient):
+    for doc in df.apply(lambda x: x.to_dict(), axis=1):
+        fix_elasticsearchclient.index(index='jobfinder_test', body=json.dumps(doc))

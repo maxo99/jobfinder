@@ -2,6 +2,7 @@ from jobfinder.domain.indexmapping import JOBS_MAPPING
 
 
 class ElastiSearchClient:
+    
     """
     A client for interacting with an Elasticsearch instance.
     """

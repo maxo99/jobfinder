@@ -1,10 +1,9 @@
 import json
 import logging
-
+from jobfinder.bootstrap import backend
 import pandas as pd
 from jinja2 import Template
 
-from jobfinder.adapters import chat
 from jobfinder.constants import SUMMARIZATION_TEMPLATE
 from jobfinder.session import get_jobs_df, st
 
@@ -54,10 +53,11 @@ def render():
 
         if summarization_mode == UserType.AI.value:
             st.info("AI will generate summaries for the selected jobs.")
-            if chat.ENABLED:
+            if backend.chat_enabled:
                 if st.button("Generate AI Summaries"):
                     st.text("Generating summaries...")
                     summarize_jobs(selection_df)
+                    update_results(selection_df)
                     st.success("Record added successfully!")
                     st.rerun()
                 else:
@@ -86,7 +86,7 @@ def summarize_jobs(selection_df: pd.DataFrame):
             "records": selection_df.to_dict("records"),
         }
     )
-    _completion = chat.completions(rendered_prompt)
+    _completion = backend.chat_client.completions(rendered_prompt)
     _content = str(_completion.choices[0].message.content)
     if not _content:
         st.error("No content returned from AI completion. Please check the prompt.")
@@ -97,13 +97,8 @@ def summarize_jobs(selection_df: pd.DataFrame):
         mask = selection_df['id'] == x['id']
         if mask.any():
             selection_df.loc[mask, 'summary'] = x['summary']
-
-
-    # Prepare the data for AI summarization
-    selection_df["summarizer"] = UserType.AI.value
-    selection_df["modified"] = get_now()
-    update_results(selection_df)
-
+            selection_df.loc[mask, "summarizer"] = UserType.AI.value
+            selection_df.loc[mask, "modified"] = get_now()
 
 
 
