@@ -12,9 +12,12 @@ JOBS_MAPPING = {
                 "summarizer": {"type": "keyword"},
                 
                 "is_remote": {"type": "boolean"},
-                "date_scraped": {"type": "date"},
-                "date_posted": {"type": "date"},
-                "modified": {"type": "date"},
+                # "date_scraped": {"type": "date"},
+                # "date_posted": {"type": "date"},
+                # "modified": {"type": "date"},
+                "date_scraped": {"type": "text"},
+                "date_posted": {"type": "text"},
+                "modified": {"type": "text"},
                 
                 "score": {"type": "float"},
                 
