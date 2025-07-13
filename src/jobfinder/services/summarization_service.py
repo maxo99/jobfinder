@@ -1,16 +1,18 @@
+import logging
+import json
+
 from jobfinder.constants import SUMMARIZATION_TEMPLATE
 from jobfinder.model import UserType
 from jobfinder.session import get_jobs_df, set_jobs_df, update_by_id
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
-from jobfinder.views.summarization_util import logger
-
 
 import pandas as pd
 from jinja2 import Template
 
 
-import json
+
+logger = logging.getLogger(__name__)
 
 
 def summarize_jobs(chat_client, selection_df: pd.DataFrame, save_jobs: bool = True) -> bool:

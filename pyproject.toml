@@ -33,9 +33,14 @@ jobfinder = { workspace = true }
 dev = [
     "jobfinder",
     "pytest>=8.4.1",
+    "pytest-cov>=4.1.0",
+    "pytest-docker"
+    
+]
+streamlit-cloud = [
+    "jobfinder",
     "watchtower>=3.4.0",
 ]
-streamlit-cloud = []
 
 [tool.pytest.ini_options]
 minversion = "6.0"

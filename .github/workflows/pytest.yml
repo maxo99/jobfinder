@@ -1,0 +1,32 @@
+---
+name: Test Python package
+
+
+on:
+  push:
+    branches:
+      - main
+      - feat/elasticsearch
+  pull_request:
+    branches:
+      - main  
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+      - name: Install Venv
+        run: uv venv
+      - name: Install Dependencies
+        run: uv pip install -e ".[dev]"
+      - name: Test
+        run: uv run pytest
