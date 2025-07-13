@@ -1,6 +1,62 @@
 # CHANGELOG
 
 
+## v0.9.0 (2025-07-13)
+
+### Build System
+
+- Introducing docker and docker compose builds and deployments
+  ([`e347802`](https://github.com/maxo99/jobfinder/commit/e3478022cb357bde4460a8b0e826efaa387ae575))
+
+- Moving watchtower to streamlit-cloud only builds
+  ([`1f921c6`](https://github.com/maxo99/jobfinder/commit/1f921c600ca787b31f208e3906b41dfbd4523b08))
+
+### Continuous Integration
+
+- Adding pytest coverage gh action
+  ([`b798715`](https://github.com/maxo99/jobfinder/commit/b7987151a365b2a2279cfc4c4242da444a8f582a))
+
+- Settings and coverage badge cleanup
+  ([`67d2b3f`](https://github.com/maxo99/jobfinder/commit/67d2b3f2f6eed0cfc31532ae4328fce819a84a2a))
+
+- Settings and coverage badge cleanup
+  ([`3e912dd`](https://github.com/maxo99/jobfinder/commit/3e912dd8cd65436947c7747ad1257c042fb2082b))
+
+### Features
+
+- **elasticsearch**: Adding elasticsearch to docker compose and introducing code for client
+  implementation
+  ([`7a68de2`](https://github.com/maxo99/jobfinder/commit/7a68de2c5ef0cd06a3ec9a54e85552786a65cae2))
+
+### Refactoring
+
+- Adding backend instance and updating session management to better facilitate testing
+  ([`b61c6e7`](https://github.com/maxo99/jobfinder/commit/b61c6e7bbfb6c223d42ce56f112adc6a33077c59))
+
+- Moving filters to sidebar so that can apply to all dataframes within current rendering
+  ([`a4f1315`](https://github.com/maxo99/jobfinder/commit/a4f1315cf1b5c71df44fb97fada1e51eda68eb07))
+
+### Testing
+
+- Including summarization test
+  ([`f523139`](https://github.com/maxo99/jobfinder/commit/f523139b8ffb52301d4ae1dfdfe7f097077bc92a))
+
+- Testing github badge for coverage results
+  ([`a077b6c`](https://github.com/maxo99/jobfinder/commit/a077b6cd90a22d00fea45213b71fe28e299f0f59))
+
+- Updates to adapter tests for mocking external resources
+  ([`ea91dbd`](https://github.com/maxo99/jobfinder/commit/ea91dbd3b1584e57354960ec97761c364084c941))
+
+- Updating elastisearch client tests
+  ([`a237057`](https://github.com/maxo99/jobfinder/commit/a237057938c38e50219fe4bc8af2f8598f17a362))
+
+- Updating pytest action to add coverage to readme
+  ([`8cff062`](https://github.com/maxo99/jobfinder/commit/8cff062174ac4759476dfd8d03353750b708388b))
+
+- Using pytest-docker for integration tests
+  ([`6e6f7d1`](https://github.com/maxo99/jobfinder/commit/6e6f7d1e260ae6c3b52834b13938594d3faaecac))
+
+
 ## v0.8.0 (2025-07-08)
 
 ### Chores
