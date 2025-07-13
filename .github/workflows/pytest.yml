@@ -43,12 +43,15 @@ jobs:
           --cov-report=term-missing:skip-covered \
           --cov=jobfinder tests/ \
           | tee pytest-coverage.txt
+
       - name: Pytest coverage comment
+        id: coverageComment
         uses: MishaKav/pytest-coverage-comment@main
         with:
           create-new-comment: true
           pytest-coverage-path: ./pytest-coverage.txt
           junitxml-path: ./pytest.xml
+
       - name: Check the output coverage
         run: |
           echo "Coverage Percentage - ${{ steps.coverageComment.outputs.coverage }}"
@@ -66,9 +69,9 @@ jobs:
 
 
       
-      - name: Pytest coverage comment
+      - name: Pytest coverage comment for main branch
+        id: coverageBadgeComment
         if: ${{ github.ref == 'refs/heads/main' }}
-        id: coverageComment
         uses: MishaKav/pytest-coverage-comment@main
         with:
           hide-comment: true
@@ -77,7 +80,7 @@ jobs:
       - name: Update Readme with Coverage Html
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          sed -i '/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\${{ steps.coverageComment.outputs.coverageHtml }}\n<!-- Pytest Coverage Comment:End -->' ./README.md
+          sed -i '/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\${{ steps.coverageBadgeComment.outputs.coverageHtml }}\n<!-- Pytest Coverage Comment:End -->' ./README.md
 
       - name: Commit & Push changes to Readme
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -87,14 +90,3 @@ jobs:
             git add README.md
             git commit -m "Update coverage on Readme" || exit 0
             git push
-
-      # - name: Create the Badge
-      #   uses: schneegans/dynamic-badges-action@v1.7.0
-      #   with:
-      #     auth: ${{ secrets.PYTEST_COVERAGE_COMMENT }}
-      #     gistID: 5e90d640f8c212ab7bbac38f72323f80
-      #     filename: pytest-coverage-comment__main.json
-      #     label: Coverage Report
-      #     message: ${{ steps.coverageComment.outputs.coverage }}
-      #     color: ${{ steps.coverageComment.outputs.color }}
-      #     namedLogo: python
