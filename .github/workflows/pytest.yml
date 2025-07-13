@@ -50,9 +50,10 @@ jobs:
           pytest-coverage-path: ./pytest-coverage.txt
           junitxml-path: ./pytest.xml
 
-      - name: Pytest coverage without comment for readme badge
+
+      - name: Pytest coverage comment on Readme
         if: ${{ github.ref == 'refs/heads/main' }}
-        id: coverageBadgeHtml
+        id: coverageReadmeHtml
         uses: MishaKav/pytest-coverage-comment@main
         with:
           hide-comment: true
@@ -61,7 +62,7 @@ jobs:
       - name: Update Readme with Coverage Html
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          sed -i '/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\${{ steps.coverageBadgeHtml.outputs.content }}\n<!-- Pytest Coverage Comment:End -->' ./README.md
+          sed -i "/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\${{ steps.coverageReadmeHtml.outputs.coverageHtml }}\n<!-- Pytest Coverage Comment:End -->" ./README.md
 
       - name: Commit & Push changes to Readme
         if: ${{ github.ref == 'refs/heads/main' }}

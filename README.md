@@ -3,7 +3,7 @@
 A Streamlit-based job search application that scrapes and manages job listings using JobSpy, with AI-powered evaluation capabilities.
 
 <!-- Pytest Coverage Comment:Begin -->
-\n<!-- Pytest Coverage Comment:End -->
+<!-- Pytest Coverage Comment:End -->
 
 
 ## Features
