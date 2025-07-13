@@ -44,7 +44,7 @@ streamlit-cloud = [
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+addopts = "-ra -q  --cov=jobfinder --cov-report=xml --cov-report=html"
 testpaths = ["tests"]
 log_cli = true
 log_cli_level = "INFO"
