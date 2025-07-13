@@ -3,6 +3,7 @@ import os
 from typing import Literal
 
 import pandas as pd
+import numpy as np
 
 from jobfinder import JOBS_DATA_FILE, RAW_DATA_DIR
 from jobfinder.model import validate_defaults
@@ -25,7 +26,7 @@ def load_data2(state: Literal["raw", "processed"] = "processed"):
         if _data_files:
             dfs = []
             for csv_file in _data_files:
-                temp_df = pd.read_csv(csv_file)
+                temp_df = pd.read_csv(csv_file).replace({np.nan: None})
                 dfs.append(temp_df)
             df = pd.concat(dfs, ignore_index=True)
         else:

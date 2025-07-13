@@ -5,6 +5,7 @@ description = "Utility for finding jobs"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "elasticsearch>=8.0.0 ,<9.0.0",
     "openai>=1.93.0",
     "pandas>=2.3.0",
     "python-jobspy>=1.1.80",
@@ -32,13 +33,18 @@ jobfinder = { workspace = true }
 dev = [
     "jobfinder",
     "pytest>=8.4.1",
+    "pytest-cov>=4.1.0",
+    "pytest-docker"
+    
+]
+streamlit-cloud = [
+    "jobfinder",
     "watchtower>=3.4.0",
 ]
-streamlit-cloud = []
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+addopts = "-ra -q  --cov=jobfinder --cov-report=xml --cov-report=html"
 testpaths = ["tests"]
 log_cli = true
 log_cli_level = "INFO"

@@ -1,7 +1,7 @@
 import logging
-
+import streamlit as st
 from jobfinder import __version__, _setup_logging
-from jobfinder.session import st, _init_session
+from jobfinder.session import _init_session
 from jobfinder.utils import get_now
 from jobfinder.views import (
     data_management,
@@ -37,20 +37,20 @@ def main():
     st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide")
 
     _setup_logging()
-    _init_session()
+    _init_session(st)
 
     # Main app
     st.title("💼 jobfinder")
     st.markdown("---")
-    display_stats.render()
+    display_stats.render(st)
 
 
     # Sidebar for scraping configuration
     with st.sidebar:
         with st.expander("🔍 Find Jobs", expanded=True):
-            find_jobs.render()
+            find_jobs.render(st)
         with st.expander("🔧 Display Filters", expanded=False):
-            display_filters.render()
+            display_filters.render(st)
 
     # Main content area
     if not st.session_state.jobs_df.empty:
@@ -60,26 +60,26 @@ def main():
 
         with jo:
             st.header("Job Listings Overview")
-            listings_overview.render()
+            listings_overview.render(st)
 
         with jd:
             st.header("Individual Job Details")
-            individual_job_details.render()
+            individual_job_details.render(st)
 
         with ar:
             st.header("Add Record")
-            add_record.render()
+            add_record.render(st)
 
         with summ:
-            summarization_util.render()
+            summarization_util.render(st)
 
         with sco:
             st.header("Job Scoring Utility")
-            scoring_util.render()
+            scoring_util.render(st)
 
         with dm:
             st.header("Data Management")
-            data_management.render()
+            data_management.render(st)
 
     else:
         # Welcome screen
@@ -111,6 +111,7 @@ def _footer():
         st.markdown(f"jobfinder v{__version__}")
     with _col_right:
         st.markdown(f"Loaded:{get_now()}")
+
 
 
 if __name__ == "__main__":

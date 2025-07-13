@@ -1,6 +1,6 @@
 import logging
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from typing import Self
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -10,16 +10,16 @@ from jobfinder.utils import get_now
 logger = logging.getLogger(__name__)
 
 
-class Status(Enum):
+class Status(StrEnum):
     NEW = "new"
     VIEWED = "viewed"
     EXCLUDED = "excluded"
     APPLIED = "applied"
 
-class UserType(Enum):
-    USER = "👤 (User)"
-    AI = "🤖 (AI)"
-    NA = "➖ (N/A)"
+class UserType(StrEnum):
+    USER = "User"
+    AI = "AI"
+    NA = "N/A"
 
 
 
@@ -47,7 +47,7 @@ class _FoundJob(BaseModel):
 
 class FoundJob(_FoundJob):
     # model_config = ConfigDict(extra='allow')
-    id: str | None = None
+    id: str
     site: str | None = None
     job_url: str | None = None
     job_url_direct: str | None = None
@@ -148,7 +148,7 @@ class FoundJob(_FoundJob):
     #         return s
 
     @classmethod
-    def from_dict(cls, data: dict) -> Self | None:
+    def from_dict(cls, data: dict) -> Self:
         try:
             return cls.model_validate(data)
         except Exception as e:
@@ -191,15 +191,20 @@ class FoundJob(_FoundJob):
                 )
         return "  \n  ".join(_d)
 
+FoundJobs = dict[str, FoundJob]
 
-def found_jobs_from_df(df: pd.DataFrame) -> dict[int, FoundJob]:
-    """Convert a DataFrame to a list of FoundJob instances."""
-    jobs = dict()
-    for i, row in df.iterrows():
+
+def found_jobs_from_df(df: pd.DataFrame) -> FoundJobs:
+    """Convert a DataFrame to a FoundJobs instance."""
+    found_jobs: FoundJobs = {}
+    for _, row in df.iterrows():
         job = FoundJob.from_dict(row.to_dict())
         if job:
-            jobs[i] = job
-    return jobs
+            found_jobs[job.id] = job
+    return found_jobs
+
+def found_jobs_to_df(found_jobs: FoundJobs) -> pd.DataFrame:
+    return pd.DataFrame([job.model_dump() for job in found_jobs.values()])
 
 
 def validate_defaults(df):

@@ -4,12 +4,11 @@ from jobspy import scrape_jobs
 
 from jobfinder.model import Status, validate_defaults
 from jobfinder.utils.persistence import save_data2, update_results
-from jobfinder.session import st
 
 SITES = ["indeed", "linkedin"]
 
 
-def render():
+def render(st):
     # Search parameters
     search_term = st.text_input("Search Term", value="python developer")
     site_name = st.multiselect("Sites", SITES, default=SITES)
@@ -22,6 +21,7 @@ def render():
     # Scrape button
     if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
         new_jobs = _find_jobs(
+            st,
             site_name=site_name,
             search_term=search_term,
             results_wanted=results,
@@ -52,6 +52,7 @@ def render():
 
 
 def _find_jobs(
+    st,
     site_name: list[str],
     search_term: str,
     results_wanted: int,

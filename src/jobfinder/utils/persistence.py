@@ -5,16 +5,15 @@ import pandas as pd
 from jobfinder import RAW_DATA_DIR, JOBS_DATA_FILE
 from jobfinder.model import validate_defaults
 from jobfinder.utils import get_now
-from jobfinder.session import st
-
+from jobfinder.session import get_jobs_df, set_jobs_df
 logger = logging.getLogger(__name__)
 
 
 def update_results(new_jobs):
     validate_defaults(new_jobs)
-    df = pd.concat([st.session_state.jobs_df, new_jobs], ignore_index=True)
+    df = pd.concat([get_jobs_df(), new_jobs], ignore_index=True)
     df = handle_duplicates(df)
-    st.session_state.jobs_df = df
+    set_jobs_df(df)
     save_data2(df, state="processed")
 
 
@@ -55,6 +54,6 @@ def save_data2(df: pd.DataFrame, state: Literal["raw", "processed"] = "processed
             _data_file = os.path.join(RAW_DATA_DIR, f"jobs_data_{get_now()}.csv")
         df.to_csv(_data_file, index=False)
         logger.info(f"Data saved to {_data_file}")
-        st.success("Data saved successfully!")
     except Exception as e:
-        st.error(f"Error saving data: {e}")
+        logger.error(f"Error saving data: {e}")
+        raise e

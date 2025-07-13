@@ -6,7 +6,6 @@ from jobfinder.session import (
     get_title_filters,
     set_status_filter,
     set_title_filters,
-    st,
 )
 from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS
 
@@ -14,7 +13,7 @@ from jobfinder.model import DEFAULT_STATUS_FILTERS, STATUS_OPTIONS
 logger = logging.getLogger(__name__)
 
 
-def render():
+def render(st):
     _selected_status = st.multiselect(
             "Status",
             options=STATUS_OPTIONS,

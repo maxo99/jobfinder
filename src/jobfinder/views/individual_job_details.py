@@ -2,12 +2,12 @@ import logging
 from jobfinder.model import UserType, FoundJob, Status, found_jobs_from_df
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
-from jobfinder.session import get_jobs_df, set_jobs_df, st
+from jobfinder.session import get_jobs_df, set_jobs_df, update_by_id
 
 logger = logging.getLogger(__name__)
 
 
-def render():
+def render(st):
     # selection_mode = st.radio(
     #     "Indivudial Record Management",
     #     ["Update Existing Records", "Add New Record"],
@@ -31,19 +31,20 @@ def render():
         if _key:
             logger.info(f"Selected job:{_key}: {_found_jobs[_key].name}")
         else:
-            _key = 0
+            _key = list(_found_jobs.keys())[0]
+
         _col_details, _col_actions = st.columns([2, 1])
         with _col_details:
-            _details(_found_jobs[_key])
+            _details(st, _found_jobs[_key])
         with _col_actions:
-            _actions(_found_jobs[_key], _key)
+            _actions(st, _found_jobs[_key], _key)
 
 
-def _details(job: FoundJob):
+def _details(st, job: FoundJob):
     st.markdown(job.get_details())
 
 
-def _actions(job: FoundJob, idx: int):
+def _actions(st, job: FoundJob, job_id: str):
     st.subheader("Actions")
 
     _current_status = job.status.value
@@ -51,7 +52,7 @@ def _actions(job: FoundJob, idx: int):
         "Update Status",
         options=[s.value for s in Status],
         index=[s.value for s in Status].index(_current_status),
-        key=f"status_{idx}",
+        key=f"status_{job_id}",
     )
     new_pros = st.text_area("Pros", value=job.pros)
     new_cons = st.text_area("Cons", value=job.cons)
@@ -62,7 +63,7 @@ def _actions(job: FoundJob, idx: int):
         value=job.score,
         min_value=float(0),
         max_value=float(10),
-        key=f"score_{idx}",
+        key=f"score_{job_id}",
     )
 
     if new_pros != job.pros or new_cons != job.cons or new_score != job.score:
@@ -78,26 +79,29 @@ def _actions(job: FoundJob, idx: int):
         # Automatically set to VIEWED if NEW
         if new_status == Status.NEW.value:
             new_status = Status.VIEWED.value
-        get_jobs_df().loc[idx, "status"] = new_status
-        get_jobs_df().loc[idx, "pros"] = new_pros
-        get_jobs_df().loc[idx, "cons"] = new_cons
-        get_jobs_df().loc[idx, "score"] = new_score
-        get_jobs_df().loc[idx, "summary"] = new_summary
-        get_jobs_df().loc[idx, "classifier"] = _classifier
-        get_jobs_df().loc[idx, "summarizer"] = _summarizer
-        get_jobs_df().loc[idx, "modified"] = get_now()
+        df = update_by_id(get_jobs_df(), job.id, {
+            "status": new_status,
+            "pros": new_pros,
+            "cons": new_cons,
+            "score": new_score,
+            "summary": new_summary,
+            "classifier": _classifier,
+            "summarizer": _summarizer,
+            "modified": get_now(),
+        })
+        set_jobs_df(df)
         save_data2(get_jobs_df())
         st.success("Job updated successfully!")
         st.rerun()
 
     # Delete button
-    if st.button("🗑️ Delete Job", key=f"delete_{idx}", type="secondary"):
-        _delete(idx)
+    if st.button("🗑️ Delete Job", key=f"delete_{job_id}", type="secondary"):
+        _delete(st, job_id)
         st.rerun()
 
 
-def _delete(idx):
-    set_jobs_df(get_jobs_df().drop(idx).reset_index(drop=True))
+def _delete(st, job_id: str):
+    set_jobs_df(get_jobs_df().drop(get_jobs_df().index[get_jobs_df()['id'] == job_id]).reset_index(drop=True))
     save_data2(get_jobs_df())
     st.success("Job deleted successfully!")
     st.rerun()

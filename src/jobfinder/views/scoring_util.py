@@ -1,13 +1,9 @@
-import json
 import logging
-from jinja2 import Template
-import pandas as pd
-from jobfinder.utils.persistence import update_results
-from jobfinder.session import st, get_jobs_df, set_selected_data, get_selected_records
-from jobfinder.adapters import chat
-from jobfinder.adapters.chat import completions
-from jobfinder.model import UserType, found_jobs_from_df, FoundJob
-from jobfinder.utils import get_now
+from jobfinder.services.scoring_service import generate_score
+from jobfinder.session import chat_enabled, get_jobs_df, set_selected_data, get_selected_records
+
+from jobfinder.model import found_jobs_from_df
+from jobfinder.utils.service_helpers import render_jinja
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
 
 logger = logging.getLogger(__name__)
@@ -18,7 +14,7 @@ SCORING_UTIL_DESCRIPTION = """
 """
 
 
-def render():
+def render(st):
     if not get_jobs_df().empty:
         st.subheader("Scoring Utility")
         st.markdown(SCORING_UTIL_DESCRIPTION)
@@ -26,9 +22,10 @@ def render():
         st.subheader("Select Listing")
         _found_jobs = found_jobs_from_df(get_jobs_df())
 
+        _keys = list(_found_jobs.keys())
         _key = st.selectbox(
             "Select a Listing for Scoring",
-            options=list(_found_jobs.keys()),
+            options=_keys,
             format_func=lambda x: _found_jobs[x].name,
             key="select_listing_scoring",
             index=0,
@@ -36,7 +33,7 @@ def render():
         if _key:
             logger.info(f"Selected job:{_key}: {_found_jobs[_key].name}")
         else:
-            _key = 0
+            _key = _keys[0]
 
         st.subheader("Select Sample Records")
         df_display = get_jobs_df().copy()
@@ -71,7 +68,7 @@ def render():
         if _selected_data and _current_prompt:
             # Render template
             _scoring_job = _found_jobs[_key]
-            rendered_prompt = _render_jinja(
+            rendered_prompt = render_jinja(
                 template_str=_current_prompt,
                 data={
                     "records": _selected_data,
@@ -83,10 +80,10 @@ def render():
             st.code(rendered_prompt, language="markdown")
 
             if st.button(
-                "Generate Score", use_container_width=True, key="generate_score"
+                "Generate Score", use_container_width=True, key="gen_score"
             ):
-                if chat.ENABLED:
-                    _generate_score(_scoring_job, rendered_prompt)
+                if chat_enabled():
+                    generate_score(st, _scoring_job, rendered_prompt)
                 else:
                     st.error("Chat not enabled, see README for configuration")
 
@@ -95,47 +92,3 @@ def render():
             st.code(st.session_state.current_prompt, language="markdown")
             st.info("Select sample records from the panel to populate template")
 
-
-def _generate_score(scoring_job: FoundJob, rendered_prompt: str):
-    _completion = completions(rendered_prompt)
-    _content = str(_completion.choices[0].message.content)
-    if not _content:
-        st.error("No content returned from AI completion. Please check the prompt.")
-        return
-    
-    if _completion.usage:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Prompt Tokens", _completion.usage.prompt_tokens)
-        with col2:
-            st.metric("Total Tokens", _completion.usage.total_tokens)
-
-
-    _x = json.loads(_content)
-    scoring_job.score = _x.get("score", 0.0)
-    scoring_job.pros = _x.get("pros", "N/A")
-    scoring_job.cons = _x.get("cons", "N/A")
-    col1, col2, col3 = st.columns([0.2, 0.4, 0.4])
-    with col1:
-        st.metric("Score", scoring_job.score)
-    with col2:
-        st.markdown("## Pros:")
-        st.markdown(scoring_job.pros)
-    with col3:
-        st.markdown("## Cons:")
-        st.markdown(scoring_job.cons)
-        
-    scoring_job.modified = get_now()
-    scoring_job.classifier = UserType.AI
-    _updated_entry = pd.DataFrame([scoring_job.model_dump(mode="json")])
-    update_results(_updated_entry)
-    st.success("Score generated and updated successfully!")
-    st.rerun()
-
-
-def _render_jinja(template_str: str, data: dict) -> str:
-    try:
-        template = Template(template_str)
-        return template.render(**data)
-    except Exception as e:
-        return f"Template Error: {str(e)}"
