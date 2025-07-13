@@ -6,7 +6,6 @@ from jobfinder.session import (
     get_filtered_jobs_df,
     get_jobs_df,
     set_filtered_jobs_df,
-    st,
 )
 
 logger = logging.getLogger(__name__)
@@ -61,7 +60,7 @@ JOBSPY_COLS = [
 DISPLAY_COLS = [*DEFAULT_COLS, *JOBSPY_COLS, *EXTRA_COLS]
 
 
-def render():
+def render(st):
     logger.info("Rendering Listings Overview")
 
     # with st.expander("Filters"):
@@ -78,7 +77,7 @@ def render():
     with _filtered:
         st.write(f"Unfiltered Jobs: {len(get_filtered_jobs_df())}")
 
-    _display_data()
+    _display_data(st)
 
 
 
@@ -102,7 +101,7 @@ def render():
     #         st.rerun()
 
 
-def _display_data():
+def _display_data(st):
     if not get_filtered_jobs_df().empty:
         logger.info("Displaying Filtered Jobs DataFrame")
         st.dataframe(

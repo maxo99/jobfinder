@@ -1,8 +1,8 @@
-from jobfinder.session import get_jobs_df, st
+from jobfinder.session import get_jobs_df
 from jobfinder.model import Status
 
 
-def render():
+def render(st):
     st.subheader("Statistics")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("New Jobs", _get_count_for_status(Status.NEW))

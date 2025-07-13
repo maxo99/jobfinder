@@ -3,12 +3,12 @@ import pandas as pd
 from jobfinder.model import UserType
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2, update_results
-from jobfinder.session import get_jobs_df, st
+from jobfinder.session import get_jobs_df
 
 logger = logging.getLogger(__name__)
 
 
-def render():
+def render(st):
     with st.form("my_form"):
         st.write("Manually create records to use for scoring context.")
         title = st.text_area("title")

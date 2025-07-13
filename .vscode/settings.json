@@ -4,6 +4,8 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "references.preferredLocation": "view",
+    "workbench.panel.defaultLocation": "bottom",
     "workbench.colorCustomizations": {
         "window.titleBarStyle": "custom",
         "window.activeBorder": "#970606",

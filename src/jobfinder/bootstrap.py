@@ -20,12 +20,15 @@ class Backend:
         self.chat_client = ChatClient()
 
     def close_connections(self):
-        if self.es_client:
-            self.es_client.close()
-            logger.info("Closed Elasticsearch client connection")
-        if self.chat_client and self.chat_client._client:
-            self.chat_client._client.close()
-            logger.info("Closed Chat client connection")
+        try:
+            if self.es_client:
+                self.es_client.close()
+                logger.info("Closed Elasticsearch client connection")
+            if self.chat_client and self.chat_client._client:
+                self.chat_client._client.close()
+                logger.info("Closed Chat client connection")
+        except Exception as e:
+            logger.error(f"Error closing connections: {e}")
 
     @property
     def chat_enabled(self):
@@ -35,14 +38,5 @@ class Backend:
         return self.chat_client.ENABLED if self.chat_client else False  
 
 
-backend = None
 
-def load_backend():
-    """
-    Load the backend instance.
-    This function is used to ensure that the backend is initialized only once.
-    """
-    global backend
-    if not backend:
-        backend = Backend()
-    return backend
+    
