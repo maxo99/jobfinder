@@ -1,6 +1,30 @@
 # CHANGELOG
 
 
+## v0.9.1 (2025-07-13)
+
+### Bug Fixes
+
+- Update to cicd for release validation
+  ([`055c988`](https://github.com/maxo99/jobfinder/commit/055c9882aa9c6adf207c79a60672f152714175e5))
+
+### Continuous Integration
+
+- Coverage badge population fix
+  ([`c978029`](https://github.com/maxo99/jobfinder/commit/c978029033ade05613a77f22f7cac07790b747ba))
+
+- Updating pytest action
+  ([`d846833`](https://github.com/maxo99/jobfinder/commit/d84683309d76ff51861a3da17ef5a9fb4fc3458c))
+
+- Updating release workflow to only trigger after succesful tests
+  ([`88b1d93`](https://github.com/maxo99/jobfinder/commit/88b1d9315bb5b1aa89dcbf6eb49d877f4595506e))
+
+### Documentation
+
+- Update README.md
+  ([`7d35c3f`](https://github.com/maxo99/jobfinder/commit/7d35c3f0ea6a4fd01ee603ae3c7e9bb602e2650a))
+
+
 ## v0.9.0 (2025-07-13)
 
 ### Build System
