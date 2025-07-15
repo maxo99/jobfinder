@@ -18,7 +18,7 @@ A Streamlit-based job search application that scrapes and manages job listings u
 - **Continous Coverage**: [pytest](https://docs.pytest.org/en/stable/) for testing and coverage reporting
 
 ## Updates
-- Releases are defined using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) and all changes will be found in the [CHANGELOG](CHANGELOG.md)
+- Semantic releases are defined using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) and all changes will be found in the [CHANGELOG](CHANGELOG.md)
 
 
 ## Walkthrough
