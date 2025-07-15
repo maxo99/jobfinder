@@ -9,7 +9,7 @@ dependencies = [
     "openai>=1.93.0",
     "pandas>=2.3.0",
     "python-jobspy>=1.1.80",
-    "streamlit>=1.46.0",
+    "streamlit>=1.46.0"
 ]
 
 [build-system]
@@ -34,7 +34,10 @@ dev = [
     "jobfinder",
     "pytest>=8.4.1",
     "pytest-cov>=4.1.0",
-    "pytest-docker"
+    "pytest-docker",
+    "boto3>=1.30.0",
+    "botocore>=1.30.0",
+    'ipykernel'
     
 ]
 streamlit-cloud = [
