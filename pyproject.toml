@@ -31,11 +31,11 @@ jobfinder = { workspace = true }
 
 [dependency-groups]
 dev = [
+    "docker>=7.1.0",
     "jobfinder",
     "pytest>=8.4.1",
     "pytest-cov>=4.1.0",
-    "pytest-docker"
-    
+    "pytest-docker",
 ]
 streamlit-cloud = [
     "jobfinder",

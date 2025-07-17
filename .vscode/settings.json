@@ -6,6 +6,8 @@
         "**/__pycache__": true,
         "**/.pytest_cache": true,
         "**/*.egg-info": true,
+        "**/*.ruff_cache": true,
+        "htmlcov": true,
     },
     "python.testing.pytestArgs": [
         "tests",
