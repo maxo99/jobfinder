@@ -5,9 +5,11 @@
         },
         "**/__pycache__": true,
         "**/.pytest_cache": true,
+        "**/*.egg-info": true,
     },
     "python.testing.pytestArgs": [
-        "tests"
+        "tests",
+        "--no-cov"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
