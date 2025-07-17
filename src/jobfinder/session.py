@@ -169,3 +169,6 @@ def get_selected_records() -> list[dict]:
 
 def set_selected_data(record_ids: list[str]):
     get_session().selected_records = record_ids
+
+def get_current_prompt() -> str:
+    return get_session().current_prompt

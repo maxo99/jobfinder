@@ -1,7 +1,7 @@
 import logging
 import streamlit as st
 from jobfinder import __version__, _setup_logging
-from jobfinder.session import _init_session
+from jobfinder.session import _init_session, get_jobs_df
 from jobfinder.utils import get_now
 from jobfinder.views import (
     data_management,
@@ -53,8 +53,7 @@ def main():
             display_filters.render(st)
 
     # Main content area
-    if not st.session_state.jobs_df.empty:
-
+    if not get_jobs_df().empty:
 
         jo, jd, ar, summ, sco, dm = st.tabs(MAIN_TABS)
 

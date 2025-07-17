@@ -20,6 +20,7 @@ def render(st):
         logger.info(f"Displaying {len(get_jobs_df().index)} Jobs")
         #  TODO: IMPROVE ORDERING/FILTERING
 
+
         _found_jobs = found_jobs_from_df(get_jobs_df())
 
         _key = st.selectbox(

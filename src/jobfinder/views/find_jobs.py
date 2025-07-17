@@ -3,7 +3,7 @@ import pandas as pd
 from jobspy import scrape_jobs
 
 from jobfinder.model import Status, validate_defaults
-from jobfinder.utils.persistence import save_data2, update_results
+from jobfinder.utils.persistence import get_jobs_df, save_data2, update_results
 
 SITES = ["indeed", "linkedin"]
 
@@ -41,13 +41,9 @@ def render(st):
                     "status",
                 ] = Status.EXCLUDED.value
 
-            if not st.session_state.jobs_df.empty:
-                update_results(new_jobs)
-            else:
-                validate_defaults(new_jobs)
-                st.session_state.jobs_df = new_jobs
+            update_results(new_jobs)
 
-            save_data2(st.session_state.jobs_df)
+            save_data2(get_jobs_df())
             st.rerun()
 
 

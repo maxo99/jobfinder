@@ -1,6 +1,6 @@
 import logging
 from jobfinder.services.scoring_service import generate_score
-from jobfinder.session import chat_enabled, get_jobs_df, set_selected_data, get_selected_records
+from jobfinder.session import chat_enabled, get_current_prompt, get_jobs_df, set_selected_data, get_selected_records
 
 from jobfinder.model import found_jobs_from_df
 from jobfinder.utils.service_helpers import render_jinja
@@ -62,7 +62,7 @@ def render(st):
             logger.error("Error rendering dataframe: %s", e)
             st.error("Error rendering dataframe. Please check the logs.")
 
-        _current_prompt = st.session_state.get("current_prompt", "")
+        _current_prompt = get_current_prompt()
         _selected_data = get_selected_records()
 
         if _selected_data and _current_prompt:
@@ -89,6 +89,6 @@ def render(st):
 
         else:
             st.subheader("👀 Template Preview")
-            st.code(st.session_state.current_prompt, language="markdown")
+            st.code(get_current_prompt(), language="markdown")
             st.info("Select sample records from the panel to populate template")
 
