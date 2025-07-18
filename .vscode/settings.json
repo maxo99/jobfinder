@@ -23,5 +23,7 @@
         // "sideBar.background": "#444444"
         "titleBar.activeBackground": "#130546", // Change this color to your desired color
         "titleBar.inactiveBackground": "#FF0000" // Change this color to your desired color
-    }
+    },
+    "pylint.args": ["--rcfile=pyproject.toml"],
+    "ruff.configurationPreference": "filesystemFirst",
 }

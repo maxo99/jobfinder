@@ -1,5 +1,6 @@
 ### CUSTOM
 *data/**/*.csv
+docker_data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
