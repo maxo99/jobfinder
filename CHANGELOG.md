@@ -1,6 +1,90 @@
 # CHANGELOG
 
 
+## v0.9.2 (2025-07-21)
+
+### Bug Fixes
+
+- Updating scoring and displaying of qualifications
+  ([`ff22ae7`](https://github.com/maxo99/jobfinder/commit/ff22ae7e91c86c8acc47d67cbd826cb5e0f836db))
+
+### Chores
+
+- Consolidating formating/linting to the toml + updating copilot default instructions
+  ([`4d79b6c`](https://github.com/maxo99/jobfinder/commit/4d79b6ca7d749672bba0d8015313bf172b6d4685))
+
+- Fixing local testing configuration so that coverage does not block debugger
+  ([`0df5362`](https://github.com/maxo99/jobfinder/commit/0df53629e52c7263bc4ec6c7b062383c1120bbfd))
+
+- Updating settings and lock file
+  ([`0165427`](https://github.com/maxo99/jobfinder/commit/0165427fdb55253ac5fc2418ceb4ef53390fae61))
+
+- Vscode settings updates for pylint and debugpy
+  ([`7d0e795`](https://github.com/maxo99/jobfinder/commit/7d0e79500172cbf6a4083791a98e4a574daaf8d9))
+
+### Continuous Integration
+
+- Updating pytest comment action
+  ([`f24cf33`](https://github.com/maxo99/jobfinder/commit/f24cf33a3947b6f9a7dfe3f73c72124d6f9c7efb))
+
+- Using cached uv for faster actions
+  ([`ca9fff8`](https://github.com/maxo99/jobfinder/commit/ca9fff832a8acf274ac0ced397034ee3e41071e7))
+
+### Documentation
+
+- Adding badges to readme
+  ([`aa51e30`](https://github.com/maxo99/jobfinder/commit/aa51e30d561ca4c6a57b0cf1251cb7ed638eca0c))
+
+- Update to readme and refactoring roadmap and walkthrough to separate document
+  ([`1d93206`](https://github.com/maxo99/jobfinder/commit/1d932067cd42c4cd3dabd1f45b561e5ade253013))
+
+- Updating readme
+  ([`f8aabc5`](https://github.com/maxo99/jobfinder/commit/f8aabc5b860706b52e5a47e6c5be72e9e122b166))
+
+### Refactoring
+
+- Using common methods where appropriate
+  ([`565ad7d`](https://github.com/maxo99/jobfinder/commit/565ad7dd1c668bff5dd1b0f0bc675acb21c88af1))
+
+- **pgvector**: Updates for postgres docker support
+  ([`3b96463`](https://github.com/maxo99/jobfinder/commit/3b96463a56df40dc94013f7c610c9d8746e12e36))
+
+### Testing
+
+- Adding wait for docker compose postgres to be ready
+  ([`f1a716b`](https://github.com/maxo99/jobfinder/commit/f1a716b3a93ce377e6f457d2ad6f2cec95da9c2e))
+
+- Adding wait for docker compose postgres to be ready
+  ([`2d4b357`](https://github.com/maxo99/jobfinder/commit/2d4b357e414a23ea7ab398a1226c96e28c352d75))
+
+- Including mock chat response
+  ([`edcb40f`](https://github.com/maxo99/jobfinder/commit/edcb40fd22ae6bccda505040b817b19f83958cab))
+
+- Including mock chat response
+  ([`8fd846f`](https://github.com/maxo99/jobfinder/commit/8fd846f56377bab33eea143f2463c9ec7b69da21))
+
+- Updates after refactor
+  ([`c97202e`](https://github.com/maxo99/jobfinder/commit/c97202e16e03eeb9e44c4adb9c56e6d17abf0d10))
+
+- Updating ci runner
+  ([`684eda1`](https://github.com/maxo99/jobfinder/commit/684eda1c1e5d1a9db2f3b87b6438fff69c690835))
+
+- Updating ci runner
+  ([`04232c0`](https://github.com/maxo99/jobfinder/commit/04232c0f031fe7f5d9c7baad3dc908b112e0bfe3))
+
+- Updating CI tests for docker compose mocked ollama
+  ([`95a9453`](https://github.com/maxo99/jobfinder/commit/95a94530df771835b31564e02c5d4d582edb875d))
+
+- Updating mockserver initializer
+  ([`139b2bc`](https://github.com/maxo99/jobfinder/commit/139b2bcde0398e6b90dcaf9c46ee9e8c6a6c723a))
+
+- Updating mockserver initializer for embed api
+  ([`b4accd2`](https://github.com/maxo99/jobfinder/commit/b4accd2699356bd6fb63857228e3b14e0ab78c9b))
+
+- Updating pytest docker compose shutdown
+  ([`f760a72`](https://github.com/maxo99/jobfinder/commit/f760a72cfe79450758e3e64256aaa3604dbceaef))
+
+
 ## v0.9.1 (2025-07-13)
 
 ### Bug Fixes
