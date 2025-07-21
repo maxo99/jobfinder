@@ -13,7 +13,7 @@ from openai.types.chat.chat_completion import (
 )
 from streamlit.testing.v1 import AppTest
 
-from jobfinder import config
+from jobfinder import PROJECT_ROOT, config
 from jobfinder.adapters.chat.chat_client import ChatClient
 from jobfinder.adapters.db.postgres_client import PostgresClient
 from jobfinder.services.data_service import DataService
@@ -70,6 +70,11 @@ def is_responsive(url):
             return True
     except Exception:
         return False
+
+
+@pytest.fixture(scope="session")
+def docker_compose_file(pytestconfig):
+    return os.path.join(str(PROJECT_ROOT), "docker-compose.yml")
 
 
 @pytest.fixture(scope="session")
@@ -153,12 +158,12 @@ def ollama_service(docker_ip, docker_services):
     if is_responsive(local_url):
         print("Using local Ollama instance")
         return local_url
-    
+
     # If Ollama is not running locally, we need to start it via Docker
     if not docker_services.is_service_running("ollama"):
         print("Starting Ollama service in Docker...")
         docker_services.start("ollama")
-        
+
     # Fall back to Docker services
     print("Waiting for Docker Ollama service to be responsive...")
     port = docker_services.port_for("ollama", 11434)
@@ -193,18 +198,6 @@ def fix_postgresclient(postgres_service) -> Generator[PostgresClient, None, None
     _client.close()
 
 
-# @pytest.fixture(scope="session")
-# def test_index(fix_elasticsearchclient):
-#     _test_index = "jobfinder_test"
-#     try:
-#         if fix_elasticsearchclient.client.indices.exists(index=_test_index):
-#             fix_elasticsearchclient.client.indices.delete(index=_test_index)
-#         _create_response = fix_elasticsearchclient.create_index(index_name=_test_index)
-#         print(f"Index creation response: {_create_response}")
-#         yield _test_index
-#         fix_elasticsearchclient.client.indices.delete(index=_test_index)
-#     except Exception as e:
-#         raise e
 
 
 @pytest.fixture()

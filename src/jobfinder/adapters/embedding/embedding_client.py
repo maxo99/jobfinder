@@ -39,7 +39,7 @@ class OllamaEmbeddingClient(EmbeddingClient):
             response = self._client.embed(
                 model=self.model, input=text, options={"dimensions": self.dimensions}
             )
-            logger.info(f"Returned embedding {response}")
+            logger.debug(f"Returned embedding {response}")
             return response["embeddings"][0]
         except Exception as e:
             logger.error(f"Error during embedding: {e}")
