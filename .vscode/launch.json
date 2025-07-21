@@ -13,7 +13,8 @@
                 "run",
                 "${workspaceFolder}/main.py"
             ],
-            "justMyCode": true,
+            "stopOnEntry": true,
+            "justMyCode": false,
         },
         {
             "name": "streamlit debug (current file)",
