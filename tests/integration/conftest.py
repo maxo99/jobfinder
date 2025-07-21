@@ -153,10 +153,12 @@ def ollama_service(docker_ip, docker_services):
     if is_responsive(local_url):
         print("Using local Ollama instance")
         return local_url
+    
     # If Ollama is not running locally, we need to start it via Docker
     if not docker_services.is_service_running("ollama"):
         print("Starting Ollama service in Docker...")
         docker_services.start("ollama")
+        
     # Fall back to Docker services
     print("Waiting for Docker Ollama service to be responsive...")
     port = docker_services.port_for("ollama", 11434)

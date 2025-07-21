@@ -41,6 +41,9 @@ jobs:
       - name: Install Dependencies
         run: uv sync --group dev
 
+      - name: Start only postgres and ollama (mock)
+        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgres ollama
+
       - name: Test
         run: |
           uv run pytest  \

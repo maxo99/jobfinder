@@ -87,7 +87,7 @@ def _actions(st, job: Job, job_id: str):
     else:
         _summarizer = job.summarizer
 
-    if st.button("💾 Update Job"):
+    if st.button("💾 Update Job", key="update_individual_job"):
         # Automatically set to VIEWED if NEW
         if new_status == NEW:
             new_status = VIEWED

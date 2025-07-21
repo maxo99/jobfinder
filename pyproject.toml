@@ -40,6 +40,7 @@ dev = [
     "pytest>=8.4.1",
     "pytest-cov>=4.1.0",
     "pytest-docker",
+    "pytest-env>=1.1.5",
 ]
 streamlit-cloud = [
     "jobfinder",
@@ -54,6 +55,9 @@ log_cli = true
 log_cli_level = "INFO"
 log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+env = [
+    "JOBS_DATA_FILE=tests/data/test_jobs.csv",
+]
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]

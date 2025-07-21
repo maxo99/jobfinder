@@ -8,7 +8,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT.joinpath("data")
 RAW_DATA_DIR = DATA_DIR.joinpath("raw")
-JOBS_DATA_FILE = DATA_DIR.joinpath("jobs_data.csv")
+JOBS_DATA_FILE = os.environ.get("JOBS_DATA_FILE", DATA_DIR.joinpath("jobs_data.csv"))
 if not DATA_DIR.exists():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 if not RAW_DATA_DIR.exists():
