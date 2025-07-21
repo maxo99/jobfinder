@@ -6,7 +6,7 @@ user reviewed existing records.
 - Use the cons of existing records with low scores as negative indicators.
 - If the listing description matches well with high-scoring records, consider it positively.
 - If the listing description matches well with low-scoring records, consider it negatively.
-- Return a score from 0.0 to 10.0, where 0.0 is the lowest and 10.0 is the highest.
+- Return a score from -1.0 to 1.0, where -1.0 is the lowest and 1.0 is the highest.
 - Return pros and cons from the listing description to support your score.
 - Pros and cons should be a single string response of bullet points.
 - Format the response as json with keys: score, pros, cons.
@@ -32,7 +32,7 @@ user reviewed existing records.
 - Use the cons of existing records with low scores as negative indicators.
 - If the listing description matches well with high-scoring records, consider it positively.
 - If the listing description matches well with low-scoring records, consider it negatively.
-- Return a score from 0.0 to 10.0, where 0.0 is the lowest and 10.0 is the highest.
+- Return a score from -1.0 to 1.0, where -1.0 is the lowest and 1.0 is the highest.
 - Return pros and cons from the listing description to support your score.
 - Pros and cons should be a single string response of bullet points.
 - Format the response as json with keys: score, pros, cons.

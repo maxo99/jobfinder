@@ -88,7 +88,7 @@ class Job(SQLModel, table=True):
     # Analysis fields
     pros: str | None = None
     cons: str | None = None
-    score: float | None = Field(default=None, ge=0.0, le=10.0)
+    score: float | None = Field(default=0.0, ge=-1.0, le=1.0)
     summary: str | None = None
     qualifications: list[Qualification] = Field(
         default_factory=list,
@@ -203,12 +203,12 @@ class Job(SQLModel, table=True):
     def validate_score(cls, s):
         try:
             if s is None or pd.isna(s):
-                return None
+                return 0.0
             score_val = float(s)
-            if 0.0 <= score_val <= 10.0:
+            if -1.0 <= score_val <= 1.0:
                 return score_val
-            logger.error(f"Score {score_val} out of range [0.0, 10.0], clamping")
-            return max(0.0, min(10.0, score_val))
+            logger.error(f"Score {score_val} out of range [-1.0, 1.0], clamping")
+            return max(-1.0, min(1.0, score_val))
         except Exception as e:
             logger.error(f"Error in validate_score: {e}")
             raise
@@ -249,6 +249,13 @@ class Job(SQLModel, table=True):
                 details.append(
                     f"**{self.company} URL:** [{self.title}]({self.job_url_direct})"
                 )
+
+            if self.qualifications:
+                details.append("## **Qualifications:**")
+                for q in self.qualifications:
+                    details.append(
+                        f"- **Skill:** {q.skill}, **Requirement:** {q.requirement}, **Experience:** {q.experience}"
+                    )
 
             if self.description:
                 details.append("## **Description:**")
@@ -339,7 +346,7 @@ def validate_df_defaults(df: pd.DataFrame) -> None:
     if "cons" not in df.columns:
         df["cons"] = ""
     if "score" not in df.columns:
-        df["score"] = 5.0
+        df["score"] = 0.0
     if "summary" not in df.columns:
         df["summary"] = ""
     if "classifier" not in df.columns:

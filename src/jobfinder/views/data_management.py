@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def render(st):
     st.subheader("Data File")
-    st.write(f"Current data file: `{JOBS_DATA_FILE.name}`")
+    st.write(f"Current data file: `{JOBS_DATA_FILE}`")
 
     _manage_data(st)
     _bulk_actions(st)

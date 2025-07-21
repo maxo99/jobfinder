@@ -15,10 +15,10 @@ def render(st):
         pros = st.text_area("pros")
         cons = st.text_area("cons")
         score = st.number_input(
-            "Score (0.0 - 10.0)",
-            value=5.0,
-            min_value=float(0),
-            max_value=float(10),
+            "Score (-1.0 - 1.0)",
+            value=0.0,
+            min_value=float(-1),
+            max_value=float(1),
             key="score_new_job",
         )
         submit = st.form_submit_button("Submit")

@@ -71,10 +71,10 @@ def _actions(st, job: Job, job_id: str):
     new_summary = st.text_area("Summary", value=job.summary)
 
     new_score = st.number_input(
-        "Score (0.0 - 10.0)",
+        "Score (-1.0 - 1.0)",
         value=job.score,
-        min_value=float(0),
-        max_value=float(10),
+        min_value=float(-1),
+        max_value=float(1),
         key=f"score_{job_id}",
     )
 

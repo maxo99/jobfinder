@@ -28,8 +28,7 @@ class DataService:
             return None
 
     def get_jobs(self, **filters) -> list:
-        # TODO: Reincorporate filters
-        return self.db_client.get_jobs()
+        return self.db_client.get_jobs(**filters)
 
 
     def get_count(self, **kwargs) -> int:
