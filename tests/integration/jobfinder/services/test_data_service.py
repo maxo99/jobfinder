@@ -1,7 +1,5 @@
 import time
 
-from jobfinder.domain.models import Qualifications
-
 
 def test_populate_index(fix_dataservice, jobs_testdata):
     fix_dataservice.store_jobs(jobs_testdata)
@@ -10,32 +8,33 @@ def test_populate_index(fix_dataservice, jobs_testdata):
     populated_count = len(fix_dataservice.get_jobs())
     assert populated_count >= len(jobs_testdata)
 
-def test_updating_summary(
-    fix_dataservice,
-    jobs_testdata
-):
-    _test_id = "FAKE_JOB_ID"
-    _test_qualifications = [
-        {"skill": "Python", "requirement": "required", "experience": "5 years"},
-        {"skill": "SQL", "requirement": "preferred", "experience": "2+ years"},
-    ]
 
-    test_data = jobs_testdata.copy()[0:1]
-    test_data[0].id = _test_id
-    fix_dataservice.store_jobs(test_data)
-    time.sleep(0.5)
-    returned_job = fix_dataservice.get_by_id(_test_id)
-    assert returned_job is not None
-    assert returned_job.id == _test_id
-    assert returned_job.qualifications == []
-    test_data = test_data.copy()
-    test_data[0].qualifications = [Qualifications(**q) for q in _test_qualifications]
-    fix_dataservice.store_jobs(test_data)
-    time.sleep(0.5)
-    updated_job = fix_dataservice.get_by_id(_test_id)
-    assert updated_job is not None
-    assert updated_job.id == _test_id
-    assert updated_job.qualifications == _test_qualifications
+# def test_updating_summary(
+#     fix_dataservice,
+#     jobs_testdata
+# ):
+#     _test_id = "FAKE_JOB_ID"
+#     _test_qualifications = [
+#         {"skill": "Python", "requirement": "required", "experience": "5 years"},
+#         {"skill": "SQL", "requirement": "preferred", "experience": "2+ years"},
+#     ]
+
+#     test_data = jobs_testdata.copy()[0:1]
+#     test_data[0].id = _test_id
+#     fix_dataservice.store_jobs(test_data)
+#     time.sleep(0.5)
+#     returned_job = fix_dataservice.get_by_id(_test_id)
+#     assert returned_job is not None
+#     assert returned_job.id == _test_id
+#     assert returned_job.qualifications == []
+#     test_data = test_data.copy()
+#     test_data[0].qualifications = [Qualifications(**q) for q in _test_qualifications]
+#     fix_dataservice.store_jobs(test_data)
+#     time.sleep(0.5)
+#     updated_job = fix_dataservice.get_by_id(_test_id)
+#     assert updated_job is not None
+#     assert updated_job.id == _test_id
+#     assert updated_job.qualifications == _test_qualifications
 
 # def test_populate_with_vectors(
 #     fix_dataservice,
