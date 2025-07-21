@@ -1,9 +1,9 @@
 import pandas as pd
-
 from jobspy import scrape_jobs
 
-from jobfinder.model import Status, validate_defaults
-from jobfinder.utils.persistence import get_jobs_df, save_data2, update_results
+from jobfinder.domain.models import EXCLUDED, df_to_jobs, validate_df_defaults
+from jobfinder.session import get_data_service
+from jobfinder.utils.persistence import save_data2
 
 SITES = ["indeed", "linkedin"]
 
@@ -31,7 +31,7 @@ def render(st):
             st.metric("Pulled Jobs", len(new_jobs.index))
             save_data2(new_jobs, state="raw")
             if exclude_remote:
-                new_jobs.loc[~new_jobs.is_remote, "status"] = Status.EXCLUDED.value
+                new_jobs.loc[~new_jobs.is_remote, "status"] = EXCLUDED
 
             if fulltime_only:
                 new_jobs.loc[
@@ -39,11 +39,9 @@ def render(st):
                         "|".join(["fulltime", "full-time"]), case=False, na=False
                     ),
                     "status",
-                ] = Status.EXCLUDED.value
+                ] = EXCLUDED
 
-            update_results(new_jobs)
-
-            save_data2(get_jobs_df())
+            get_data_service().store_jobs(df_to_jobs(new_jobs))
             st.rerun()
 
 
@@ -67,7 +65,7 @@ def _find_jobs(
             )
 
             if jobs is not None and not jobs.empty:
-                validate_defaults(jobs)
+                validate_df_defaults(jobs)
                 return jobs
             else:
                 st.warning("No jobs found with the specified criteria.")

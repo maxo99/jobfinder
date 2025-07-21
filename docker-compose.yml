@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   jobfinder:
     build: .
@@ -21,11 +19,82 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-  elasticsearch:
-    image: elasticsearch:8.8.0
-    ports:
-      - 9200:9200
-      - 9300:9300
+    depends_on:
+      # elasticsearch:
+      #   condition: service_healthy
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+  # elasticsearch:
+  #   image: elasticsearch:8.8.0
+  #   ports:
+  #     - 9200:9200
+  #     - 9300:9300
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+
+  postgres:
+    image: pgvector/pgvector:pg17 # PostgreSQL with pgvector support
+    container_name: postgres
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-jobfinder}
+      POSTGRES_SSLMODE: ${POSTGRES_SSLMODE:-disable}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-jobfinder}"]
+      interval: 10s
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/schema/postgres.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  ollama:
+    container_name: ollama
+    restart: unless-stopped
+    image: ollama/ollama:latest
+    volumes:
+      - "./docker_data/ollamadata:/root/.ollama"
+    ports:
+      - 11434:11434
+    healthcheck:
+      test: ollama list || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    networks:
+      - ollama_network
+
+
+  ollama-pull:
+    container_name: ollama-pull
+    image: curlimages/curl:latest
+    environment:
+      - MODELS=${MODELS:-nomic-embed-text,gemma3:1b}
+    command:
+      - sh
+      - -c
+      - |
+        for model in $$(echo "$$MODELS" | tr ',' ' '); do
+          echo "Pulling model: $$model"
+          curl -X POST http://ollama:11434/api/pull -d "{\"name\":\"$$model\"}" || echo "Failed to pull $$model"
+          sleep 5
+        done
+        echo "All models pulled successfully"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - ollama_network
+
+volumes:
+  pgdata:
+
+networks:
+  ollama_network:
+    driver: bridge    
