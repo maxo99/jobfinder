@@ -149,7 +149,7 @@ def ollama_service(docker_ip, docker_services):
     print("Checking Ollama service...")
 
     # First check if we can connect to a local Ollama instance
-    local_url = "http://localhost:11434"
+    local_url = "http://127.0.0.1:11434"
     if is_responsive(local_url):
         print("Using local Ollama instance")
         return local_url

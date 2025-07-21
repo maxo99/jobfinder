@@ -66,8 +66,8 @@ jobs:
             sleep 2
           done
 
-      - name: Set Postgres host for tests
-        run: echo "POSTGRES_HOST=host.docker.internal" >> $GITHUB_ENV
+      # - name: Set Postgres host for tests
+      #   run: echo "POSTGRES_HOST=host.docker.internal" >> $GITHUB_ENV
 
 
       - name: Test
