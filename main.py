@@ -1,24 +1,27 @@
 import logging
+
 import streamlit as st
+
 from jobfinder import __version__, _setup_logging
-from jobfinder.session import _init_session, get_jobs_df
+from jobfinder.session import (
+    _init_session,
+    _init_working_df,
+    get_working_df,
+)
 from jobfinder.utils import get_now
 from jobfinder.views import (
+    add_record,
     data_management,
-    display_filters,
+    # display_filters,
+    display_stats,
     find_jobs,
     individual_job_details,
     listings_overview,
     scoring_util,
-    add_record,
     summarization_util,
-    display_stats,
 )
 
-
 logger = logging.getLogger(__name__)
-
-
 
 
 MAIN_TABS = [
@@ -36,25 +39,25 @@ def main():
 
     st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide")
 
-    _setup_logging()
-    _init_session(st)
+    if 'initialized' not in st.session_state:
+        _setup_logging()
+        _init_session(st)
+        _init_working_df(st)
 
     # Main app
     st.title("💼 jobfinder")
     st.markdown("---")
     display_stats.render(st)
 
-
     # Sidebar for scraping configuration
     with st.sidebar:
         with st.expander("🔍 Find Jobs", expanded=True):
             find_jobs.render(st)
-        with st.expander("🔧 Display Filters", expanded=False):
-            display_filters.render(st)
+        # with st.expander("🔧 Display Filters", expanded=False):
+        #     display_filters.render(st)
 
     # Main content area
-    if not get_jobs_df().empty:
-
+    if not get_working_df().empty:
         jo, jd, ar, summ, sco, dm = st.tabs(MAIN_TABS)
 
         with jo:
@@ -90,7 +93,6 @@ def main():
         3. **Enter search terms** and location
         4. **Click 'Scrape Jobs'** to start collecting job listings
         5. **View and manage** your jobs in the tabs above
-        
         ### Features:
         - 🔍 **Job Scraping**: Collect jobs from multiple sites
         - 📊 **Overview**: View all jobs with filtering options
@@ -110,7 +112,6 @@ def _footer():
         st.markdown(f"jobfinder v{__version__}")
     with _col_right:
         st.markdown(f"Loaded:{get_now()}")
-
 
 
 if __name__ == "__main__":

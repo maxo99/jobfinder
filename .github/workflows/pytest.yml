@@ -41,6 +41,35 @@ jobs:
       - name: Install Dependencies
         run: uv sync --group dev
 
+
+      - name: Ensure Docker Compose v2 is installed
+        run: |
+          if ! docker compose version; then
+            sudo curl -SL https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            docker-compose version
+          fi
+
+
+      - name: Start only postgres and ollama (mock)
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgres ollama
+
+
+      - name: Wait for Postgres to be healthy
+        run: |
+          for i in {1..30}; do
+            if docker compose exec -T postgres pg_isready -U postgres -P postgres; then
+              echo "Postgres is ready!"
+              break
+            fi
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
+
+      # - name: Set Postgres host for tests
+      #   run: echo "POSTGRES_HOST=host.docker.internal" >> $GITHUB_ENV
+
+
       - name: Test
         run: |
           uv run pytest  \

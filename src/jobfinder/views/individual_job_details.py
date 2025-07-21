@@ -1,8 +1,16 @@
 import logging
-from jobfinder.model import UserType, FoundJob, Status, found_jobs_from_df
+
+from jobfinder.domain.models import NEW, STATUS_TYPES, USER, VIEWED, Job, df_to_jobs
+from jobfinder.session import (
+    get_data_service,
+    get_jobs_df,
+    get_working_count,
+    get_working_df,
+    set_jobs_df,
+    update_by_id,
+)
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
-from jobfinder.session import get_jobs_df, set_jobs_df, update_by_id
 
 logger = logging.getLogger(__name__)
 
@@ -16,43 +24,46 @@ def render(st):
     # if selection_mode == "Add New Record":
 
     # else:
-    if not get_jobs_df().empty:
-        logger.info(f"Displaying {len(get_jobs_df().index)} Jobs")
-        #  TODO: IMPROVE ORDERING/FILTERING
+    # if not get_jobs_df().empty:
+    logger.info(f"Displaying {get_working_count()} Jobs")
+    #  TODO: IMPROVE ORDERING/FILTERING
 
+    working_df = get_working_df()
+    _keys = working_df["id"].astype(str).tolist()
 
-        _found_jobs = found_jobs_from_df(get_jobs_df())
-
-        _key = st.selectbox(
-            "Select a Job",
-            options=list(_found_jobs.keys()),
-            format_func=lambda x: _found_jobs[x].name,
-            index=0,
+    _key = st.selectbox(
+        "Select a Job",
+        options=_keys,
+        format_func=lambda x: working_df.loc[working_df["id"] == x]["name"].iloc[0],
+        index=0,
+    )
+    if _key:
+        logger.info(
+            f"Selected job:{_key}: {working_df.loc[working_df['id'] == _key]['name'].iloc[0]}"
         )
-        if _key:
-            logger.info(f"Selected job:{_key}: {_found_jobs[_key].name}")
-        else:
-            _key = list(_found_jobs.keys())[0]
+    else:
+        _key = _keys[0]
 
-        _col_details, _col_actions = st.columns([2, 1])
-        with _col_details:
-            _details(st, _found_jobs[_key])
-        with _col_actions:
-            _actions(st, _found_jobs[_key], _key)
+    _col_details, _col_actions = st.columns([2, 1])
+    selection = df_to_jobs(working_df.loc[working_df["id"] == _key])[0]
+    with _col_details:
+        _details(st, selection)
+    with _col_actions:
+        _actions(st, selection, _key)
 
 
-def _details(st, job: FoundJob):
+def _details(st, job: Job):
     st.markdown(job.get_details())
 
 
-def _actions(st, job: FoundJob, job_id: str):
+def _actions(st, job: Job, job_id: str):
     st.subheader("Actions")
 
-    _current_status = job.status.value
+    _current_status = job.status
     new_status = st.selectbox(
         "Update Status",
-        options=[s.value for s in Status],
-        index=[s.value for s in Status].index(_current_status),
+        options=STATUS_TYPES,
+        index=list(STATUS_TYPES).index(_current_status),
         key=f"status_{job_id}",
     )
     new_pros = st.text_area("Pros", value=job.pros)
@@ -68,28 +79,32 @@ def _actions(st, job: FoundJob, job_id: str):
     )
 
     if new_pros != job.pros or new_cons != job.cons or new_score != job.score:
-        _classifier = UserType.USER.value
+        _classifier = USER
     else:
-        _classifier = UserType(job.classifier).value
+        _classifier = job.classifier
     if new_summary != job.summary:
-        _summarizer = UserType.USER.value
+        _summarizer = USER
     else:
-        _summarizer = UserType(job.summarizer).value
+        _summarizer = job.summarizer
 
-    if st.button("💾 Update Job"):
+    if st.button("💾 Update Job", key="update_individual_job"):
         # Automatically set to VIEWED if NEW
-        if new_status == Status.NEW.value:
-            new_status = Status.VIEWED.value
-        df = update_by_id(get_jobs_df(), job.id, {
-            "status": new_status,
-            "pros": new_pros,
-            "cons": new_cons,
-            "score": new_score,
-            "summary": new_summary,
-            "classifier": _classifier,
-            "summarizer": _summarizer,
-            "modified": get_now(),
-        })
+        if new_status == NEW:
+            new_status = VIEWED
+        df = update_by_id(
+            get_jobs_df(),
+            job.id,
+            {
+                "status": new_status,
+                "pros": new_pros,
+                "cons": new_cons,
+                "score": new_score,
+                "summary": new_summary,
+                "classifier": _classifier,
+                "summarizer": _summarizer,
+                "modified": get_now(),
+            },
+        )
         set_jobs_df(df)
         save_data2(get_jobs_df())
         st.success("Job updated successfully!")
@@ -102,8 +117,7 @@ def _actions(st, job: FoundJob, job_id: str):
 
 
 def _delete(st, job_id: str):
-    set_jobs_df(get_jobs_df().drop(get_jobs_df().index[get_jobs_df()['id'] == job_id]).reset_index(drop=True))
-    save_data2(get_jobs_df())
+    get_data_service().delete_job(job_id)
     st.success("Job deleted successfully!")
     st.rerun()
 

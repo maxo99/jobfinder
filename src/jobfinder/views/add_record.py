@@ -1,9 +1,8 @@
 import logging
-import pandas as pd
-from jobfinder.model import UserType
+
+from jobfinder.domain.models import NA, USER, Job
+from jobfinder.session import get_data_service
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import save_data2, update_results
-from jobfinder.session import get_jobs_df
 
 logger = logging.getLogger(__name__)
 
@@ -27,30 +26,27 @@ def render(st):
             st.text("Submitted")
 
             if summary:
-                _summarizer = UserType.USER.value
+                _summarizer = USER
             else:
-                _summarizer = UserType.NA.value
+                _summarizer = NA
 
             if pros or cons or score is not None:
-                _classifier = UserType.USER.value
+                _classifier = USER
             else:
-                _classifier = UserType.NA.value
+                _classifier = NA
 
-            _new_record = pd.DataFrame(
-                {
-                    "id": [f"USER_CREATED_{get_now()}"],
-                    "company": ["USER_ADDED"],
-                    "title": [title],
-                    "pros": [pros],
-                    "summary": [summary],
-                    "cons": [cons],
-                    "score": [score],
-                    "classifier": [_classifier],
-                    "summarizer": [_summarizer],
-                    "modified": [get_now()],
-                },
+            _new_record = Job(
+                id=f"USER_CREATED_{get_now()}",
+                company="USER_ADDED",
+                title=title,
+                pros=pros,
+                summary=summary,
+                cons=cons,
+                score=score,
+                classifier=_classifier,
+                summarizer=_summarizer,
+                modified=get_now(),
             )
-            update_results(_new_record)
-            save_data2(get_jobs_df())
+            get_data_service().store_jobs([_new_record])
             st.success("Record added successfully!")
             st.rerun()

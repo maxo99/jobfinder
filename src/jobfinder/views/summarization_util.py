@@ -1,24 +1,27 @@
 import logging
 
-from jobfinder.services.summarization_service import summarize_jobs
-from jobfinder.session import get_jobs_df
+import pandas as pd
 
-from jobfinder.model import UserType
+from jobfinder.domain.models import AI, USER, df_to_jobs
+from jobfinder.session import (
+    chat_enabled,
+    get_data_service,
+    get_generative_service,
+    get_working_df,
+)
 from jobfinder.utils import get_now
-from jobfinder.utils.persistence import update_results
 from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
-from jobfinder.session import chat_enabled, get_chat_client
 
 logger = logging.getLogger(__name__)
 
 
 def render(st):
     st.subheader("Summarize Jobs")
-    df_display = get_jobs_df().copy()
-    selection_df = df_display[DISPLAY_COLS].copy()
+    df_display = get_working_df().copy()
+
 
     selected_rows = st.dataframe(
-        selection_df,
+        df_display[DISPLAY_COLS].copy(),
         use_container_width=True,
         on_select="rerun",
         column_order=DEFAULT_COLS,
@@ -26,45 +29,39 @@ def render(st):
         key="summarization_selection_dataframe",
     )
 
-    _selected_data = None
-    if (
-        selected_rows
-        and "selection" in selected_rows
-        and "rows" in selected_rows["selection"]
-    ):
-        selected_indices = selected_rows["selection"]["rows"]
-        _selected_data_records = [selection_df.iloc[i]["id"] for i in selected_indices]
+    selected_df = _get_selected_df(df_display, selected_rows)
 
-        selected_df = df_display[df_display["id"].isin(_selected_data_records)]
-        _selected_data = selected_df.to_dict("records")
-
-    if not _selected_data:
+    if selected_df.empty:
         st.warning("Please select one or more jobs to summarize.")
     else:
         summarization_mode = st.radio(
             "Summarization Mode",
-            [UserType.AI.value, UserType.USER.value],
+            [AI, USER],
             horizontal=True,
             key="summarize_jobs_mode",
         )
+        # _selected_data = selected_df.to_dict("records")
 
-        if summarization_mode == UserType.AI.value:
+        if summarization_mode == AI:
             st.info("AI will generate summaries for the selected jobs.")
             if chat_enabled():
                 if st.button("Generate AI Summaries"):
-                    st.text("Generating summaries...")
-                    result = summarize_jobs(get_chat_client(), selection_df)
-                    if result:
-                        update_results(selection_df)
-                        st.success("Record summarized successfully!")
-                        st.rerun()
-                    else:
-                        st.error(
-                            "No content returned from AI completion. Please check the prompt."
-                        )
-                else:
-                    st.error("Chat not enabled, see README for configuration")
-        elif summarization_mode == UserType.USER.value:
+                    with st.spinner(f"Generating {len(selected_df.index)} summaries...", show_time=True):
+                        result = get_generative_service().summarize_jobs(selected_df)
+                        if isinstance(result, pd.DataFrame):
+                            _jobs = df_to_jobs(result)
+                            st.success("Record summarized successfully!")
+                            get_data_service().store_jobs(_jobs)
+                            st.text("Updated DataFrame:")
+                            st.rerun()
+                        else:
+                            st.error(
+                                "No content returned from AI completion. "
+                                "Please check the prompt."
+                            )
+            else:
+                st.error("Chat not enabled, see README for configuration")
+        elif summarization_mode == USER:
             st.info("You will provide a summary for the selected jobs.")
 
             with st.form("user summarization form"):
@@ -74,12 +71,25 @@ def render(st):
                 submit = st.form_submit_button("Submit")
                 if submit:
                     st.text("Submitted")
-                    selection_df["summarizer"] = UserType.USER.value
-                    selection_df["summary"] = new_summary
-                    selection_df["modified"] = get_now()
-                    update_results(selection_df)
+                    selected_df["summarizer"] = USER
+                    selected_df["summary"] = new_summary
+                    selected_df["modified"] = get_now()
+                    get_data_service().store_jobs(df_to_jobs(selected_df))
                     st.success("Record added successfully!")
                     st.rerun()
+
+def _get_selected_df(df_display: pd.DataFrame, selected_rows: dict) -> pd.DataFrame:
+    selected_df = pd.DataFrame()
+    if (
+        selected_rows
+        and "selection" in selected_rows
+        and "rows" in selected_rows["selection"]
+    ):
+        selected_indices = selected_rows["selection"]["rows"]
+        _selected_data_records = [df_display.iloc[i]["id"] for i in selected_indices]
+
+        selected_df = df_display[df_display["id"].isin(_selected_data_records)]
+    return selected_df
 
 
 # def _actions(job: FoundJob, idx: int):
