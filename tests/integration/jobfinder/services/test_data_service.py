@@ -1,12 +1,43 @@
+import logging
 import time
+
+from jobfinder.domain.models import Qualification
+
+logger = logging.getLogger(__name__)
 
 
 def test_populate_index(fix_dataservice, jobs_testdata):
+    startup_count = len(fix_dataservice.get_jobs())
+    logger.info("Starting count of jobs in index: %d", startup_count)
     fix_dataservice.store_jobs(jobs_testdata)
     time.sleep(2)
 
     populated_count = len(fix_dataservice.get_jobs())
+    logger.info("Populated count of jobs in index: %d", populated_count)
     assert populated_count >= len(jobs_testdata)
+
+
+def test_embed_populated_job(fix_dataservice, jobs_testdata):
+    try:
+        jobs_testdata = jobs_testdata.copy()[0:1]
+        jobs_testdata[0].qualifications = [
+            Qualification(skill="Python", requirement="required", experience="5 years")
+        ]
+
+        fix_dataservice.store_jobs(jobs_testdata)
+        time.sleep(1)
+        fix_dataservice.embed_populated_jobs(jobs_testdata)
+        time.sleep(1)
+        fix_dataservice.store_jobs(jobs_testdata)
+
+        results = fix_dataservice.search_similar_jobs(jobs_testdata[0].title[0:5])
+        assert len(results) > 0, "No similar jobs found after embedding."
+        assert results[0].id == jobs_testdata[0].id, (
+            "The first job in the search results should match the stored job."
+        )
+        print("finished")
+    except Exception as e:
+        raise e
 
 
 # def test_updating_summary(

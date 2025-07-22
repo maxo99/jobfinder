@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import create_engine, select, text
+from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.orm import sessionmaker
 
 from jobfinder import config
@@ -57,8 +57,11 @@ class PostgresClient:
                         updated_jobs.append(job)
                 session.commit()
                 # Only refresh the jobs that are actually in this session
+                if updated_jobs:
+                    logger.info(f"Refreshing {len(updated_jobs)} jobs in session.")
                 for job in updated_jobs:
                     session.refresh(job)
+            logger.info(f"Upserted {len(updated_jobs)} jobs successfully.")
         except Exception as e:
             logger.error(f"Error upserting jobs: {e}")
             raise e
@@ -100,4 +103,31 @@ class PostgresClient:
                 else:
                     raise ValueError(f"Job with id {job_id} not found")
         except Exception as e:
+            raise e
+
+    def search_by_title(
+        self, title_embedding: list[float], limit: int = 5
+    ) -> list[Job]:
+        try:
+            logger.info("Searching jobs by title embedding")
+
+            similarity_threshold: float = 0.7
+            embedding_str: str = str(title_embedding).replace("[", "").replace("]", "")
+            embedding_sql = text(f"ARRAY[{embedding_str}]::vector")
+
+            with self.session_maker() as session:
+                results = (
+                    session.query(Job)
+                    .filter(
+                        func.cosine_distance(Job.title_vector, embedding_sql)
+                        < similarity_threshold
+                    )
+                    .order_by(func.cosine_distance(Job.title_vector, embedding_sql))
+                    .limit(limit)
+                    .all()
+                )
+                logger.info(f"Found {len(results)} jobs matching title embedding")
+                return results
+        except Exception as e:
+            logger.error(f"Error searching jobs by title: {e}")
             raise e

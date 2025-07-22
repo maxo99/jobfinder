@@ -11,8 +11,9 @@ from jobfinder.utils.loader import load_raw_jobs_df
 
 @pytest.fixture(scope="session")
 def raw_jobs_df():
-    return load_raw_jobs_df()
-
+    raw =  load_raw_jobs_df()
+    raw = raw.drop_duplicates(subset=["id"], keep="last")
+    return raw
 
 @pytest.fixture(scope="session")
 def jobs_testdata(raw_jobs_df) -> list[Job]:

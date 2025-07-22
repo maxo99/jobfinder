@@ -5,15 +5,31 @@ import pandas as pd
 from pgvector.sqlalchemy import Vector
 from pydantic import (
     BaseModel,
-    field_serializer,
     field_validator,
 )
-from sqlalchemy import Column
-from sqlmodel import JSON, Field, SQLModel
+from sqlalchemy import Column, event
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import Session
+from sqlmodel import Field, SQLModel
 
 from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)
+
+
+def serialize_qualifications_before_flush(session: Session, flush_context, instances):
+    try:
+        for obj in session.new.union(session.dirty):
+            if isinstance(obj, Job) and obj.qualifications:
+                # Convert Qualification objects to dicts for DB storage
+                if isinstance(obj.qualifications[0], Qualification):
+                    obj.qualifications = [q.model_dump() for q in obj.qualifications]
+    except Exception as e:
+        logger.error(f"Error in before_flush serialize_qualifications: {e}")
+        raise
+
+
+event.listen(Session, "before_flush", serialize_qualifications_before_flush)
 
 
 # Vector dimension for embeddings
@@ -90,10 +106,10 @@ class Job(SQLModel, table=True):
     cons: str | None = None
     score: float | None = Field(default=0.0, ge=-1.0, le=1.0)
     summary: str | None = None
-    qualifications: list[Qualification] = Field(
+    qualifications: list = Field(
         default_factory=list,
         description="List of skills and requirements",
-        sa_column=Column(JSON),
+        sa_column=Column(JSONB),
     )
 
     # Timestamp fields
@@ -120,10 +136,10 @@ class Job(SQLModel, table=True):
     job_function: str | None = None
 
     # Vector fields for embeddings (pgvector)
-    title_vector: list[float] | None = Field(
+    title_vector: list[float]  | None = Field(
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
-    description_vector: list[float] | None = Field(
+    qualifications_vector: list[float] | None = Field(
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
     summary_vector: list[float] | None = Field(
@@ -192,7 +208,7 @@ class Job(SQLModel, table=True):
                 return "N/A"
             if isinstance(c, str) and c in USER_TYPES:
                 return c
-            logger.error(f"Invalid user type value: {c}, defaulting to 'N/A'")
+            logger.warning(f"Invalid user type value: {c}, defaulting to 'N/A'")
             return "N/A"
         except Exception as e:
             logger.error(f"Error in validate_user_type: {e}")
@@ -274,30 +290,45 @@ class Job(SQLModel, table=True):
             logger.error(f"Error generating job details: {e}")
             raise
 
-    @field_serializer("qualifications")
-    @classmethod
-    def serialize_qualifications(cls, val):
-        try:
-            if not val:
-                return val
-            if isinstance(val, list) and isinstance(val[0], Qualification):
-                return [q.model_dump() for q in val]
-            return val
-        except Exception as e:
-            raise e
+    # @field_serializer("qualifications")
+    # @classmethod
+    # def serialize_qualifications(cls, val) -> list[dict]:
+    #     try:
+    #         if not val:
+    #             return []
+    #         if isinstance(val, list) and isinstance(val[0], Qualification):
+    #             return [q.model_dump() for q in val]
+    #         return val
+    #     except Exception as e:
+    #         logger.error(f"Error in serialize_qualifications: {e}")
+    #         raise
 
-    @field_validator("qualifications", mode="before")
-    @classmethod
-    def validate_qualifications(cls, val):
-        try:
-            if not val:
-                return val
-            if isinstance(val, list) and isinstance(val[0], dict):
-                return [Qualification(**q) for q in val]
-            return val
-        except Exception as e:
-            logger.error(f"Error in validate_qualifications: {e}")
-            raise
+    # @field_validator("qualifications", mode="before")
+    # @classmethod
+    # def validate_qualifications(cls, val):
+    #     try:
+    #         if not val:
+    #             return val
+    #         if isinstance(val, list) and isinstance(val[0], dict):
+    #             return [Qualification(**q) for q in val]
+    #         return val
+    #     except Exception as e:
+    #         logger.error(f"Error in validate_qualifications: {e}")
+    #         raise
+
+    # @field_validator("qualifications", mode="before")
+    # @classmethod
+    # def validate_qualifications(cls, val):
+    #     try:
+    #         if not val:
+    #             return []
+    #         # Convert list of Qualification objects to dicts
+    #         if isinstance(val, list) and isinstance(val[0], Qualification):
+    #             return [q.model_dump() for q in val]
+    #         return val
+    #     except Exception as e:
+    #         logger.error(f"Error in validate_qualifications: {e}")
+    #         raise
 
 
 def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:

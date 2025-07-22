@@ -24,6 +24,13 @@
         "titleBar.activeBackground": "#130546", // Change this color to your desired color
         "titleBar.inactiveBackground": "#FF0000" // Change this color to your desired color
     },
-    "pylint.args": ["--rcfile=pyproject.toml","-j"],
+    "pylint.args": [
+        "--rcfile=pyproject.toml",
+        "-j"
+    ],
     "ruff.configurationPreference": "filesystemFirst",
+    "files.associations": {
+        "justfile": "makefile",
+        "Justfile": "makefile"
+    },
 }

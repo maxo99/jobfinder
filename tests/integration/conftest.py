@@ -7,6 +7,7 @@ from collections.abc import Generator
 import docker
 import psycopg2
 import pytest
+from pytest_docker import Services
 import requests
 from openai.types.chat.chat_completion import (
     ChatCompletion,
@@ -26,14 +27,32 @@ logger = logging.getLogger(__name__)
 def at():
     _at = AppTest.from_file("main.py", default_timeout=30).run(timeout=60)
     yield _at
-    print("Test session completed, cleaning up...")
+    # print("Test session completed, cleaning up...")
 
 
 # Pin the project name to avoid creating multiple stacks
 @pytest.fixture(scope="session")
-def docker_compose_project_name() -> str:
-    return "jobfinder"
+def docker_compose_project_name(keepalive, docker_compose_project_name) -> str:
+    """Override `docker_compose_project_name` to make sure that we have a
+    unique project name if user asked to keep containers alive. This way
+    we won’t create Docker container every time we will start pytest."""
 
+    if keepalive:
+        return "jobfinder"
+
+    return docker_compose_project_name
+
+
+@pytest.fixture(scope="session")
+def docker_cleanup(keepalive, docker_cleanup):
+    """If user asked to keep Docker alive, make `pytest-docker` execute
+    the `docker-compose version` command. This way, Docker container won’t
+    be shut down."""
+
+    if keepalive:
+        return "version"
+
+    return docker_cleanup
 
 @pytest.fixture(scope="session")
 def docker_setup():
@@ -61,6 +80,43 @@ def docker_setup():
     except Exception as e:
         print(f"Error checking container status: {e}")
         raise e
+
+
+def pytest_addoption(parser):
+    """Add custom options to pytest.
+    Add the --keepalive option for pytest.
+    """
+
+    parser.addoption("--keepalive", "-K", action="store_true", default=False, help="Keep Docker containers alive")
+
+
+@pytest.fixture(scope="session")
+def keepalive(request):
+    """Check if user asked to keep Docker running after the test."""
+
+    return request.config.option.keepalive
+
+# @pytest.fixture(scope='session')
+# def docker_services(request, docker_compose_files, docker_ip, docker_services_project_name):
+#     """Provide the docker services as a pytest fixture.
+
+#     The services will be stopped after all tests are run.
+#     """
+#     keep_alive = request.config.getoption("--keepalive", False)
+#     services = Services(
+#         docker_compose_files,
+#         docker_ip,
+#         docker_services_project_name
+#     )
+#     yield services
+#     if not keep_alive:
+#         services.shutdown()
+
+
+# @pytest.fixture(scope="session")
+# def my_service(request):
+#     if request.config.getoption("--env") == "docker":
+#         request.getfixturevalue("my_container")
 
 
 def is_responsive(url):

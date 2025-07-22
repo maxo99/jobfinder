@@ -12,7 +12,7 @@ services:
       - OPENAI_KEY=${OPENAI_KEY:-}
     volumes:
       - ./data:/app/data
-    restart: unless-stopped
+    # restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
       interval: 120s
@@ -43,7 +43,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-jobfinder}
       POSTGRES_SSLMODE: ${POSTGRES_SSLMODE:-disable}
-    restart: unless-stopped
+    # restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-jobfinder}"]
       interval: 10s
@@ -55,7 +55,7 @@ services:
 
   ollama:
     container_name: ollama
-    restart: unless-stopped
+    # restart: unless-stopped
     image: ollama/ollama:latest
     volumes:
       - "./docker_data/ollamadata:/root/.ollama"

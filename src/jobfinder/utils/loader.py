@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def load_raw_jobs_df(state: Literal["raw", "processed"] = "processed") -> pd.DataFrame:
     logger.info(f"Loading data with state: {state}")
     _data_files = []
-    if state == "processed":
+    if state == "processed" and os.path.exists(JOBS_DATA_FILE):
         _data_files = [JOBS_DATA_FILE]
     else:
         _data_files = [

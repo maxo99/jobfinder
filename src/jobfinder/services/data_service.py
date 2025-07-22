@@ -30,7 +30,6 @@ class DataService:
     def get_jobs(self, **filters) -> list:
         return self.db_client.get_jobs(**filters)
 
-
     def get_count(self, **kwargs) -> int:
         try:
             return self.db_client.get_count(**kwargs)
@@ -45,3 +44,24 @@ class DataService:
         except Exception as e:
             logger.error(f"Error deleting job {job_id}: {e}")
             raise e
+
+    def embed_populated_jobs(self, jobs: list[Job]):
+        try:
+            for job in jobs:
+                if job.title:
+                    job.title_vector = self.embedding_client.embed(job.title)
+                if job.summary:
+                    job.summary_vector = self.embedding_client.embed(job.summary)
+            self.store_jobs(jobs)
+            logger.info(f"Embedded {len(jobs)} populated jobs.")
+        except Exception as e:
+            logger.error(f"Error embedding populated jobs: {e}")
+            raise e
+
+    def search_similar_jobs(self, title: str, **filters) -> list[Job]:
+        try:
+            title_vector = self.embedding_client.embed(title)
+            return self.db_client.search_by_title(title_embedding=title_vector)
+        except Exception as e:
+            logger.error(f"Error searching jobs with title '{title}': {e}")
+            return []
