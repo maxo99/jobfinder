@@ -14,3 +14,9 @@ dev-logs:
 
 test-deploy:
     docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgres ollama --force-recreate
+
+build:
+    uv build
+
+build-dev:
+    uv build --group=dev

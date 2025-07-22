@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import time
@@ -7,15 +6,10 @@ from collections.abc import Generator
 import docker
 import psycopg2
 import pytest
-from pytest_docker import Services
 import requests
-from openai.types.chat.chat_completion import (
-    ChatCompletion,
-)
 from streamlit.testing.v1 import AppTest
 
 from jobfinder import PROJECT_ROOT, config
-from jobfinder.adapters.chat.chat_client import ChatClient
 from jobfinder.adapters.db.postgres_client import PostgresClient
 from jobfinder.services.data_service import DataService
 from jobfinder.services.generative_service import GenerativeService
@@ -54,6 +48,7 @@ def docker_cleanup(keepalive, docker_cleanup):
 
     return docker_cleanup
 
+
 @pytest.fixture(scope="session")
 def docker_setup():
     """Only start Docker services if they're not already running."""
@@ -87,7 +82,13 @@ def pytest_addoption(parser):
     Add the --keepalive option for pytest.
     """
 
-    parser.addoption("--keepalive", "-K", action="store_true", default=False, help="Keep Docker containers alive")
+    parser.addoption(
+        "--keepalive",
+        "-K",
+        action="store_true",
+        default=False,
+        help="Keep Docker containers alive",
+    )
 
 
 @pytest.fixture(scope="session")
@@ -95,6 +96,7 @@ def keepalive(request):
     """Check if user asked to keep Docker running after the test."""
 
     return request.config.option.keepalive
+
 
 # @pytest.fixture(scope='session')
 # def docker_services(request, docker_compose_files, docker_ip, docker_services_project_name):
@@ -254,58 +256,53 @@ def fix_postgresclient(postgres_service) -> Generator[PostgresClient, None, None
     _client.close()
 
 
+# @pytest.fixture()
+# def mock_openai_client_summarizer(at, jobs_data_f, monkeypatch):
+#     from unittest.mock import MagicMock
 
+#     def mock_completions(content: str) -> ChatCompletion:
+#         summaries = []
+#         for _, job in jobs_data_f.iterrows():
+#             summaries.append(
+#                 {
+#                     "id": job["id"],
+#                     "summary": f"Mocked summary for {job['title']} at {job['company']}",
+#                 }
+#             )
+#         return ChatCompletion.model_validate(
+#             {
+#                 "choices": [
+#                     {
+#                         "index": 0,
+#                         "message": {
+#                             "role": "assistant",
+#                             "content": json.dumps({"summaries": summaries}),
+#                         },
+#                         "finish_reason": "stop",
+#                     }
+#                 ],
+#                 "id": "mocked_completion_id",
+#                 "object": "chat.completion",
+#                 "created": int(time.time()),
+#                 "model": "gpt-4o-2024-05-13",
+#                 "usage": {
+#                     "completion_tokens": 5,
+#                     "prompt_tokens": 36,
+#                     "total_tokens": 41,
+#                     "completion_tokens_details": None,
+#                 },
+#             }
+#         )
 
-@pytest.fixture()
-def mock_openai_client_summarizer(at, jobs_data_f, monkeypatch):
-    from unittest.mock import MagicMock
-
-    def mock_completions(content: str) -> ChatCompletion:
-        summaries = []
-        for _, job in jobs_data_f.iterrows():
-            summaries.append(
-                {
-                    "id": job["id"],
-                    "summary": f"Mocked summary for {job['title']} at {job['company']}",
-                }
-            )
-        return ChatCompletion.model_validate(
-            {
-                "choices": [
-                    {
-                        "index": 0,
-                        "message": {
-                            "role": "assistant",
-                            "content": json.dumps({"summaries": summaries}),
-                        },
-                        "finish_reason": "stop",
-                    }
-                ],
-                "id": "mocked_completion_id",
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": "gpt-4o-2024-05-13",
-                "usage": {
-                    "completion_tokens": 5,
-                    "prompt_tokens": 36,
-                    "total_tokens": 41,
-                    "completion_tokens_details": None,
-                },
-            }
-        )
-
-    # with patch('jobfinder.views.summarization_util.get_chat_client') as get_client_mock:
-    mock_client = MagicMock(spec=ChatClient)
-    mock_client._client = MagicMock()
-    monkeypatch.setattr(mock_client, "completions", mock_completions)
-    yield mock_client
+#     # with patch('jobfinder.views.summarization_util.get_chat_client') as get_client_mock:
+#     mock_client = MagicMock(spec=ChatClient)
+#     mock_client._client = MagicMock()
+#     monkeypatch.setattr(mock_client, "completions", mock_completions)
+#     yield mock_client
 
 
 @pytest.fixture()
 def mock_get_jobs_df(at, jobs_data_f, monkeypatch):
-    def _mock_get_jobs_df():
-        return jobs_data_f
-
     def _get_test_session():
         return at.session_state
 
