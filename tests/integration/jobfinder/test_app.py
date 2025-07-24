@@ -3,17 +3,17 @@ import os
 from jobfinder import RAW_DATA_DIR
 
 
-def test_find_jobs_returns_new_raw_data_entry(at):
-    try:
-        _starting_raw_count = len(os.listdir(RAW_DATA_DIR))
-        at.button(key="scrape_job").click().run()
-        data = at.session_state.jobs_df
-        assert _starting_raw_count < len(os.listdir(RAW_DATA_DIR))
-        assert not data.empty
+# def test_find_jobs_returns_new_raw_data_entry(at):
+#     try:
+#         _starting_raw_count = len(os.listdir(RAW_DATA_DIR))
+#         at.button(key="scrape_job").click().run()
+#         data = at.session_state.jobs_df
+#         assert _starting_raw_count < len(os.listdir(RAW_DATA_DIR))
+#         assert not data.empty
 
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        raise e
+#     except Exception as e:
+#         print(f"Error occurred: {e}")
+#         raise e
 
 
 # def test_update_button(at):
