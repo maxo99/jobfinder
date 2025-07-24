@@ -1,6 +1,36 @@
 # CHANGELOG
 
 
+## v0.10.0 (2025-07-24)
+
+### Build System
+
+- Changing build-system to uv_build
+  ([`3937033`](https://github.com/maxo99/jobfinder/commit/3937033a6878675765fd59ff5b18d61ff660545a))
+
+### Features
+
+- Updates to chat call using a json schema to ensure response validation
+  ([`11298b8`](https://github.com/maxo99/jobfinder/commit/11298b83569624b847e0601d7fc9fb0560a1e29f))
+
+### Testing
+
+- Updates to test data for mocks
+  ([`ab7ae7e`](https://github.com/maxo99/jobfinder/commit/ab7ae7e5c537c49cd487a040abfb0f74a1fff93e))
+
+- Updates to test data for mocks
+  ([`fc68cb1`](https://github.com/maxo99/jobfinder/commit/fc68cb1449228dd167c899d796eb0fc670da6cd2))
+
+- Updates to test setup for mocks
+  ([`f0bdf63`](https://github.com/maxo99/jobfinder/commit/f0bdf63230f9271201456f3cf9ffce9672744f84))
+
+- Updates to test setup for mocks
+  ([`f93bdb9`](https://github.com/maxo99/jobfinder/commit/f93bdb958ee3cdf3e1224c6f4d2a83cc8a487d15))
+
+- Updating local test setup/teardown via pytest-docker
+  ([`a473e5a`](https://github.com/maxo99/jobfinder/commit/a473e5ab3372486f779f7b28f22025a11c847fbd))
+
+
 ## v0.9.2 (2025-07-21)
 
 ### Bug Fixes
