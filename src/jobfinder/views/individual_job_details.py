@@ -1,8 +1,11 @@
 import logging
 
+import pandas as pd
+
 from jobfinder.domain.models import NEW, STATUS_TYPES, USER, VIEWED, Job, df_to_jobs
 from jobfinder.session import (
     get_data_service,
+    get_generative_service,
     get_jobs_df,
     get_working_count,
     get_working_df,
@@ -54,6 +57,29 @@ def render(st):
 
 def _details(st, job: Job):
     st.markdown(job.get_details())
+    expand_details = False
+    if job.qualifications:
+        st.markdown("## **Qualifications:**")
+        st.dataframe(
+                data=pd.DataFrame(job.qualifications)[['skill', 'experience', 'requirement']],
+                use_container_width=True,
+                hide_index=True,
+            )
+    else:
+        expand_details = True
+
+        if st.button("🤖 AI Extract Qualifications", key="add_qualifications"):
+            with st.spinner("Extracting Qualifications...", show_time=True):
+                _jobs = [job]
+                get_generative_service().extract_qualifications(_jobs)
+                st.success("Record summarized successfully!")
+                get_data_service().store_jobs(_jobs)
+                st.rerun()
+
+    with st.expander("📖 Job Details", expanded=expand_details):
+        if job.description:
+            st.markdown("## **Description:**")
+            st.markdown(job.description)
 
 
 def _actions(st, job: Job, job_id: str):

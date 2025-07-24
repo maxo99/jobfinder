@@ -19,9 +19,13 @@ def test_populate_index(fix_dataservice, jobs_testdata):
 
 def test_embed_populated_job(fix_dataservice, jobs_testdata):
     try:
+        test_id = "test_job_id"
         jobs_testdata = jobs_testdata.copy()[0:1]
+        jobs_testdata[0].id = test_id
         jobs_testdata[0].qualifications = [
-            Qualification(skill="Python", requirement="required", experience="5 years")
+            Qualification(
+                id=test_id, skill="Python", requirement="required", experience="5 years"
+            )
         ]
 
         fix_dataservice.store_jobs(jobs_testdata)

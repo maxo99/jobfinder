@@ -37,15 +37,15 @@ user reviewed existing records.
 - Pros and cons should be a single string response of bullet points.
 - Format the response as json with keys: score, pros, cons.
 ## Listing:
-### Title: {{listing.title}}
-### Description: {{listing.description}}
+### Title: {{ listing.title }}
+### Description: {{ listing.description }}
 ### Existing Records:
 {% for record in records %}
-    ### Title: {{record.title}}
-    ### Summary: {{record.summary}}
-    ### Pros: {{record.pros}}
-    ### Cons: {{record.cons}}
-    ### Score: {{record.score}}
+    ### Title: {{ record.title }}
+    ### Summary: {{ record.summary }}
+    ### Pros: {{ record.pros }}
+    ### Cons: {{ record.cons }}
+    ### Score: {{ record.score }}
 {% endfor %}
 
 """
@@ -54,37 +54,32 @@ SUMMARIZATION_INSTRUCTIONS = """
 # Instructions:
 - Review one or more job listings for extraction/summarization.
 - The goal is to extract qualifications and experience levels from the job listings.
-- The response should be a json object with 'summaries' with a json object containing job IDs as keys.
-- Each job ID should map to a list of qualifications.
-- The qualifications should be extracted from the job listing description.
+- Each returned qualification **must** have a jobID that exactly matches one of the jobIDs provided in the listings below.
+- **Do not invent or hallucinate jobIDs. Only use jobIDs from the provided listings.**
+- The qualifications should be extracted from the job listing description respective of the jobID it belongs to.
 - The qualifications should be grouped by skill and experience level.
 - The experience level should be represented as a string (e.g., "5 years", "2+ years", "N/A").
 - The qualifications should be grouped by skill and whether they are required, preferred, or desired.
-- The qualifications should be grouped by skill and experience level.
-- Each qualification should have the following properties:
-    - `skill`: The skill or technology required.
-    - `requirement`: Whether the skill is required, preferred, or desired.
-    - `experience`: The experience level required for the skill.
-
 """
 
+# SUMMARIZATION_EXAMPLE_RESPONSE = """
+# ## Example Response:
+# {"summaries":[{"id":"{{JOB_ID}}","skill":"Programming Languages","requirement":"true","experience":"8 years with one or more (e.g., Python, C, C++, Java, JavaScript)"},{"id":"{{JOB_ID}}","skill":"Master\'s/PhD ","requirement":"preferred","experience":"Engineering, Computer Science, or a related technical field"}]}
 
-SUMMARIZATION_EXAMPLE_RESPONSE = """
-## Example Response:
-{"summaries":{"job1":[{"skill":"Programming Languages","requirement":"true","experience":"8 years with one or more (e.g., Python, C, C++, Java, JavaScript)"},{"skill":"Master\'s/PhD ","requirement":"preferred","experience":"Engineering, Computer Science, or a related technical field"}]}}
-
-
-"""
+# """
 
 
 SUMMARIZATION_LISTINGS_TEMPLATE = """
-# Job Listings:
+## Job Listings:
 {% for record in records %}
-## Job Listing
-    ### ID: {{record.id}}
-    ### Description: {{record.description}}
+### Job Listing
+    #### jobID: {{ record.id }}
+    #### Description: {{ record.description }}
 {% endfor %}
 
+# Instruction Reminder:
+**the only valid jobIDs:**
+REMEMBER: Do not invent or hallucinate jobIDs. Use only the jobIDs are listed above.
 
 """
 

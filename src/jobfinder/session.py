@@ -45,6 +45,7 @@ def _init_session(st):
 
 
 def _init_working_df(st):
+    logger.info("Initializing working DataFrame")
     if "working_df" not in st.session_state:
         st.session_state.working_df = pd.DataFrame()
 

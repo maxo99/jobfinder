@@ -3,16 +3,19 @@
 dev-sync:
     uv sync --group=dev
 
-dev-deploy:
-    docker compose -f docker-compose.yml up -d
+dev-up:
+    docker compose up -d  postgres ollama 
 
 dev-down:
-    docker compose -f docker-compose.yml down --remove-orphans
+    docker compose down --remove-orphans
 
-dev-logs:
-    docker compose -f docker-compose.yml logs -f
+dev-restart: dev-down dev-up
+    echo "Restarting development environment..."
 
-test-deploy:
+logs SERVICE:
+    docker compose logs -f {{SERVICE}}
+
+test-up:
     docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgres ollama --force-recreate
 
 build:

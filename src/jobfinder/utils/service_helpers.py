@@ -1,9 +1,9 @@
 import logging
 
-
 from jinja2 import Template
 
-logger = logging.getLogger(__name__)    
+logger = logging.getLogger(__name__)
+
 
 def render_jinja(template_str: str, data: dict) -> str:
     try:

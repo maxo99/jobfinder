@@ -325,4 +325,5 @@ def fix_generativeservice(
     try:
         yield GenerativeService(chat_client=fix_ollamachatclient)
     finally:
-        fix_ollamachatclient.close()
+        ...
+        # fix_ollamachatclient.close()
