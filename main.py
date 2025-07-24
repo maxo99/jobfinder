@@ -18,7 +18,6 @@ from jobfinder.views import (
     individual_job_details,
     listings_overview,
     scoring_util,
-    summarization_util,
 )
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,7 @@ MAIN_TABS = [
     "📊 Job Overview",
     "📋 Job Details",
     "➕ Add Record",
-    "📝 Summarization Util",
+    # "📝 Summarization Util",
     "🤖 Scoring Util",
     "⚙️ Data Management",
 ]
@@ -42,7 +41,7 @@ def main():
     if 'initialized' not in st.session_state:
         _setup_logging()
         _init_session(st)
-        _init_working_df(st)
+    _init_working_df(st)
 
     # Main app
     st.title("💼 jobfinder")
@@ -58,7 +57,7 @@ def main():
 
     # Main content area
     if not get_working_df().empty:
-        jo, jd, ar, summ, sco, dm = st.tabs(MAIN_TABS)
+        jo, jd, ar, sco, dm = st.tabs(MAIN_TABS)
 
         with jo:
             st.header("Job Listings Overview")
@@ -72,8 +71,8 @@ def main():
             st.header("Add Record")
             add_record.render(st)
 
-        with summ:
-            summarization_util.render(st)
+        # with summ:
+        #     summarization_util.render(st)
 
         with sco:
             st.header("Job Scoring Utility")

@@ -20,12 +20,12 @@ class OpenAIChatClient(ChatClient):
             )
         logger.info(f"OpenAI chat client initialized with model {self.model}")
 
-    def _completions(self, content: str) -> ChatCompletion:
+    def _completions(self, content: str, format=...) -> ChatCompletion:
         try:
             logger.info(f"Perfoming completions call with:{self.model}")
             completion = self._client.chat.completions.create(
                 model=self.model,
-                response_format={"type": "json_object"},
+                response_format={"type": "json_schema", "json_schema": format},
                 messages=[
                     {
                         "role": "user",

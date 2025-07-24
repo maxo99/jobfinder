@@ -74,7 +74,6 @@ def render(st):
     _selected_data = get_selected_records()
 
     if _selected_data and _current_prompt:
-        # Render template
         _scoring_job = df_to_jobs(current_selected)[0]
         rendered_prompt = render_jinja(
             template_str=_current_prompt,
@@ -88,19 +87,22 @@ def render(st):
         st.code(rendered_prompt, language="markdown")
 
         if st.button("Generate Score", use_container_width=True, key="gen_score"):
-            if chat_enabled():
+            if not chat_enabled():
+                st.error("Chat not enabled, see README for configuration")
+            try:
                 _scoring_job = get_generative_service().generate_score(
                     st, _scoring_job, rendered_prompt=rendered_prompt
                 )
-                if _scoring_job:
-                    get_data_service().store_jobs([_scoring_job])
-                    st.success("Score generated and updated successfully!")
-                else:
-                    st.error("Failed to generate score. Please check the logs.")
-                    return
-                st.rerun()
-            else:
-                st.error("Chat not enabled, see README for configuration")
+            except Exception as e:
+                logger.error("Error generating score: %s", e)
+                st.error("Error generating score. Please check the logs.")
+                return
+            if not _scoring_job:
+                st.error("Failed to generate score. Please check the logs.")
+                return
+            get_data_service().store_jobs([_scoring_job])
+            st.success("Score generated and updated successfully!")
+            st.rerun()
 
     else:
         st.subheader("👀 Template Preview")

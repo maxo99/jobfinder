@@ -56,10 +56,18 @@ class DataFilters(BaseModel):
 
 
 class Qualification(BaseModel):
-    skill: str
-    requirement: str
-    experience: str
+    id: str = Field(description="The jobID which this qualification belongs to")
+    skill: str = Field(description="The skill or technologies representing the qualification")
+    experience: str = Field(description="The experience level for the skill")
+    requirement: str = Field(description="Whether the skill is required, preferred, or desired")
 
+
+class ScoringResponse(BaseModel):
+    score: float = Field(
+        default=0.0, ge=-1.0, le=1.0, description="The score of the job based on the AI analysis"
+    )
+    pros: str = Field(default="N/A", description="Pros of the job")
+    cons: str = Field(default="N/A", description="Cons of the job")
 
 # class Summarization(BaseModel):
 #     qualifications: list[Qualifications] = Field(
@@ -71,11 +79,18 @@ class Qualification(BaseModel):
 
 
 class SummarizationResponse(BaseModel):
-    summaries: dict[str, list[Qualification]] = Field(
-        default_factory=dict,
-        description="Dictionary mapping job IDs to lists of qualifications",
+    summaries: list[Qualification] = Field(
+        default_factory=list,
+        description="List of qualifications extracted from job postings",
     )
 
+
+    def get_qualifications(self, job_id: str) -> list[Qualification] | list:
+        try:
+            return [q for q in self.summaries if q.id == job_id]
+        except Exception as e:
+            logger.error(f"Error in get_qualifications: {e}")
+            raise
 
 # class Summaries(BaseModel):
 #     summaries: list[Summarization]
@@ -265,25 +280,6 @@ class Job(SQLModel, table=True):
                 details.append(
                     f"**{self.company} URL:** [{self.title}]({self.job_url_direct})"
                 )
-
-            if self.qualifications:
-                details.append("## **Qualifications:**")
-                for q in self.qualifications:
-                    details.append(
-                        f"- **Skill:** {q.skill}, **Requirement:** {q.requirement}, **Experience:** {q.experience}"
-                    )
-
-            if self.description:
-                details.append("## **Description:**")
-                if long:
-                    details.append(self.description)
-                else:
-                    desc = (
-                        self.description[:1000] + "..."
-                        if len(self.description) > 1000
-                        else self.description
-                    )
-                    details.append(desc)
 
             return "  \n  ".join(details)
         except Exception as e:

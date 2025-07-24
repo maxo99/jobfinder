@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CompletionResponse:
     id: str
-    content: str
+    content:  dict
     prompt_tokens: int = 0
     total_tokens: int = 0
 
@@ -17,12 +18,12 @@ class ChatClient(ABC):
     _client: ...
     model: str
 
-    def completions(self, content: str) -> CompletionResponse:
-        response = self._completions(content)
+    def completions(self, content: str, format: dict[str, Any]) -> CompletionResponse:
+        response = self._completions(content, format=format)
         return self._to_completion_response(response)
 
     @abstractmethod
-    def _completions(self, content: str):
+    def _completions(self, content: str, format: dict[str, Any]):
         raise NotImplementedError
 
     @abstractmethod
