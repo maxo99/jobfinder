@@ -50,6 +50,8 @@ jobs:
             docker-compose version
           fi
 
+      - name: Create empty .env file for docker-compose
+        run: touch .env
 
       - name: Start only postgres and ollama (mock)
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgres ollama
@@ -58,7 +60,7 @@ jobs:
       - name: Wait for Postgres to be healthy
         run: |
           for i in {1..30}; do
-            if docker compose exec -T postgres pg_isready -U postgres ; then
+            if docker compose exec -T postgres pg_isready -U postgres -d jobfinder; then
               echo "Postgres is ready!"
               break
             fi

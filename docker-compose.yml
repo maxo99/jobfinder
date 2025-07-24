@@ -9,7 +9,6 @@ services:
       - .env
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - OPENAI_KEY=${OPENAI_KEY:-}
     volumes:
       - ./data:/app/data
     # restart: unless-stopped
