@@ -117,7 +117,7 @@ max-returns = 6
 max-branches = 12
 
 [tool.pyright]
-include = ["src", "tests", "main.py"]
+include = ["src", "tests"]
 exclude = [
     "docker_data",
     "doc",
