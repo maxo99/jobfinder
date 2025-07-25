@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import logging
 
 from sqlalchemy import create_engine, func, select, text
@@ -7,6 +8,12 @@ from jobfinder import config
 from jobfinder.domain.models import Job, SQLModel
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class SimilarityResponse:
+    jobs: list[Job]
+    scores: list[float]
 
 
 class PostgresClient:
@@ -49,8 +56,15 @@ class PostgresClient:
                     existing_job = session.get(Job, job.id)
                     if existing_job:
                         for key, value in job.model_dump().items():
-                            if getattr(job, key):
-                                setattr(existing_job, key, value)
+                            if hasattr(job, key) and "vector" in key:
+                                # Handle vector fields specifically
+                                vector_value = getattr(job, key)
+                                if vector_value is not None and len(vector_value) > 0:
+                                    setattr(existing_job, key, vector_value)
+                            else:
+                                # Handle non-vector fields
+                                if value is not None and value != "":
+                                    setattr(existing_job, key, value)
                         updated_jobs.append(existing_job)
                     else:
                         session.add(job)
@@ -130,4 +144,40 @@ class PostgresClient:
                 return results
         except Exception as e:
             logger.error(f"Error searching jobs by title: {e}")
+            raise e
+
+    def search_similar_jobs(
+        self,
+        qualifications_embedding: list[float],
+        limit: int = 5,
+        similarity_threshold: float = 0.1,
+    ) -> SimilarityResponse:
+        try:
+            logger.info("Searching jobs by qualifications embedding")
+
+            embedding_str: str = (
+                str(qualifications_embedding).replace("[", "").replace("]", "")
+            )
+            embedding_sql = text(f"ARRAY[{embedding_str}]::vector")
+
+            with self.session_maker() as session:
+                distance_expr = func.cosine_distance(
+                    Job.qualifications_vector, embedding_sql
+                )
+
+                results = (
+                    session.query(Job, distance_expr.label("cosine_distance"))
+                    .filter(distance_expr < similarity_threshold)
+                    .order_by(distance_expr)
+                    .limit(limit)
+                    .all()
+                )
+                logger.info(
+                    f"Found {len(results)} jobs matching qualifications embedding"
+                )
+                return SimilarityResponse(
+                    jobs=[r[0] for r in results], scores=[r[1] for r in results]
+                )
+        except Exception as e:
+            logger.error(f"Error searching jobs by qualifications: {e}")
             raise e

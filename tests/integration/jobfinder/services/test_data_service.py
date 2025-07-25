@@ -1,6 +1,8 @@
 import logging
 import time
 
+import pytest
+
 from jobfinder.domain.models import Qualification
 
 logger = logging.getLogger(__name__)
@@ -27,9 +29,6 @@ def test_embed_populated_job(fix_dataservice, jobs_testdata):
                 id=test_id, skill="Python", requirement="required", experience="5 years"
             )
         ]
-
-        fix_dataservice.store_jobs(jobs_testdata)
-        time.sleep(1)
         fix_dataservice.embed_populated_jobs(jobs_testdata)
         time.sleep(1)
         fix_dataservice.store_jobs(jobs_testdata)
@@ -42,6 +41,35 @@ def test_embed_populated_job(fix_dataservice, jobs_testdata):
         print("finished")
     except Exception as e:
         raise e
+
+
+
+
+# # @pytest.mark.usefixtures("fix_populated_index")
+# def test_similar_job_search(fix_dataservice, fix_generativeservice, jobs_testdata):
+#     try:
+#         test_jobs = jobs_testdata.copy()[0:2]
+#         fix_generativeservice.extract_qualifications(test_jobs)
+#         jobs_1 = [test_jobs[0]]
+#         jobs_2 = [test_jobs[1]]
+#         jobs_1[0].id = "job123"
+#         jobs_2[0].id = "job456"
+
+#         fix_dataservice.embed_populated_jobs(jobs_1)
+#         fix_dataservice.store_jobs(jobs_1)
+
+#         test_jobs[1].qualifications = [
+#             Qualification(
+#                 id=test_jobs[1].id,
+#                 skill="Python",
+#                 requirement="required",
+#                 experience="5 years",
+#             )
+#         ]
+#         results = fix_dataservice.search_by_qualifications(test_jobs[1])
+#         assert len(results.jobs) > 0, "No similar jobs found."
+#     except Exception as e:
+#         raise e
 
 
 # def test_updating_summary(

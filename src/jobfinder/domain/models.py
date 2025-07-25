@@ -69,14 +69,6 @@ class ScoringResponse(BaseModel):
     pros: str = Field(default="N/A", description="Pros of the job")
     cons: str = Field(default="N/A", description="Cons of the job")
 
-# class Summarization(BaseModel):
-#     qualifications: list[Qualifications] = Field(
-#         default_factory=list, description="List of skills and requirements"
-#     )
-
-#     # def to_summary(self) -> dict:
-#     #     return {"qualifications": [q.model_dump() for q in self.qualifications]}
-
 
 class SummarizationResponse(BaseModel):
     summaries: list[Qualification] = Field(
@@ -91,11 +83,6 @@ class SummarizationResponse(BaseModel):
         except Exception as e:
             logger.error(f"Error in get_qualifications: {e}")
             raise
-
-# class Summaries(BaseModel):
-#     summaries: list[Summarization]
-
-# Qualifications = TypeAdapter(list[Qualification])
 
 
 class Job(SQLModel, table=True):
@@ -325,7 +312,20 @@ class Job(SQLModel, table=True):
     #     except Exception as e:
     #         logger.error(f"Error in validate_qualifications: {e}")
     #         raise
+    def create_qualifications_text(self) -> str:
+        try:
+            if not self.qualifications:
+                return ""
 
+            texts = []
+            for qual in self.qualifications:
+                text = f"Skill: {qual.skill}, Requirement: {qual.requirement}, Experience: {qual.experience}"
+                texts.append(text)
+
+            return " | ".join(texts)
+        except Exception as e:
+            logger.error(f"Error creating qualifications text: {e}")
+            raise
 
 def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     if not jobs:

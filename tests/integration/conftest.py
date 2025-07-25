@@ -310,7 +310,7 @@ def mock_get_jobs_df(at, jobs_data_f, monkeypatch):
     yield
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def fix_dataservice(fix_postgresclient, fix_ollamaembeddingclient) -> DataService:
     return DataService(
         db_client=fix_postgresclient,
@@ -318,7 +318,7 @@ def fix_dataservice(fix_postgresclient, fix_ollamaembeddingclient) -> DataServic
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def fix_generativeservice(
     fix_ollamachatclient,
 ) -> Generator[GenerativeService, None, None]:
@@ -327,3 +327,16 @@ def fix_generativeservice(
     finally:
         ...
         # fix_ollamachatclient.close()
+
+
+@pytest.fixture(scope="session")
+def fix_populated_index(fix_dataservice, jobs_testdata, fix_generativeservice):
+    count = 5
+    test_jobs = jobs_testdata.copy()[0:count]
+    for j in test_jobs:
+        j.id = f"job_{j.id}"
+    logger.info(f"Testing extraction of qualifications from {count} jobs.")
+    fix_generativeservice.extract_qualifications(test_jobs)
+
+    fix_dataservice.store_jobs(test_jobs)
+    time.sleep(2)

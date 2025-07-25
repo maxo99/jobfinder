@@ -1,6 +1,6 @@
 import logging
 
-from jobfinder.adapters.db.postgres_client import PostgresClient
+from jobfinder.adapters.db.postgres_client import PostgresClient, SimilarityResponse
 from jobfinder.adapters.embedding.embedding_client import EmbeddingClient
 from jobfinder.domain.models import Job
 
@@ -50,8 +50,10 @@ class DataService:
             for job in jobs:
                 if job.title:
                     job.title_vector = self.embedding_client.embed(job.title)
-                if job.summary:
-                    job.summary_vector = self.embedding_client.embed(job.summary)
+                if job.qualifications:
+                    job.qualifications_vector = self.embedding_client.embed(
+                        job.create_qualifications_text()
+                    )
             self.store_jobs(jobs)
             logger.info(f"Embedded {len(jobs)} populated jobs.")
         except Exception as e:
@@ -65,3 +67,24 @@ class DataService:
         except Exception as e:
             logger.error(f"Error searching jobs with title '{title}': {e}")
             return []
+
+    def search_by_qualifications(
+        self,
+        job: Job,
+        limit: int = 5,
+        similarity_threshold: float = 0.7,
+    ) -> SimilarityResponse | None:
+        try:
+            if not job.qualifications_vector:
+                job.qualifications_vector = self.embedding_client.embed(
+                    job.create_qualifications_text()
+                )
+            _results = self.db_client.search_similar_jobs(
+                qualifications_embedding=job.qualifications_vector,
+                limit=limit,
+                similarity_threshold=similarity_threshold,
+            )
+            return _results
+        except Exception as e:
+            logger.error(f"Error searching jobs by qualifications: {e}")
+            return None

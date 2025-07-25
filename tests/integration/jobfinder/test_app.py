@@ -1,6 +1,6 @@
-import os
+# import os
 
-from jobfinder import RAW_DATA_DIR
+# from jobfinder import RAW_DATA_DIR
 
 
 # def test_find_jobs_returns_new_raw_data_entry(at):
