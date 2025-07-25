@@ -1,7 +1,6 @@
 import logging
 
-import streamlit as st
-
+# import streamlit as st
 from jobfinder.domain.constants import DEFAULT_COLS, DISPLAY_COLS
 from jobfinder.session import get_working_df
 
@@ -9,15 +8,15 @@ logger = logging.getLogger(__name__)
 
 
 # def render(st):
-logger.info("Rendering Listings Overview")
 
-# with st.expander("Filters"):
+# # with st.expander("Filters"):
 
-_filtered_df = get_working_df().copy()
-
+# _filtered_df = get_working_df().copy()
 
 
-def _display_data():
+def render(st):
+    logger.info("Rendering Listings Overview")
+
     if not get_working_df().empty:
         logger.info("Displaying Filtered Jobs DataFrame")
         st.dataframe(
@@ -30,6 +29,8 @@ def _display_data():
         st.info("No jobs match the current filters.")
 
 
+# _display_data()
+
 # apply_status_filters(_filtered_df)
 # apply_title_filters(_filtered_df)
 # set_filtered_jobs_df(_filtered_df)
@@ -40,7 +41,6 @@ def _display_data():
 # with _filtered:
 #     st.write(f"Unfiltered Jobs: {len(get_filtered_jobs_df())}")
 
-_display_data()
 
 # _save_changes, _col_refresh = st.columns(2)
 # with _save_changes:
@@ -60,5 +60,3 @@ _display_data()
 #         set_title_filters([])
 #         set_filtered_jobs_df(get_jobs_df().copy())
 #         st.rerun()
-
-

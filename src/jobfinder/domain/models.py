@@ -173,11 +173,11 @@ class Job(SQLModel, table=True):
     def allow_none(cls, v):
         try:
             if isinstance(v, pd.Series) and pd.isna(v).all():
-                return None
+                return []
             elif isinstance(v, str) and v.strip() == "":
                 return None
             elif isinstance(v, list | dict) and not v:
-                return None
+                return v
             elif isinstance(v, int | float) and pd.isna(v):
                 return None
 

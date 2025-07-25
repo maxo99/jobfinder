@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+import streamlit as st
 
 from jobfinder.bootstrap import Backend
 from jobfinder.domain.constants import PRESET_TEMPLATES
@@ -13,13 +14,12 @@ from jobfinder.utils.loader import load_raw_jobs
 
 logger = logging.getLogger(__name__)
 
-# Global variable to hold the Streamlit session state
-_st: ...
+# # Global variable to hold the Streamlit session state
 
 
-def _init_session(st):
-    global _st
-    _st = st
+def _init_session():
+    # global _st
+    # _st = st
 
     logger.info("Initializing session")
 
@@ -44,7 +44,7 @@ def _init_session(st):
     st.session_state.initialized = True
 
 
-def _init_working_df(st):
+def _init_working_df():
     logger.info("Initializing working DataFrame")
     if "working_df" not in st.session_state:
         st.session_state.working_df = pd.DataFrame()
@@ -66,14 +66,14 @@ def reload_working_df():
     _jobs = get_data_service().get_jobs(
         # **get_data_filters().model_dump()
     )
-    _st.session_state.working_df = jobs_to_df(_jobs)
+    st.session_state.working_df = jobs_to_df(_jobs)
     logger.info(f"Working DF reloaded with {len(get_working_df())} records.")
 
 
 def get_working_df() -> pd.DataFrame:
-    if "working_df" not in _st.session_state:
-        _init_working_df(_st)
-    return _st.session_state.working_df
+    if "working_df" not in st.session_state:
+        _init_working_df()
+    return st.session_state.working_df
 
 
 def get_working_count() -> int:
@@ -81,7 +81,7 @@ def get_working_count() -> int:
 
 
 def get_jobs() -> list[Job]:
-    return _st.session_state.jobs
+    return st.session_state.jobs
 
 
 def get_jobsdf() -> pd.DataFrame:
@@ -208,10 +208,12 @@ def get_generative_service() -> GenerativeService:
 
 
 def get_session():
-    return _st.session_state
+    return st.session_state
 
 
 def get_backend() -> Backend:
     if "backend" not in get_session():
+        _init_session()
+    if not get_session().backend:
         raise ValueError("Backend not initialized. Call _init_session() first.")
     return get_session().backend

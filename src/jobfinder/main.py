@@ -12,9 +12,11 @@ from jobfinder import __version__, _setup_logging
 #     listings_overview,
 #     scoring_util,
 # )
+from jobfinder.pages import listings_overview
 from jobfinder.session import (
     _init_session,
     _init_working_df,
+    get_working_df,
     # get_working_df,
 )
 from jobfinder.utils import get_now
@@ -39,13 +41,12 @@ def main():
 
     if "initialized" not in st.session_state:
         _setup_logging()
-        _init_session(st)
-    _init_working_df(st)
+        _init_session()
+    _init_working_df()
 
-    # Main app
     st.title("💼 jobfinder")
     st.markdown("---")
-    display_stats.render(st)
+
 
     # Sidebar for scraping configuration
     # with st.sidebar:
@@ -61,49 +62,25 @@ def main():
     st.sidebar.page_link("pages/scoring_util.py", label="Scoring Utility", icon="🤖")
 
     # # Main content area
-    # if not get_working_df().empty:
-    #     jo, jd, ar, sco, dm = st.tabs(MAIN_TABS)
-
-    #     with jo:
-    #         st.header("Job Listings Overview")
-    #         listings_overview.render(st)
-
-    #     # with jd:
-    #     #     st.header("Individual Job Details")
-    #     #     individual_job_details.render(st)
-
-    #     with ar:
-    #         st.header("Add Record")
-    #         add_record.render(st)
-
-    #     # with summ:
-    #     #     summarization_util.render(st)
-
-    #     with sco:
-    #         st.header("Job Scoring Utility")
-    #         scoring_util.render(st)
-
-    #     with dm:
-    #         st.header("Data Management")
-    #         # data_management.render(st)
-
-    # else:
-    # Welcome screen
-    st.info("Configure your job search and start scraping.")
-    st.markdown("""
-    ### Getting Started:
-    1. **Configure your search** in the sidebar
-    2. **Select a job site** (Indeed, LinkedIn)
-    3. **Enter search terms** and location
-    4. **Click 'Scrape Jobs'** to start collecting job listings
-    5. **View and manage** your jobs in the tabs above
-    ### Features:
-    - 🔍 **Job Scraping**: Collect jobs from multiple sites
-    - 📊 **Overview**: View all jobs with filtering options
-    - 📋 **Details**: Focus on individual jobs with notes
-    - ✅ **Tracking**: Mark jobs as viewed and add personal notes
-    - 💾 **Persistence**: Data is automatically saved between sessions
-    """)
+    if not get_working_df().empty:
+        display_stats.render(st)
+        listings_overview.render(st)
+    else:
+        st.info("Configure your job search and start scraping.")
+        st.markdown("""
+        ### Getting Started:
+        1. **Configure your search** in the sidebar
+        2. **Select a job site** (Indeed, LinkedIn)
+        3. **Enter search terms** and location
+        4. **Click 'Scrape Jobs'** to start collecting job listings
+        5. **View and manage** your jobs in the tabs above
+        ### Features:
+        - 🔍 **Job Scraping**: Collect jobs from multiple sites
+        - 📊 **Overview**: View all jobs with filtering options
+        - 📋 **Details**: Focus on individual jobs with notes
+        - ✅ **Tracking**: Mark jobs as viewed and add personal notes
+        - 💾 **Persistence**: Data is automatically saved between sessions
+        """)
 
     # Footer
     _footer()
