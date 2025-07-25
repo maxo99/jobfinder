@@ -13,7 +13,6 @@ RUN uv sync --locked --no-install-project --no-dev
 
 # Copy source and install project
 COPY ./src ./src
-COPY ./main.py ./
 RUN mkdir ./data
 RUN uv sync --locked --no-dev
 
@@ -46,4 +45,4 @@ EXPOSE 8501
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "./src/jobfinder/main.py", "--server.port=8501", "--server.address=0.0.0.0"]

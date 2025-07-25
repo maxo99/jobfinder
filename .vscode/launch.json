@@ -4,6 +4,8 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+
         {
             "name": "streamlit debug - main",
             "type": "debugpy",
@@ -11,7 +13,7 @@
             "module": "streamlit",
             "args": [
                 "run",
-                "${workspaceFolder}/main.py"
+                "${workspaceFolder}/src/jobfinder/main.py"
             ],
             "stopOnEntry": true,
             "justMyCode": false,

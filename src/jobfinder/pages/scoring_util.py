@@ -1,5 +1,6 @@
 import logging
 
+from jobfinder.domain.constants import DEFAULT_COLS, DISPLAY_COLS
 from jobfinder.domain.models import df_to_jobs
 from jobfinder.session import (
     chat_enabled,
@@ -11,7 +12,6 @@ from jobfinder.session import (
     set_selected_data,
 )
 from jobfinder.utils.service_helpers import render_jinja
-from jobfinder.views.listings_overview import DEFAULT_COLS, DISPLAY_COLS
 
 logger = logging.getLogger(__name__)
 

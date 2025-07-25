@@ -3,7 +3,7 @@ import logging
 from jinja2 import Template
 
 from jobfinder.adapters.chat.chat_client import ChatClient
-from jobfinder.constants import (
+from jobfinder.domain.constants import (
     # SUMMARIZATION_EXAMPLE_RESPONSE,
     SUMMARIZATION_INSTRUCTIONS,
     SUMMARIZATION_LISTINGS_TEMPLATE,

@@ -2,7 +2,7 @@ import logging
 
 from jinja2 import Template
 
-from jobfinder.constants import PRESET_TEMPLATES
+from jobfinder.domain.constants import PRESET_TEMPLATES
 from jobfinder.domain.models import ScoringResponse, jobs_to_df
 from jobfinder.utils.service_helpers import render_jinja
 

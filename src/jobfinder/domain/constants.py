@@ -116,3 +116,55 @@ _DEFAULT_UPDATE_COLS = [
     "summarizer",
     "modified",
 ]
+
+DEFAULT_COLS = [
+    "modified",
+    "date_posted",
+    "company",
+    "title",
+    "site",
+    "status",
+    "summarizer",
+    "classifier",
+    "score",
+    "is_remote",
+    "job_type",
+]
+EXTRA_COLS = ["id", "pros", "cons", "summary"]
+
+JOBSPY_COLS = [
+    "id",
+    "job_url",
+    "job_url_direct",
+    "location",
+    "salary_source",
+    "interval",
+    "min_amount",
+    "max_amount",
+    "currency",
+    "job_level",
+    "job_function",
+    "description",
+    "company_industry",
+    "company_url",
+    "listing_type",
+    "emails",
+    "company_logo",
+    "company_url_direct",
+    "company_addresses",
+    "company_num_employees",
+    "company_revenue",
+    "company_description",
+    "skills",
+    "experience_range",
+    "company_rating",
+    "company_reviews_count",
+    "vacancy_count",
+    "work_from_home_type",
+]
+
+DISPLAY_COLS = [
+    *DEFAULT_COLS,
+    #   *JOBSPY_COLS,
+    *EXTRA_COLS,
+]

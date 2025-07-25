@@ -1,7 +1,7 @@
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 
-from sqlalchemy import create_engine, func, select, text
+from sqlalchemy import create_engine, func, inspect, select, text
 from sqlalchemy.orm import sessionmaker
 
 from jobfinder import config
@@ -18,22 +18,31 @@ class SimilarityResponse:
 
 class PostgresClient:
     def __init__(self, db_url: str | None = None):
-        logger.info("Initializing Postgres client")
-        self.db_url = db_url or config.get_pg_url()
-        self.engine = create_engine(self.db_url)
-        self.session_maker = sessionmaker(bind=self.engine)
-        self._session = self.session_maker()
+        try:
+            logger.info("Initializing Postgres client")
+            self.db_url = db_url or config.get_pg_url()
+            self.engine = create_engine(self.db_url)
+            self.session_maker = sessionmaker(bind=self.engine)
+            self._session = self.session_maker()
 
-        with self.engine.connect() as conn:
-            conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-            conn.commit()
+            with self.engine.connect() as conn:
+                conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+                conn.commit()
 
-        self._create_tables()
+            self._create_tables()
+        except Exception as e:
+            logger.error(f"Error initializing Postgres client: {e}")
+            raise e
 
     def _create_tables(self):
-        logger.info("Creating Postgres tables if they do not exist")
-        SQLModel.metadata.create_all(self.engine)
-        logger.info("Postgres tables created/checked successfully")
+        if "job" not in inspect(self.engine).get_table_names():
+            logger.info("Creating Postgres tables if they do not exist")
+            SQLModel.metadata.create_all(self.engine)
+            logger.info("Postgres tables created/checked successfully")
+        else:
+            logger.warning(
+                f"SQL tables already exist: {list(SQLModel.metadata.tables.keys())}"
+            )
 
     def close(self):
         try:

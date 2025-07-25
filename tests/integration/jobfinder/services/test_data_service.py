@@ -1,8 +1,6 @@
 import logging
 import time
 
-import pytest
-
 from jobfinder.domain.models import Qualification
 
 logger = logging.getLogger(__name__)
@@ -41,8 +39,6 @@ def test_embed_populated_job(fix_dataservice, jobs_testdata):
         print("finished")
     except Exception as e:
         raise e
-
-
 
 
 # # @pytest.mark.usefixtures("fix_populated_index")

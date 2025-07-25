@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+import streamlit as st
 
 from jobfinder.domain.models import NEW, STATUS_TYPES, USER, VIEWED, Job, df_to_jobs
 from jobfinder.session import (
@@ -18,53 +19,18 @@ from jobfinder.utils.persistence import save_data2
 logger = logging.getLogger(__name__)
 
 
-def render(st):
-    # selection_mode = st.radio(
-    #     "Indivudial Record Management",
-    #     ["Update Existing Records", "Add New Record"],
-    #     horizontal=True
-    # )
-    # if selection_mode == "Add New Record":
-
-    # else:
-    # if not get_jobs_df().empty:
-    logger.info(f"Displaying {get_working_count()} Jobs")
-    #  TODO: IMPROVE ORDERING/FILTERING
-
-    working_df = get_working_df()
-    _keys = working_df["id"].astype(str).tolist()
-
-    _key = st.selectbox(
-        "Select a Job",
-        options=_keys,
-        format_func=lambda x: working_df.loc[working_df["id"] == x]["name"].iloc[0],
-        index=0,
-    )
-    if _key:
-        logger.info(
-            f"Selected job:{_key}: {working_df.loc[working_df['id'] == _key]['name'].iloc[0]}"
-        )
-    else:
-        _key = _keys[0]
-
-    _col_details, _col_actions = st.columns([2, 1])
-    selection = df_to_jobs(working_df.loc[working_df["id"] == _key])[0]
-    with _col_details:
-        _details(st, selection)
-    with _col_actions:
-        _actions(st, selection, _key)
-
-
 def _details(st, job: Job):
     st.markdown(job.get_details())
     expand_details = False
     if job.qualifications:
         st.markdown("## **Qualifications:**")
         st.dataframe(
-                data=pd.DataFrame(job.qualifications)[['skill', 'experience', 'requirement']],
-                use_container_width=True,
-                hide_index=True,
-            )
+            data=pd.DataFrame(job.qualifications)[
+                ["skill", "experience", "requirement"]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
     else:
         expand_details = True
 
@@ -148,5 +114,37 @@ def _delete(st, job_id: str):
     st.rerun()
 
 
-def get_user_record_count():
-    return 0
+# selection_mode = st.radio(
+#     "Indivudial Record Management",
+#     ["Update Existing Records", "Add New Record"],
+#     horizontal=True
+# )
+# if selection_mode == "Add New Record":
+
+# else:
+# if not get_jobs_df().empty:
+logger.info(f"Displaying {get_working_count()} Jobs")
+#  TODO: IMPROVE ORDERING/FILTERING
+
+working_df = get_working_df()
+_keys = working_df["id"].astype(str).tolist()
+
+_key = st.selectbox(
+    "Select a Job",
+    options=_keys,
+    format_func=lambda x: working_df.loc[working_df["id"] == x]["name"].iloc[0],
+    index=0,
+)
+if _key:
+    logger.info(
+        f"Selected job:{_key}: {working_df.loc[working_df['id'] == _key]['name'].iloc[0]}"
+    )
+else:
+    _key = _keys[0]
+
+_col_details, _col_actions = st.columns([2, 1])
+selection = df_to_jobs(working_df.loc[working_df["id"] == _key])[0]
+with _col_details:
+    _details(st, selection)
+with _col_actions:
+    _actions(st, selection, _key)

@@ -1,6 +1,8 @@
 import logging
 import os
 
+import streamlit as st
+
 from jobfinder import JOBS_DATA_FILE
 from jobfinder.session import get_jobsdf
 from jobfinder.utils import get_now
@@ -8,15 +10,7 @@ from jobfinder.utils import get_now
 logger = logging.getLogger(__name__)
 
 
-def render(st):
-    st.subheader("Data File")
-    st.write(f"Current data file: `{JOBS_DATA_FILE}`")
-
-    _manage_data(st)
-    _bulk_actions(st)
-
-
-def _manage_data(st):
+def _manage_data():
     _col_export_data, _col_clear_data = st.columns(2)
 
     with _col_export_data:
@@ -44,7 +38,7 @@ def _manage_data(st):
             st.rerun()
 
 
-def _bulk_actions(st):
+def _bulk_actions():
     st.subheader("Bulk Actions")
     # TODO: Update to mark all as new (just clear status/pros/cons vs new date as well?)
 
@@ -56,3 +50,10 @@ def _bulk_actions(st):
             # save_data2(get_jobs_df())
             st.success("All jobs marked as new!")
             st.rerun()
+
+
+st.subheader("Data File")
+st.write(f"Current data file: `{JOBS_DATA_FILE}`")
+
+_manage_data()
+_bulk_actions()

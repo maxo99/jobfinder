@@ -57,14 +57,21 @@ class DataFilters(BaseModel):
 
 class Qualification(BaseModel):
     id: str = Field(description="The jobID which this qualification belongs to")
-    skill: str = Field(description="The skill or technologies representing the qualification")
+    skill: str = Field(
+        description="The skill or technologies representing the qualification"
+    )
     experience: str = Field(description="The experience level for the skill")
-    requirement: str = Field(description="Whether the skill is required, preferred, or desired")
+    requirement: str = Field(
+        description="Whether the skill is required, preferred, or desired"
+    )
 
 
 class ScoringResponse(BaseModel):
     score: float = Field(
-        default=0.0, ge=-1.0, le=1.0, description="The score of the job based on the AI analysis"
+        default=0.0,
+        ge=-1.0,
+        le=1.0,
+        description="The score of the job based on the AI analysis",
     )
     pros: str = Field(default="N/A", description="Pros of the job")
     cons: str = Field(default="N/A", description="Cons of the job")
@@ -75,7 +82,6 @@ class SummarizationResponse(BaseModel):
         default_factory=list,
         description="List of qualifications extracted from job postings",
     )
-
 
     def get_qualifications(self, job_id: str) -> list[Qualification] | list:
         try:
@@ -138,7 +144,7 @@ class Job(SQLModel, table=True):
     job_function: str | None = None
 
     # Vector fields for embeddings (pgvector)
-    title_vector: list[float]  | None = Field(
+    title_vector: list[float] | None = Field(
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
     qualifications_vector: list[float] | None = Field(
@@ -166,8 +172,15 @@ class Job(SQLModel, table=True):
     @classmethod
     def allow_none(cls, v):
         try:
-            if v is None or (isinstance(v, pd.Series) and pd.isna(v).any()):
+            if isinstance(v, pd.Series) and pd.isna(v).all():
                 return None
+            elif isinstance(v, str) and v.strip() == "":
+                return None
+            elif isinstance(v, list | dict) and not v:
+                return None
+            elif isinstance(v, int | float) and pd.isna(v):
+                return None
+
             return v
         except Exception as e:
             logger.error(f"Error in allow_none validator: {e}")
@@ -327,6 +340,7 @@ class Job(SQLModel, table=True):
             logger.error(f"Error creating qualifications text: {e}")
             raise
 
+
 def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     if not jobs:
         return pd.DataFrame()
@@ -356,11 +370,6 @@ def df_to_jobs(df: pd.DataFrame) -> list[Job]:
 
 
 def validate_df_defaults(df: pd.DataFrame) -> None:
-    # Ensure Proper column types
-    df.loc[:, "pros"] = df["pros"].astype(str)
-    df.loc[:, "cons"] = df["cons"].astype(str)
-    df.loc[:, "summary"] = df["summary"].astype(str)
-    df.loc[:, "date_posted"] = df["date_posted"].astype(str)
     # Set defaults
     if "date_scraped" not in df.columns:
         df["date_scraped"] = get_now()
@@ -380,3 +389,8 @@ def validate_df_defaults(df: pd.DataFrame) -> None:
         df["classifier"] = NA
     if "summarizer" not in df.columns:
         df["summarizer"] = NA
+        # Ensure Proper column types
+    df.loc[:, "pros"] = df["pros"].astype(str)
+    df.loc[:, "cons"] = df["cons"].astype(str)
+    df.loc[:, "summary"] = df["summary"].astype(str)
+    df.loc[:, "date_posted"] = df["date_posted"].astype(str)

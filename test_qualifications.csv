@@ -1,0 +1,187 @@
+name,id,site,job_url,job_url_direct,title,company,date_posted,description,location,is_remote,status,classifier,summarizer,pros,cons,score,summary,qualifications,date_scraped,modified,job_type,salary_source,interval,min_amount,max_amount,currency,company_industry,company_url,company_logo,company_url_direct,experience_range,job_level,job_function,title_vector,qualifications_vector,summary_vector
+InsightGlobalIT: Python ETL Developer,job_in-2a1b29a0d3474192,indeed,https://www.indeed.com/viewjob?jk=2a1b29a0d3474192,http://www.indeed.com/job/python-etl-developer-2a1b29a0d3474192,Python ETL Developer,InsightGlobalIT,2025-07-14,"**Title:** **Developer Standard III – Python ETL Developer**
+
+**Location: Washington, DC (Onsite)**
+
+Job Description
+
+* **Proficiency in Python scripting and prior experience working with large datasets in Python.**
+* **Experience with Python data processing libraries.**
+* **More than 8\+ years of experience in Python ETL Development**
+* **Good SQL experience.**
+* **Proficiency to Develop and implement robust ELT/ETL processes to efficiently handle data extraction, loading and transformation loading from various sources into the cloud platform.**
+* Knowledge of **Dremio** is preferred but not mandatory.
+* **8\+ years of experience working in Data Management systems with a strong focus on Python\-based solutions.**
+* **Proficiency in reference Data Management systems and experience in sql.**
+* Knowledge of Power BI reporting.
+* Ability to interact with clients and provide quality production support.
+* Proven conceptual, analytical, and judgmental skills.
+* Excellent oral and written communication skills.
+
+Job Types: Full\-time, Contract
+
+Pay: $50\.00 \- $52\.00 per hour
+
+Schedule:
+
+* 8 hour shift
+
+Work Location: In person","Washington, DC, US",False,new,N/A,AI,None,None,0.0,None,"[{'id': 'job_in-2a1b29a0d3474192', 'skill': 'Python ETL Development', 'experience': '8+ years', 'requirement': 'proficiency in Python scripting and prior experience working with large datasets in Python'}, {'id': 'job_in-2a1b29a0d3474192', 'skill': 'Data Management', 'experience': '8+ years', 'requirement': 'Knowledge of reference Data Management systems and experience in sql.'}]",2025-07-14 08:23:20,2025-07-24 13:35:44,"fulltime, contract",direct_data,hourly,50.0,52.0,USD,,https://www.indeed.com/cmp/Insightglobalit,,,,,,,,
+None: Senior Software Engineer,job_in-f7cbc8ae66de2323,indeed,https://www.indeed.com/viewjob?jk=f7cbc8ae66de2323,https://jobs.ashbyhq.com/superdial/5019a8a4-e695-464d-a081-fea1e29161f1?utm_source=nmq9AAPx8m,Senior Software Engineer,,2025-07-14,"We’re looking for a Senior Software Engineer with strong Python experience and a product mindset. You’ll work closely with our CTO, founding team, and—critically—our customers to design and build the core infrastructure that powers our AI\-first RCM platform. You’ll have a front\-row seat to user feedback and help shape not just the tech, but the product itself.
+
+
+**About the Role:**
+
+* Design and implement backend services and APIs using Python (FastAPI or similar)
+* Work directly with customers to understand needs, gather feedback, and build solutions
+* Integrate LLMs and AI agents into operational workflows
+* Own system design decisions related to performance, reliability, and scale
+* Lead technical projects from architecture through deployment
+* Collaborate cross\-functionally with Product, AI, and Ops teams
+* Help shape engineering best practices, mentoring junior developers as we grow
+
+**About You:**
+
+* 3\+ years of backend engineering experience, with deep Python expertise
+* Strong background in building and scaling APIs, services, and distributed systems
+* Proven ability to work closely with end users and translate feedback into product improvements
+* Experience with modern infrastructure (Docker, cloud platforms, CI/CD)
+* Familiarity with databases (PostgreSQL preferred) and async programming
+* Bonus: experience in AI, LLMs, or healthcare tech (especially RCM)
+* Bonus: startup or 0 1 experience
+
+**Why Join SuperDial**
+
+* High ownership: your work will directly impact our customers and business
+* Deep customer connection: work closely with real users to ship fast and iterate
+* Mission\-driven team: solving real, painful problems in US healthcare
+* Competitive compensation, early equity, and full benefits
+
+**Who we are:**
+
+
+SuperDial is transforming AI in healthcare by building scalable, AI\-powered solutions that optimize revenue cycle management. Join us and help shape the future of AI in healthcare!
+
+
+The base salary for this role ranges from $125,000 to 185,000, depending on experience, skill set, and fit. We also offer equity and benefits as part of our total compensation package. Final offers may vary based on experience and qualifications \- we’re always open to exceptional talent.",US,False,new,N/A,AI,None,None,0.0,None,"[{'id': 'job_in-f7cbc8ae66de2323', 'skill': 'Backend Services & APIs', 'experience': '2 years', 'requirement': 'FastAPI or similar'}]",2025-07-14 08:23:20,2025-07-24 13:35:44,fulltime,direct_data,yearly,125000.0,185000.0,USD,,,,,,,,,,
+"Google: Software Engineer III, Full Stack, Platforms and Devices",job_in-95731e8596cd7975,indeed,https://www.indeed.com/viewjob?jk=95731e8596cd7975,https://careers.google.com/jobs/results/80452357350924998-software-engineer-iii/,"Software Engineer III, Full Stack, Platforms and Devices",Google,2025-07-14,"### **Minimum qualifications:**
+
+* Bachelor’s degree or equivalent practical experience.
+* 2 years of experience with software development in one or more programming languages, or 1 year of experience with an advanced degree.
+* 2 years of experience with data structures or algorithms.
+* 2 years of experience with full stack development, across back\-end such as Java, Python, Golang, or C\+\+ codebases, and front\-end experience including JavaScript or TypeScript, HTML, CSS or equivalent.
+
+  
+
+### **Preferred qualifications:**
+
+* Master's degree or PhD in Computer Science or related technical fields.
+* Experience developing accessible technologies.
+
+**About the job**
+-----------------
+
+
+Google's software engineers develop the next\-generation technologies that change how billions of users connect, explore, and interact with information and one another. Our products need to handle information at massive scale, and extend well beyond web search. We're looking for engineers who bring fresh ideas from all areas, including information retrieval, distributed computing, large\-scale system design, networking and data storage, security, artificial intelligence, natural language processing, UI design and mobile; the list goes on and is growing every day. As a software engineer, you will work on a specific project critical to Google’s needs with opportunities to switch teams and projects as you and our fast\-paced business grow and evolve. We need our engineers to be versatile, display leadership qualities and be enthusiastic to take on new problems across the full\-stack as we continue to push technology forward.
+
+
+
+The Platforms and Devices team encompasses Google's various computing software platforms across environments (desktop, mobile, applications), as well as our first party devices and services that combine the best of Google AI, software, and hardware. Teams across this area research, design, and develop new technologies to make our user's interaction with computing faster and more seamless, building innovative experiences for our users around the world.
+
+  
+
+The US base salary range for this full\-time position is $141,000\-$202,000 \+ bonus \+ equity \+ benefits. Our salary ranges are determined by role, level, and location. Within the range, individual pay is determined by work location and additional factors, including job\-related skills, experience, and relevant education or training. Your recruiter can share more about the specific salary range for your preferred location during the hiring process.
+
+
+Please note that the compensation details listed in US role postings reflect the base salary only, and do not include bonus, equity, or benefits. Learn more about benefits at Google.
+**Responsibilities**
+--------------------
+
+* Write product or system development code.
+* Participate in, or lead design reviews with peers and stakeholders to decide amongst available technologies.
+* Review code developed by other developers and provide feedback to ensure best practices (e.g., style guidelines, checking code in, accuracy, testability, and efficiency).
+* Contribute to existing documentation or educational content and adapt content based on product/program updates and user feedback.
+* Triage product or system issues and debug/track/resolve by analyzing the sources of issues and the impact on hardware, network, or service operations and quality.
+Google is proud to be an equal opportunity workplace and is an affirmative action employer. We are committed to equal employment opportunity regardless of race, color, ancestry, religion, sex, national origin, sexual orientation, age, citizenship, marital status, disability, gender identity or Veteran status. We also consider qualified applicants regardless of criminal histories, consistent with legal requirements. See also Google's EEO Policy and EEO is the Law. If you have a disability or special need that requires accommodation, please let us know by completing our Accommodations for Applicants form.","Mountain View, CA, US",False,new,N/A,AI,None,None,0.0,None,"[{'id': 'job_in-95731e8596cd7975', 'skill': 'Data Management Systems', 'experience': 'SQL experience', 'requirement': 'Ability to develop and implement robust ELT/ETL processes'}]",2025-07-14 08:23:20,2025-07-24 13:35:44,fulltime,direct_data,yearly,141000.0,202000.0,USD,,https://www.indeed.com/cmp/Google,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/fff4be3829cee39e477a518f55475f44,http://goo.gle/3ygdkgv,,,,,,
+"Google: Software Engineering Manager II, Infrastructure, Google Cloud",job_in-e3072b899ad135f7,indeed,https://www.indeed.com/viewjob?jk=e3072b899ad135f7,https://careers.google.com/jobs/results/130918197309121222-software-engineering-manager-ii/,"Software Engineering Manager II, Infrastructure, Google Cloud",Google,2025-07-14,"Note: By applying to this position you will have an opportunity to share your preferred working location from the following: **Sunnyvale, CA, USA; Durham, NC, USA; Raleigh, NC, USA**.### **Minimum qualifications:**
+
+* Bachelor's degree or equivalent practical experience.
+* 8 years of experience with software development in one or more programming languages (e.g., Python, C, C\+\+, Java, JavaScript).
+* 3 years of experience in a technical leadership role; overseeing strategic projects, with 2 years of experience in a people management, supervision/team leadership role.
+* 3 years of experience building and developing large\-scale infrastructure or distributed systems.
+
+  
+
+### **Preferred qualifications:**
+
+* Master’s degree or PhD in Engineering, Computer Science, or a related technical field.
+* 3 years of experience working in matrixed organization.
+
+**About the job**
+-----------------
+
+
+Like Google's own ambitions, the work of a Software Engineer goes beyond just Search. Software Engineering Managers have not only the technical expertise to take on and provide technical leadership to major projects, but also manage a team of Engineers. You not only optimize your own code but make sure Engineers are able to optimize theirs. As a Software Engineering Manager you manage your project goals, contribute to product strategy and help develop your team. Teams work all across the company, in areas such as information retrieval, artificial intelligence, natural language processing, distributed computing, large\-scale system design, networking, security, data compression, user interface design; the list goes on and is growing every day. Operating with scale and speed, our exceptional software engineers are just getting started \- and as a manager, you guide the way.  
+
+  
+
+With technical and leadership expertise, you manage engineers across multiple teams and locations, a large product budget and oversee the deployment of large\-scale projects across multiple sites internationally.
+
+  
+
+
+Google Cloud accelerates every organization’s ability to digitally transform its business and industry. We deliver enterprise\-grade solutions that leverage Google’s cutting\-edge technology, and tools that help developers build more sustainably. Customers in more than 200 countries and territories turn to Google Cloud as their trusted partner to enable growth and solve their most critical business problems.
+
+
+The US base salary range for this full\-time position is $197,000\-$291,000 \+ bonus \+ equity \+ benefits. Our salary ranges are determined by role, level, and location. Within the range, individual pay is determined by work location and additional factors, including job\-related skills, experience, and relevant education or training. Your recruiter can share more about the specific salary range for your preferred location during the hiring process. Please note that the compensation details listed in US role postings reflect the base salary only, and do not include bonus, equity, or benefits. Learn more about benefits at Google.
+
+**Responsibilities**
+--------------------
+
+* Set and communicate team priorities that support the broader organization's goals. Align strategy, processes, and decision\-making across teams.
+* Set clear expectations with individuals based on their level and role and aligned to the broader organization's goals. Meet regularly with individuals to discuss performance and development and provide feedback and coaching.
+* Develop the mid\-term technical vision and roadmap within the scope of your (often multiple) team(s). Evolve the roadmap to meet anticipated future requirements and infrastructure needs.
+* Design, guide and vet systems designs within the scope of the broader area, and write product or system development code to solve ambiguous problems.
+* Review code developed by other engineers and provide feedback to ensure best practices (e.g., style guidelines, checking code in, accuracy, testability, and efficiency).
+Google is proud to be an equal opportunity workplace and is an affirmative action employer. We are committed to equal employment opportunity regardless of race, color, ancestry, religion, sex, national origin, sexual orientation, age, citizenship, marital status, disability, gender identity or Veteran status. We also consider qualified applicants regardless of criminal histories, consistent with legal requirements. See also Google's EEO Policy and EEO is the Law. If you have a disability or special need that requires accommodation, please let us know by completing our Accommodations for Applicants form.","Durham, NC, US",False,new,N/A,AI,None,None,0.0,None,"[{'id': 'job_in-e3072b899ad135f7', 'skill': 'ML/AI', 'experience': 'Bonus experience in AI, LLMs, or healthcare tech', 'requirement': 'Experience in data management systems and SQL'}]",2025-07-14 08:23:20,2025-07-24 13:35:44,fulltime,direct_data,yearly,197000.0,291000.0,USD,,https://www.indeed.com/cmp/Google,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/fff4be3829cee39e477a518f55475f44,http://goo.gle/3ygdkgv,,,,,,
+"Google: Software Engineering Manager II, Infrastructure, Google Cloud",job_in-958545560aa4073f,indeed,https://www.indeed.com/viewjob?jk=958545560aa4073f,https://careers.google.com/jobs/results/130918197309121222-software-engineering-manager-ii/,"Software Engineering Manager II, Infrastructure, Google Cloud",Google,2025-07-14,"Note: By applying to this position you will have an opportunity to share your preferred working location from the following: **Sunnyvale, CA, USA; Durham, NC, USA; Raleigh, NC, USA**.### **Minimum qualifications:**
+
+* Bachelor's degree or equivalent practical experience.
+* 8 years of experience with software development in one or more programming languages (e.g., Python, C, C\+\+, Java, JavaScript).
+* 3 years of experience in a technical leadership role; overseeing strategic projects, with 2 years of experience in a people management, supervision/team leadership role.
+* 3 years of experience building and developing large\-scale infrastructure or distributed systems.
+
+  
+
+### **Preferred qualifications:**
+
+* Master’s degree or PhD in Engineering, Computer Science, or a related technical field.
+* 3 years of experience working in matrixed organization.
+
+**About the job**
+-----------------
+
+
+Like Google's own ambitions, the work of a Software Engineer goes beyond just Search. Software Engineering Managers have not only the technical expertise to take on and provide technical leadership to major projects, but also manage a team of Engineers. You not only optimize your own code but make sure Engineers are able to optimize theirs. As a Software Engineering Manager you manage your project goals, contribute to product strategy and help develop your team. Teams work all across the company, in areas such as information retrieval, artificial intelligence, natural language processing, distributed computing, large\-scale system design, networking, security, data compression, user interface design; the list goes on and is growing every day. Operating with scale and speed, our exceptional software engineers are just getting started \- and as a manager, you guide the way.  
+
+  
+
+With technical and leadership expertise, you manage engineers across multiple teams and locations, a large product budget and oversee the deployment of large\-scale projects across multiple sites internationally.
+
+  
+
+
+Google Cloud accelerates every organization’s ability to digitally transform its business and industry. We deliver enterprise\-grade solutions that leverage Google’s cutting\-edge technology, and tools that help developers build more sustainably. Customers in more than 200 countries and territories turn to Google Cloud as their trusted partner to enable growth and solve their most critical business problems.
+
+
+The US base salary range for this full\-time position is $197,000\-$291,000 \+ bonus \+ equity \+ benefits. Our salary ranges are determined by role, level, and location. Within the range, individual pay is determined by work location and additional factors, including job\-related skills, experience, and relevant education or training. Your recruiter can share more about the specific salary range for your preferred location during the hiring process. Please note that the compensation details listed in US role postings reflect the base salary only, and do not include bonus, equity, or benefits. Learn more about benefits at Google.
+
+**Responsibilities**
+--------------------
+
+* Set and communicate team priorities that support the broader organization's goals. Align strategy, processes, and decision\-making across teams.
+* Set clear expectations with individuals based on their level and role and aligned to the broader organization's goals. Meet regularly with individuals to discuss performance and development and provide feedback and coaching.
+* Develop the mid\-term technical vision and roadmap within the scope of your (often multiple) team(s). Evolve the roadmap to meet anticipated future requirements and infrastructure needs.
+* Design, guide and vet systems designs within the scope of the broader area, and write product or system development code to solve ambiguous problems.
+* Review code developed by other engineers and provide feedback to ensure best practices (e.g., style guidelines, checking code in, accuracy, testability, and efficiency).
+Google is proud to be an equal opportunity workplace and is an affirmative action employer. We are committed to equal employment opportunity regardless of race, color, ancestry, religion, sex, national origin, sexual orientation, age, citizenship, marital status, disability, gender identity or Veteran status. We also consider qualified applicants regardless of criminal histories, consistent with legal requirements. See also Google's EEO Policy and EEO is the Law. If you have a disability or special need that requires accommodation, please let us know by completing our Accommodations for Applicants form.","Raleigh, NC, US",False,new,N/A,N/A,None,None,0.0,None,[],2025-07-14 08:23:20,2025-07-14 08:23:20,fulltime,direct_data,yearly,197000.0,291000.0,USD,,https://www.indeed.com/cmp/Google,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/fff4be3829cee39e477a518f55475f44,http://goo.gle/3ygdkgv,,,,,,

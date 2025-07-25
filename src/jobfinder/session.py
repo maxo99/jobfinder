@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from jobfinder.bootstrap import Backend
-from jobfinder.constants import PRESET_TEMPLATES
+from jobfinder.domain.constants import PRESET_TEMPLATES
 from jobfinder.domain.models import DataFilters, Job, jobs_to_df
 
 # from jobfinder.adapters.search.elasticsearch_client import ElastiSearchClient
