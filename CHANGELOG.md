@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.11.0 (2025-07-25)
+
+### Features
+
+- Introduction of embedding and search logic
+  ([`4f61a9b`](https://github.com/maxo99/jobfinder/commit/4f61a9b336599594ee9e1ef56ffac128a617067a))
+
+
 ## v0.10.0 (2025-07-24)
 
 ### Build System
