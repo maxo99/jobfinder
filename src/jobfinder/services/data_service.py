@@ -72,7 +72,7 @@ class DataService:
         self,
         job: Job,
         limit: int = 5,
-        similarity_threshold: float = 0.7,
+        similarity_threshold: float = 0.1,
     ) -> SimilarityResponse | None:
         try:
             if not job.qualifications_vector:

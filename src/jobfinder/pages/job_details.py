@@ -3,7 +3,8 @@ import logging
 import pandas as pd
 import streamlit as st
 
-from jobfinder.domain.models import NEW, STATUS_TYPES, USER, VIEWED, Job, df_to_jobs
+from jobfinder.domain.constants import NEW, STATUS_TYPES, USER, VIEWED
+from jobfinder.domain.models import Job, df_to_jobs
 from jobfinder.session import (
     get_data_service,
     get_generative_service,
@@ -15,11 +16,12 @@ from jobfinder.session import (
 )
 from jobfinder.utils import get_now
 from jobfinder.utils.persistence import save_data2
+from jobfinder.views import common
 
 logger = logging.getLogger(__name__)
 
 
-def _details(st, job: Job):
+def _details(job: Job):
     st.markdown(job.get_details())
     expand_details = False
     if job.qualifications:
@@ -31,13 +33,23 @@ def _details(st, job: Job):
             use_container_width=True,
             hide_index=True,
         )
+        # TODO: IF HAS SCORE
+        # if job.score:
+        #     st.markdown("## **AI Score:**")
+        #     st.write(job.score)
+
+        if st.button("🤖 AI Score Job", key="score_job"):
+            st.session_state.scoring_selection = job.id
+            st.switch_page("pages/scoring_util.py")
+
     else:
         expand_details = True
 
-        if st.button("🤖 AI Extract Qualifications", key="add_qualifications"):
+        if st.button("🤖 AI Extract Summarization", key="add_qualifications"):
             with st.spinner("Extracting Qualifications...", show_time=True):
                 _jobs = [job]
                 get_generative_service().extract_qualifications(_jobs)
+                get_data_service().embed_populated_jobs(_jobs)
                 st.success("Record summarized successfully!")
                 get_data_service().store_jobs(_jobs)
                 st.rerun()
@@ -48,7 +60,7 @@ def _details(st, job: Job):
             st.markdown(job.description)
 
 
-def _actions(st, job: Job, job_id: str):
+def _actions(job: Job, job_id: str):
     st.subheader("Actions")
 
     _current_status = job.status
@@ -104,11 +116,11 @@ def _actions(st, job: Job, job_id: str):
 
     # Delete button
     if st.button("🗑️ Delete Job", key=f"delete_{job_id}", type="secondary"):
-        _delete(st, job_id)
+        _delete(job_id)
         st.rerun()
 
 
-def _delete(st, job_id: str):
+def _delete(job_id: str):
     get_data_service().delete_job(job_id)
     st.success("Job deleted successfully!")
     st.rerun()
@@ -123,6 +135,10 @@ def _delete(st, job_id: str):
 
 # else:
 # if not get_jobs_df().empty:
+
+common.render_header()
+
+
 logger.info(f"Displaying {get_working_count()} Jobs")
 #  TODO: IMPROVE ORDERING/FILTERING
 
@@ -145,6 +161,8 @@ else:
 _col_details, _col_actions = st.columns([2, 1])
 selection = df_to_jobs(working_df.loc[working_df["id"] == _key])[0]
 with _col_details:
-    _details(st, selection)
+    _details(selection)
 with _col_actions:
-    _actions(st, selection, _key)
+    _actions(selection, _key)
+
+common.render_footer()

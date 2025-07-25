@@ -1,6 +1,8 @@
 import logging
 import time
 
+from jobfinder.domain.constants import EXCLUDED
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,3 +34,25 @@ def test_populate_jobs(fix_postgresclient, jobs_testdata):
     assert populated_count == len(jobs_testdata), (
         "Not all documents were indexed correctly."
     )
+
+
+def test_get_jobs_with_filters(fix_postgresclient, jobs_testdata):
+    try:
+        fix_postgresclient.upsert_jobs(jobs_testdata)
+        time.sleep(2)
+        total_jobs = fix_postgresclient.get_jobs()
+        assert len(total_jobs) == len(jobs_testdata), "Total jobs count mismatch."
+        jobs_testdata[0].status = EXCLUDED
+        # Test with a filter that should return some jobs
+        results = fix_postgresclient.get_jobs(location="NYC")
+        assert len(results) > 0, "No jobs found with location 'NYC'."
+
+        # Test with a filter that should return no jobs
+        results = fix_postgresclient.get_jobs(location="NonExistentLocation")
+        assert len(results) == 0, "Jobs found when none were expected."
+
+        # Test with a 'not_' filter
+        results = fix_postgresclient.get_jobs(not_status="D")
+        assert len(results) > 0, "No jobs found with status not equal to 'D'."
+    except Exception as e:
+        raise e

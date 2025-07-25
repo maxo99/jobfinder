@@ -2,22 +2,15 @@ import pandas as pd
 import streamlit as st
 from jobspy import scrape_jobs
 
-from jobfinder.domain.models import EXCLUDED, df_to_jobs, validate_df_defaults
+from jobfinder.domain.constants import EXCLUDED
+from jobfinder.domain.models import df_to_jobs, validate_df_defaults
 from jobfinder.session import get_data_service
 from jobfinder.utils.persistence import save_data2
+from jobfinder.views import common
 
 SITES = ["indeed", "linkedin"]
 
 
-# def find_jobs():
-# Search parameters
-search_term = st.text_input("Search Term", value="python developer")
-site_name = st.multiselect("Sites", SITES, default=SITES)
-results = st.number_input("Results", min_value=1, max_value=1000, value=2)
-hours_old = st.number_input("Age", min_value=1, max_value=480, value=72)
-
-exclude_remote = st.checkbox("Exclude Remote", value=True)
-fulltime_only = st.checkbox("Fulltime Only", value=True)
 
 
 def _find_jobs(
@@ -50,6 +43,16 @@ def _find_jobs(
         st.error(f"Error scraping jobs: {e}")
         return pd.DataFrame()
 
+common.render_header()
+# Search parameters
+search_term = st.text_input("Search Term", value="python developer")
+site_name = st.multiselect("Sites", SITES, default=SITES)
+results = st.number_input("Results", min_value=1, max_value=1000, value=2)
+hours_old = st.number_input("Age", min_value=1, max_value=480, value=72)
+
+exclude_remote = st.checkbox("Exclude Remote", value=True)
+fulltime_only = st.checkbox("Fulltime Only", value=True)
+
 
 # Scrape button
 if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
@@ -81,3 +84,4 @@ if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
 
             get_data_service().store_jobs(df_to_jobs(new_jobs))
             st.rerun()
+common.render_footer()

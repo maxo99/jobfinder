@@ -6,6 +6,7 @@ import streamlit as st
 from jobfinder import JOBS_DATA_FILE
 from jobfinder.session import get_jobsdf
 from jobfinder.utils import get_now
+from jobfinder.views import common
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +53,10 @@ def _bulk_actions():
             st.rerun()
 
 
+common.render_header()
 st.subheader("Data File")
 st.write(f"Current data file: `{JOBS_DATA_FILE}`")
 
 _manage_data()
 _bulk_actions()
+common.render_footer()

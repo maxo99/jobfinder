@@ -64,6 +64,7 @@ def reload_working_df():
     logger.info("Reloading working DataFrame")
     # TODO: Readd DataFilters
     _jobs = get_data_service().get_jobs(
+        not_status="excluded",
         # **get_data_filters().model_dump()
     )
     st.session_state.working_df = jobs_to_df(_jobs)

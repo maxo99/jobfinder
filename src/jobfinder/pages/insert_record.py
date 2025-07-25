@@ -2,13 +2,16 @@ import logging
 
 import streamlit as st
 
-from jobfinder.domain.models import NA, USER, Job
+from jobfinder.domain.constants import NA, USER
+from jobfinder.domain.models import Job
 from jobfinder.session import get_data_service
 from jobfinder.utils import get_now
+from jobfinder.views import common
 
 logger = logging.getLogger(__name__)
 
 
+common.render_header()
 with st.form("my_form"):
     st.write("Manually create records to use for scoring context.")
     title = st.text_area("title")
@@ -51,3 +54,4 @@ with st.form("my_form"):
         get_data_service().store_jobs([_new_record])
         st.success("Record added successfully!")
         st.rerun()
+common.render_footer()

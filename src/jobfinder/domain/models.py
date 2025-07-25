@@ -12,6 +12,14 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 from sqlmodel import Field, SQLModel
 
+from jobfinder.domain.constants import (
+    DEFAULT_STATUS_FILTERS,
+    EMBEDDINGS_DIMENSION,
+    NA,
+    NEW,
+    STATUS_TYPES,
+    USER_TYPES,
+)
 from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)
@@ -30,23 +38,6 @@ def serialize_qualifications_before_flush(session: Session, flush_context, insta
 
 
 event.listen(Session, "before_flush", serialize_qualifications_before_flush)
-
-
-# Vector dimension for embeddings
-EMBEDDINGS_DIMENSION = 768
-
-NEW = "new"
-VIEWED = "viewed"
-EXCLUDED = "excluded"
-APPLIED = "applied"
-STATUS_TYPES = {NEW, VIEWED, EXCLUDED, APPLIED}
-USER = "User"
-AI = "AI"
-NA = "N/A"
-USER_TYPES = {USER, AI, NA}
-
-
-DEFAULT_STATUS_FILTERS = [s for s in STATUS_TYPES if s != EXCLUDED]
 
 
 class DataFilters(BaseModel):

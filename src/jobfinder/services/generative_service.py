@@ -5,10 +5,11 @@ from jinja2 import Template
 from jobfinder.adapters.chat.chat_client import ChatClient
 from jobfinder.domain.constants import (
     # SUMMARIZATION_EXAMPLE_RESPONSE,
+    AI,
     SUMMARIZATION_INSTRUCTIONS,
     SUMMARIZATION_LISTINGS_TEMPLATE,
 )
-from jobfinder.domain.models import AI, Job, ScoringResponse, SummarizationResponse
+from jobfinder.domain.models import Job, ScoringResponse, SummarizationResponse
 from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)

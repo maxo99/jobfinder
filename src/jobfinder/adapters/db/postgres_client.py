@@ -97,7 +97,13 @@ class PostgresClient:
                 query = select(Job)
                 if filters:
                     for key, value in filters.items():
-                        query = query.where(getattr(Job, key) == value)
+                        if key.startswith("not_"):
+                            # Handle "not equal" filters
+                            actual_key = key[4:]  # Remove "not_" prefix
+                            query = query.where(getattr(Job, actual_key) != value)
+                        else:
+                            # Handle regular equality filters
+                            query = query.where(getattr(Job, key) == value)
                 return list(session.execute(query).scalars().all())
         except Exception as e:
             logger.error(f"Error getting jobs: {e}")

@@ -2,97 +2,39 @@ import logging
 
 import streamlit as st
 
-from jobfinder import __version__, _setup_logging
-
-# from jobfinder.pages import (
-#     display_stats,
-#     insert_record,
-#     # find_jobs,
-#     # individual_job_details,
-#     listings_overview,
-#     scoring_util,
-# )
+from jobfinder import _setup_logging
+from jobfinder.domain.constants import DEFAULT_PAGE_DESCRIPTION
 from jobfinder.pages import listings_overview
 from jobfinder.session import (
     _init_session,
     _init_working_df,
     get_working_df,
-    # get_working_df,
 )
-from jobfinder.utils import get_now
-from jobfinder.views import display_stats
+from jobfinder.views import common
 
 logger = logging.getLogger(__name__)
 
 
-MAIN_TABS = [
-    "📊 Job Overview",
-    # " Add Record",
-    # "📝 Summarization Util",
-    "🤖 Scoring Util",
-    # "⚙️ Data Management",
-]
+
 
 
 def main():
     logging.info("Starting up main()")
-
-    st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide")
+    st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide", initial_sidebar_state="expanded")
 
     if "initialized" not in st.session_state:
         _setup_logging()
         _init_session()
     _init_working_df()
 
-    st.title("💼 jobfinder")
-    st.markdown("---")
 
-
-    # Sidebar for scraping configuration
-    # with st.sidebar:
-    #     with st.expander("🔍 Find Jobs", expanded=True):
-    #         find_jobs.render(st)
-    #     # with st.expander("🔧 Display Filters", expanded=False):
-    #     #     display_filters.render(st)
-
-    st.sidebar.page_link("pages/find_jobs.py", label="Scrape New Jobs", icon="🔍")
-    st.sidebar.page_link("pages/job_details.py", label="Job Details", icon="📋")
-    st.sidebar.page_link("pages/insert_record.py", label="Insert Record", icon="➕")
-    st.sidebar.page_link("pages/data_management.py", label="Data Management", icon="⚙️")
-    st.sidebar.page_link("pages/scoring_util.py", label="Scoring Utility", icon="🤖")
-
-    # # Main content area
+    common.render_header()
     if not get_working_df().empty:
-        display_stats.render(st)
         listings_overview.render(st)
     else:
         st.info("Configure your job search and start scraping.")
-        st.markdown("""
-        ### Getting Started:
-        1. **Configure your search** in the sidebar
-        2. **Select a job site** (Indeed, LinkedIn)
-        3. **Enter search terms** and location
-        4. **Click 'Scrape Jobs'** to start collecting job listings
-        5. **View and manage** your jobs in the tabs above
-        ### Features:
-        - 🔍 **Job Scraping**: Collect jobs from multiple sites
-        - 📊 **Overview**: View all jobs with filtering options
-        - 📋 **Details**: Focus on individual jobs with notes
-        - ✅ **Tracking**: Mark jobs as viewed and add personal notes
-        - 💾 **Persistence**: Data is automatically saved between sessions
-        """)
-
-    # Footer
-    _footer()
-
-
-def _footer():
-    st.markdown("---")
-    _col_left, _col_right = st.columns([1, 2])
-    with _col_left:
-        st.markdown(f"jobfinder v{__version__}")
-    with _col_right:
-        st.markdown(f"Loaded:{get_now()}")
+        st.markdown(DEFAULT_PAGE_DESCRIPTION)
+    common.render_footer()
 
 
 if __name__ == "__main__":
