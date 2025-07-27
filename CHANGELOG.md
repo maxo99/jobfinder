@@ -1,12 +1,49 @@
 # CHANGELOG
 
 
+## v0.12.0 (2025-07-27)
+
+### Bug Fixes
+
+- Reloading of stats
+  ([`adcf984`](https://github.com/maxo99/jobfinder/commit/adcf984a5ac8c242baeb7a5c6e88393bd8deeeb2))
+
+### Features
+
+- Updates to sidebar and navigation logic
+  ([`b247b10`](https://github.com/maxo99/jobfinder/commit/b247b1096fabf9dfc37fd0de23eadf2e38501bee))
+
+- Updates to stats display
+  ([`4c56294`](https://github.com/maxo99/jobfinder/commit/4c56294811331115cf9c2289caa73c5ee290e86f))
+
+### Refactoring
+
+- Class moving and cleanup
+  ([`1caf57b`](https://github.com/maxo99/jobfinder/commit/1caf57bb6ce70685d0f5d6433eadfaefa6e9af8d))
+
+- Using page links instead of tabs for navigation
+  ([`4deddcf`](https://github.com/maxo99/jobfinder/commit/4deddcfc402d45e6e0e0191e8eb4dfcd7f1b469f))
+
+### Testing
+
+- Readding app layer test
+  ([`2f2201b`](https://github.com/maxo99/jobfinder/commit/2f2201bb8a866e786da93258e780eb899b0b1f4c))
+
+- Updates to testes to incorporate both similarity searches
+  ([`8bc8df9`](https://github.com/maxo99/jobfinder/commit/8bc8df931be7e2271aaad15c096081cff86c43fc))
+
+
 ## v0.11.0 (2025-07-25)
 
 ### Features
 
 - Introduction of embedding and search logic
   ([`4f61a9b`](https://github.com/maxo99/jobfinder/commit/4f61a9b336599594ee9e1ef56ffac128a617067a))
+
+### Refactoring
+
+- Refactor data management and main page structure
+  ([`7f68964`](https://github.com/maxo99/jobfinder/commit/7f68964d2d1be9e8a14b9225d7763f412fb8241c))
 
 
 ## v0.10.0 (2025-07-24)
