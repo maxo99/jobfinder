@@ -1,3 +1,5 @@
+
+
 def test_embedding_client(fix_ollamaembeddingclient):
     try:
         response = fix_ollamaembeddingclient.embed("Test embedding text")

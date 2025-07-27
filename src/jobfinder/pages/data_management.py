@@ -4,7 +4,8 @@ import os
 import streamlit as st
 
 from jobfinder import JOBS_DATA_FILE
-from jobfinder.session import get_jobsdf
+from jobfinder.domain.constants import DEFAULT_COLS
+from jobfinder.session import get_working_df
 from jobfinder.utils import get_now
 from jobfinder.views import common
 
@@ -17,7 +18,7 @@ def _manage_data():
     with _col_export_data:
         st.subheader("Export Data")
         if st.button("📥 Download CSV"):
-            csv_data = get_jobsdf().to_csv(index=False)
+            csv_data = get_working_df().to_csv(index=False)
             st.download_button(
                 label="Download jobs data as CSV",
                 data=csv_data,
@@ -53,10 +54,34 @@ def _bulk_actions():
             st.rerun()
 
 
+
 common.render_header()
 st.subheader("Data File")
 st.write(f"Current data file: `{JOBS_DATA_FILE}`")
-
 _manage_data()
+
+_working = get_working_df()
+if _working.empty:
+    st.warning("No jobs found. Please scrape new jobs for page functionality.")
+    st.stop()
+_s_rows = st.dataframe(
+    _working,
+    use_container_width=True,
+    hide_index=True,
+    on_select="rerun",
+    selection_mode="multi-row",
+    column_order=DEFAULT_COLS,
+    key="data_management_dataframe",
+)
+_selected_data = []
+if _s_rows and "selection" in _s_rows and "rows" in _s_rows["selection"]:
+    _s_ids = _s_rows["selection"]["rows"]
+    _selected_data = [_working.iloc[i]["id"] for i in _s_ids]
+
+st.markdown("---")
+if _selected_data:
+    st.subheader("Selected Records")
+    st.write(f"Selected {_selected_data}")
+    st.write(f"Total Selected: {len(_selected_data)}")
 _bulk_actions()
 common.render_footer()

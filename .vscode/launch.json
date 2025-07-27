@@ -17,6 +17,7 @@
             ],
             "stopOnEntry": true,
             "justMyCode": false,
+            "console": "internalConsole"
         },
         {
             "name": "streamlit debug (current file)",

@@ -81,7 +81,6 @@ if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
         st.dataframe(new_jobs, use_container_width=True)
         if st.button("Save Scraped Jobs", type="primary", key="save_scraped_jobs"):
             save_data2(new_jobs, state="raw")
-
             get_data_service().store_jobs(df_to_jobs(new_jobs))
             st.rerun()
 common.render_footer()

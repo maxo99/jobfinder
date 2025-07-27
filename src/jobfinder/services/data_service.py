@@ -60,27 +60,39 @@ class DataService:
             logger.error(f"Error embedding populated jobs: {e}")
             raise e
 
-    def search_similar_jobs(self, title: str, **filters) -> list[Job]:
+    def search_by_title(self, job: Job, **filters) -> SimilarityResponse | None:
         try:
-            title_vector = self.embedding_client.embed(title)
-            return self.db_client.search_by_title(title_embedding=title_vector)
+            if not job.title:
+                raise ValueError("Job title is required for title search.")
+            if not job.title_vector:
+                logger.info(f"Embedding title for job {job.id}")
+                job.title_vector = self.embedding_client.embed(job.title)
+                self.store_jobs([job])
+            return self.db_client.search_by_title_embeddings(
+                title_embedding=job.title_vector,
+                job_exclusion_id=job.id,
+            )
         except Exception as e:
-            logger.error(f"Error searching jobs with title '{title}': {e}")
-            return []
+            logger.error(f"Error searching jobs with title '{job.title}': {e}")
+            return None
 
     def search_by_qualifications(
         self,
         job: Job,
         limit: int = 5,
-        similarity_threshold: float = 0.1,
+        similarity_threshold: float = 0.99,
     ) -> SimilarityResponse | None:
         try:
+            if not job.qualifications:
+                raise ValueError("Job qualifications are required for search.")
             if not job.qualifications_vector:
-                job.qualifications_vector = self.embedding_client.embed(
-                    job.create_qualifications_text()
-                )
-            _results = self.db_client.search_similar_jobs(
-                qualifications_embedding=job.qualifications_vector,
+                logger.info(f"Embedding qualifications for job {job.id}")
+                _v = self.embedding_client.embed(job.create_qualifications_text())
+                job.qualifications_vector = _v
+                self.store_jobs([job])
+            _results = self.db_client.search_by_qualifications_embeddings(
+                qe=job.qualifications_vector,
+                job_exclusion_id=job.id,
                 limit=limit,
                 similarity_threshold=similarity_threshold,
             )

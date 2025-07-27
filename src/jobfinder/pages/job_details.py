@@ -8,7 +8,6 @@ from jobfinder.domain.models import Job, df_to_jobs
 from jobfinder.session import (
     get_data_service,
     get_generative_service,
-    get_jobs_df,
     get_working_count,
     get_working_df,
     set_jobs_df,
@@ -96,7 +95,7 @@ def _actions(job: Job, job_id: str):
         if new_status == NEW:
             new_status = VIEWED
         df = update_by_id(
-            get_jobs_df(),
+            get_working_df(),
             job.id,
             {
                 "status": new_status,
@@ -109,8 +108,8 @@ def _actions(job: Job, job_id: str):
                 "modified": get_now(),
             },
         )
-        set_jobs_df(df)
-        save_data2(get_jobs_df())
+        get_data_service().store_jobs(df_to_jobs(df))
+        save_data2(get_working_df())
         st.success("Job updated successfully!")
         st.rerun()
 
@@ -137,6 +136,7 @@ def _delete(job_id: str):
 # if not get_jobs_df().empty:
 
 common.render_header()
+common.check_working_df()
 
 
 logger.info(f"Displaying {get_working_count()} Jobs")

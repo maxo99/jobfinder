@@ -23,6 +23,7 @@ from jobfinder.views import common
 logger = logging.getLogger(__name__)
 
 common.render_header()
+common.check_working_df()
 
 st.subheader("Scoring Utility 🤖")
 st.markdown(SCORING_UTIL_DESCRIPTION)
@@ -45,24 +46,27 @@ else:
         key="select_listing_scoring",
         index=0,
     )
-current_selected = working_df.loc[working_df["id"] == _key]
-
+scoring_job = df_to_jobs(working_df.loc[working_df["id"] == _key])[0]
 # IF NUMBER OF QUALIFIED ....
 # SEARCH BY TITLE?
 
 st.subheader("Select Sample Records")
-_selected_data = []
-similars = get_data_service().search_by_qualifications(
-    current_selected["qualifications_vector"].iloc[0]
-)
+if not scoring_job.qualifications:
+    st.warning("Please update the listing with qualifications to use this feature.")
+    st.stop()
+similars = get_data_service().search_by_qualifications(scoring_job)
 if not similars:
     st.warning("No similar records found. Please select a different listing.")
     st.stop()
 logger.info(f"Found {len(similars.jobs)} jobs with scores:{similars.scores}")
 selection_df = jobs_to_df(similars.jobs)[DISPLAY_COLS]
 
+# Adding scores into dataframe for display
+selection_df["score"] = similars.scores
+selection_df = selection_df.sort_values(by="score", ascending=False)
+selection_df = selection_df.reset_index(drop=True)
 
-selected_rows = st.dataframe(
+_s_rows = st.dataframe(
     selection_df,
     use_container_width=True,
     on_select="rerun",
@@ -71,24 +75,20 @@ selected_rows = st.dataframe(
     key="scoring_selection_dataframe",
 )
 
-if (
-    selected_rows
-    and "selection" in selected_rows
-    and "rows" in selected_rows["selection"]
-):
-    selected_indices = selected_rows["selection"]["rows"]
-    _selected_data = [selection_df.iloc[i]["id"] for i in selected_indices]
+_selected_data = []
+if _s_rows and "selection" in _s_rows and "rows" in _s_rows["selection"]:
+    _s_ids = _s_rows["selection"]["rows"]
+    _selected_data = [selection_df.iloc[i]["id"] for i in _s_ids]
 
 
 _current_prompt = get_current_prompt()
 
 if _selected_data and _current_prompt:
-    _scoring_job = df_to_jobs(current_selected)[0]
     rendered_prompt = render_jinja(
         template_str=_current_prompt,
         data={
             "records": _selected_data,
-            "listing": _scoring_job.model_dump(),
+            "listing": scoring_job.model_dump(),
         },
     )
 
@@ -103,12 +103,12 @@ if _selected_data and _current_prompt:
 
         #     st.error("Chat not enabled, see README for configuration")
         try:
-            _scoring_job = get_generative_service().generate_score(
-                st, _scoring_job, rendered_prompt=rendered_prompt
+            scoring_job = get_generative_service().generate_score(
+                st, scoring_job, rendered_prompt=rendered_prompt
             )
-            if not _scoring_job:
+            if not scoring_job:
                 raise ValueError("Failed to generate scoring job.")
-            get_data_service().store_jobs([_scoring_job])
+            get_data_service().store_jobs([scoring_job])
             st.success("Score generated and updated successfully!")
         except Exception as e:
             logger.error("Error generating score: %s", e)

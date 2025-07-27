@@ -1,8 +1,10 @@
 import logging
 from dataclasses import dataclass
 
-from sqlalchemy import create_engine, func, inspect, select, text
+from numpy import ndarray
+from sqlalchemy import TextClause, create_engine, func, inspect, select, text
 from sqlalchemy.orm import sessionmaker
+from sqlmodel import not_
 
 from jobfinder import config
 from jobfinder.domain.models import Job, SQLModel
@@ -134,56 +136,55 @@ class PostgresClient:
         except Exception as e:
             raise e
 
-    def search_by_title(
-        self, title_embedding: list[float], limit: int = 5
-    ) -> list[Job]:
+    def search_by_title_embeddings(
+        self,
+        title_embedding: list[float],
+        job_exclusion_id: str | None = None,
+        limit: int = 5,
+        similarity_threshold: float = 0.999,
+    ) -> SimilarityResponse:
         try:
             logger.info("Searching jobs by title embedding")
-
-            similarity_threshold: float = 0.7
-            embedding_str: str = str(title_embedding).replace("[", "").replace("]", "")
-            embedding_sql = text(f"ARRAY[{embedding_str}]::vector")
+            embedding_sql = self._format_embedding(title_embedding)
 
             with self.session_maker() as session:
-                results = (
-                    session.query(Job)
-                    .filter(
-                        func.cosine_distance(Job.title_vector, embedding_sql)
-                        < similarity_threshold
-                    )
-                    .order_by(func.cosine_distance(Job.title_vector, embedding_sql))
-                    .limit(limit)
-                    .all()
+                dist = func.cosine_distance(Job.title_vector, embedding_sql)
+
+                query = select(Job, dist.label("cosine_distance")).where(
+                    dist < similarity_threshold
                 )
+                if job_exclusion_id is not None:
+                    query = query.where(not_(Job.id == job_exclusion_id))
+                results = session.execute(
+                    query.order_by(dist).limit(limit)
+                ).all()
+
                 logger.info(f"Found {len(results)} jobs matching title embedding")
-                return results
+                return SimilarityResponse(
+                    jobs=[r[0] for r in results], scores=[r[1] for r in results]
+                )
         except Exception as e:
             logger.error(f"Error searching jobs by title: {e}")
             raise e
 
-    def search_similar_jobs(
+    def search_by_qualifications_embeddings(
         self,
-        qualifications_embedding: list[float],
+        qe: list[float] | ndarray,
+        job_exclusion_id: str | None = None,
         limit: int = 5,
-        similarity_threshold: float = 0.1,
+        similarity_threshold: float = 0.999,
     ) -> SimilarityResponse:
         try:
             logger.info("Searching jobs by qualifications embedding")
-
-            embedding_str: str = (
-                str(qualifications_embedding).replace("[", "").replace("]", "")
-            )
-            embedding_sql = text(f"ARRAY[{embedding_str}]::vector")
+            embedding_sql = self._format_embedding(qe)
 
             with self.session_maker() as session:
-                distance_expr = func.cosine_distance(
-                    Job.qualifications_vector, embedding_sql
-                )
+                dist = func.cosine_distance(Job.qualifications_vector, embedding_sql)
 
                 results = (
-                    session.query(Job, distance_expr.label("cosine_distance"))
-                    .filter(distance_expr < similarity_threshold)
-                    .order_by(distance_expr)
+                    session.query(Job, dist.label("cosine_distance"))
+                    .filter(dist < similarity_threshold)
+                    .order_by(dist)
                     .limit(limit)
                     .all()
                 )
@@ -196,3 +197,11 @@ class PostgresClient:
         except Exception as e:
             logger.error(f"Error searching jobs by qualifications: {e}")
             raise e
+
+    @staticmethod
+    def _format_embedding(embedding: list[float] | ndarray) -> TextClause:
+        """Format the embedding for SQL query."""
+        if isinstance(embedding, ndarray):
+            embedding = embedding.tolist()
+        _embedding_str = ",".join([f"{float(x):.10f}" for x in embedding])
+        return text(f"ARRAY[{_embedding_str}]::vector")

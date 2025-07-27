@@ -18,6 +18,11 @@ def render_header():
         _render_stats()
     render_sidebar()
 
+def check_working_df():
+    if get_working_df().empty:
+        st.warning("No jobs found. Please scrape new jobs for page functionality.")
+        st.stop()
+
 
 def render_footer():
     st.markdown("---")

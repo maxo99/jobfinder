@@ -84,18 +84,94 @@ def get_working_count() -> int:
 def get_jobs() -> list[Job]:
     return st.session_state.jobs
 
-
-def get_jobsdf() -> pd.DataFrame:
-    _jobs = get_jobs()
-    return jobs_to_df(_jobs)
-
-
-def get_jobs_df() -> pd.DataFrame:
-    return get_session().jobs_df
-
-
 def set_jobs_df(df):
     get_session().jobs_df = df
+
+
+def update_by_id(df: pd.DataFrame, job_id: str, new_data: dict) -> pd.DataFrame:
+    df = df.copy()
+    mask = df["id"] == job_id
+    if mask.any():
+        for k, v in new_data.items():
+            if k in df.columns:
+                df.loc[mask, k] = v
+            else:
+                logger.error(f"Column '{k}' does not exist in the DataFrame.")
+        logger.info(f"Job {job_id} updated successfully!")
+    else:
+        logger.error(f"Job {job_id} not found.")
+    return df
+
+def get_selected_records() -> list[dict]:
+    if not get_session().selected_records:
+        return []
+
+    selected_df = get_working_df()[
+        get_working_df()["id"].isin(get_session().selected_records)
+    ]
+    return selected_df.to_dict("records")
+
+
+def set_selected_data(record_ids: list[str]):
+    get_session().selected_records = record_ids
+
+
+def get_current_prompt() -> str:
+    return get_session().current_prompt
+
+
+
+
+
+def chat_enabled() -> bool:
+    backend = get_backend()
+    return backend.chat_enabled
+
+
+def get_data_service() -> DataService:
+    backend = get_backend()
+    if not backend.data_service:
+        raise ValueError("DataService is not initialized.")
+    return backend.data_service
+
+
+def get_generative_service() -> GenerativeService:
+    backend = get_backend()
+    if not backend.generative_service:
+        raise ValueError("GenerativeService is not initialized.")
+    return backend.generative_service
+
+
+def get_session():
+    return st.session_state
+
+
+def get_backend() -> Backend:
+    if "backend" not in get_session():
+        _init_session()
+    if not get_session().backend:
+        raise ValueError("Backend not initialized. Call _init_session() first.")
+    return get_session().backend
+
+
+# def get_data_filters():
+#     return get_session().data_filters
+
+
+# def get_title_filters():
+#     return get_data_filters().title_filters
+
+
+# def set_title_filters(filters):
+#     get_data_filters().title_filters = filters
+
+
+# def get_status_filter():
+#     return get_data_filters().status_filters
+
+
+# def set_status_filter(status):
+#     get_data_filters().status_filters = status
 
 
 # def get_filtered_jobs_df() -> pd.DataFrame:
@@ -135,86 +211,3 @@ def set_jobs_df(df):
 #         update_cols = _DEFAULT_UPDATE_COLS
 #     get_jobs_df().loc[df.index, update_cols] = df[update_cols]
 
-
-def update_by_id(df: pd.DataFrame, job_id: str, new_data: dict) -> pd.DataFrame:
-    df = df.copy()
-    mask = df["id"] == job_id
-    if mask.any():
-        for k, v in new_data.items():
-            if k in df.columns:
-                df.loc[mask, k] = v
-            else:
-                logger.error(f"Column '{k}' does not exist in the DataFrame.")
-        logger.info(f"Job {job_id} updated successfully!")
-    else:
-        logger.error(f"Job {job_id} not found.")
-    return df
-
-
-def get_data_filters():
-    return get_session().data_filters
-
-
-def get_title_filters():
-    return get_data_filters().title_filters
-
-
-def set_title_filters(filters):
-    get_data_filters().title_filters = filters
-
-
-def get_status_filter():
-    return get_data_filters().status_filters
-
-
-def set_status_filter(status):
-    get_data_filters().status_filters = status
-
-
-def get_selected_records() -> list[dict]:
-    if not get_session().selected_records:
-        return []
-
-    selected_df = get_working_df()[
-        get_working_df()["id"].isin(get_session().selected_records)
-    ]
-    return selected_df.to_dict("records")
-
-
-def set_selected_data(record_ids: list[str]):
-    get_session().selected_records = record_ids
-
-
-def get_current_prompt() -> str:
-    return get_session().current_prompt
-
-
-def chat_enabled() -> bool:
-    backend = get_backend()
-    return backend.chat_enabled
-
-
-def get_data_service() -> DataService:
-    backend = get_backend()
-    if not backend.data_service:
-        raise ValueError("DataService is not initialized.")
-    return backend.data_service
-
-
-def get_generative_service() -> GenerativeService:
-    backend = get_backend()
-    if not backend.generative_service:
-        raise ValueError("GenerativeService is not initialized.")
-    return backend.generative_service
-
-
-def get_session():
-    return st.session_state
-
-
-def get_backend() -> Backend:
-    if "backend" not in get_session():
-        _init_session()
-    if not get_session().backend:
-        raise ValueError("Backend not initialized. Call _init_session() first.")
-    return get_session().backend

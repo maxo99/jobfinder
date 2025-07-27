@@ -1,10 +1,12 @@
 import logging
 from typing import Self
 
+from numpy import ndarray
 import pandas as pd
 from pgvector.sqlalchemy import Vector
 from pydantic import (
     BaseModel,
+    field_serializer,
     field_validator,
 )
 from sqlalchemy import Column, event
@@ -84,7 +86,7 @@ class SummarizationResponse(BaseModel):
 
 class Job(SQLModel, table=True):
     # Primary fields
-    id: str = Field(primary_key=True)
+    id: str = Field(primary_key=True,nullable=False)
     site: str | None = None
     job_url: str | None = None
     job_url_direct: str | None = None
@@ -126,11 +128,11 @@ class Job(SQLModel, table=True):
     # Company details
     company_industry: str | None = None
     company_url: str | None = None
-    company_logo: str | None = None
-    company_url_direct: str | None = None
+    # company_logo: str | None = None
+    # company_url_direct: str | None = None
 
-    # Experience fields
-    experience_range: str | None = None
+    # experience_range: str | None = None
+    # LinkedIn Only
     job_level: str | None = None
     job_function: str | None = None
 
@@ -144,6 +146,28 @@ class Job(SQLModel, table=True):
     summary_vector: list[float] | None = Field(
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
+
+
+    @field_validator("title_vector", "qualifications_vector", "summary_vector", mode="before")
+    @classmethod
+    def validate_vectors(cls, v):
+        if isinstance(v, ndarray):
+            v = v.tolist()
+        return v
+
+    @field_serializer("title_vector", "qualifications_vector", "summary_vector")
+    @classmethod
+    def serialize_vectors(cls, v) -> list[float] | None:
+        try:
+            if v is None:
+                return None
+            if isinstance(v, ndarray):
+                return v.tolist()
+            return v
+        except Exception as e:
+            logger.error(f"Error in serialize_vectors: {e}")
+            raise
+
 
     def __str__(self) -> str:
         return f"Job(ID: {self.id}, Name: {self.name})"
@@ -340,7 +364,7 @@ def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     df = pd.DataFrame(data)
 
     # Ensure all columns are present
-    for field in Job.__fields__.keys():
+    for field in Job.model_fields.keys():
         if field not in df.columns:
             df[field] = None
 
@@ -385,3 +409,22 @@ def validate_df_defaults(df: pd.DataFrame) -> None:
     df.loc[:, "cons"] = df["cons"].astype(str)
     df.loc[:, "summary"] = df["summary"].astype(str)
     df.loc[:, "date_posted"] = df["date_posted"].astype(str)
+    # Drop Naukri specific columns
+    df.drop(
+        columns=[
+            "skills",
+            "experience_range",
+            "company_rating",
+            "company_reviews_count",
+            "vacancy_count",
+            "work_from_home_type",
+        ],
+        errors="ignore",
+        inplace=True,
+    )
+    # Drop Undesired columns
+    df.drop(
+        columns=["company_logo", "emails", "company_url_direct"],
+        errors="ignore",
+        inplace=True,
+    )
