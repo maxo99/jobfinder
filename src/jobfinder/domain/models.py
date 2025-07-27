@@ -348,7 +348,15 @@ class Job(SQLModel, table=True):
 
             texts = []
             for qual in self.qualifications:
-                text = f"Skill: {qual.skill}, Requirement: {qual.requirement}, Experience: {qual.experience}"
+                if isinstance(qual, dict):
+                    skill = qual.get("skill", "N/A")
+                    requirement = qual.get("requirement", "N/A")
+                    experience = qual.get("experience", "N/A")
+                else:
+                    skill = qual.skill
+                    requirement = qual.requirement
+                    experience = qual.experience
+                text = f"Skill: {skill}, Requirement: {requirement}, Experience: {experience}"
                 texts.append(text)
 
             return " | ".join(texts)

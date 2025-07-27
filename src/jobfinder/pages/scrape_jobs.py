@@ -54,6 +54,9 @@ exclude_remote = st.checkbox("Exclude Remote", value=True)
 fulltime_only = st.checkbox("Fulltime Only", value=True)
 
 
+new_jobs = pd.DataFrame()
+if "new_jobs" in st.session_state:
+    new_jobs = st.session_state.new_jobs
 # Scrape button
 if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
     new_jobs = _find_jobs(
@@ -79,8 +82,12 @@ if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
         st.metric("Pulled Jobs", len(new_jobs.index))
 
         st.dataframe(new_jobs, use_container_width=True)
-        if st.button("Save Scraped Jobs", type="primary", key="save_scraped_jobs"):
-            save_data2(new_jobs, state="raw")
-            get_data_service().store_jobs(df_to_jobs(new_jobs))
-            st.rerun()
+        st.session_state.new_jobs = new_jobs
+if not new_jobs.empty:
+    if st.button("Save Scraped Jobs", type="primary", key="save_scraped_jobs"):
+        save_data2(new_jobs, state="raw")
+        get_data_service().store_jobs(df_to_jobs(new_jobs))
+        st.session_state.new_jobs = pd.DataFrame()  # Clear after saving
+        st.success("Jobs saved successfully!")
+        st.rerun()
 common.render_footer()

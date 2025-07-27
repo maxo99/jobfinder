@@ -48,7 +48,7 @@ def test_extract_qualifications(jobs_testdata, fix_generativeservice):
         fix_generativeservice.extract_qualifications(test_jobs)
         assert len(test_jobs[0].qualifications) > 0
         logger.info(f"Output:\n{test_jobs[0].qualifications}")
-        jobs_to_df(test_jobs).head(count).to_csv("test_qualifications.csv", index=False)
+        # jobs_to_df(test_jobs).head(count).to_csv("test_qualifications.csv", index=False)
         logger.info("Qualifications extracted successfully.")
 
     except Exception as e:

@@ -91,13 +91,12 @@ def get_working_df() -> pd.DataFrame:
 def get_working_count() -> int:
     return len(get_working_df().index)
 
+# def get_jobs() -> list[Job]:
+#     return st.session_state.jobs
 
-def get_jobs() -> list[Job]:
-    return st.session_state.jobs
 
-
-def set_jobs_df(df):
-    get_session().jobs_df = df
+# def set_jobs_df(df):
+#     get_session().jobs_df = df
 
 
 def update_by_id(df: pd.DataFrame, job_id: str, new_data: dict) -> pd.DataFrame:

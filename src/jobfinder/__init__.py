@@ -5,7 +5,8 @@ import os
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+JOBFINDER_ROOT = Path(__file__).parent
+PROJECT_ROOT = Path(JOBFINDER_ROOT).parent.parent
 DATA_DIR = PROJECT_ROOT.joinpath("data")
 RAW_DATA_DIR = DATA_DIR.joinpath("raw")
 JOBS_DATA_FILE = os.environ.get("JOBS_DATA_FILE", DATA_DIR.joinpath("jobs_data.csv"))
