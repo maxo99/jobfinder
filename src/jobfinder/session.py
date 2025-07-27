@@ -4,8 +4,8 @@ import pandas as pd
 import streamlit as st
 
 from jobfinder.bootstrap import Backend
-from jobfinder.domain.constants import PRESET_TEMPLATES
-from jobfinder.domain.models import DataFilters, Job, jobs_to_df
+from jobfinder.domain.constants import EXCLUDED, NA, NEW, PRESET_TEMPLATES
+from jobfinder.domain.models import DataFilters, Job, StatsModel, jobs_to_df
 
 # from jobfinder.adapters.search.elasticsearch_client import ElastiSearchClient
 from jobfinder.services.data_service import DataService
@@ -52,12 +52,23 @@ def _init_working_df():
     if st.session_state.working_df.empty:
         logger.info(f"Startup DB count:{get_data_service().get_count()}")
     reload_working_df()
-
+    reload_stats()
     if st.session_state.working_df.empty:
         logger.warning("No jobs found in the database. Loading from file.")
         raw_jobs = load_raw_jobs()
         if raw_jobs:
             get_data_service().store_jobs(raw_jobs)
+
+
+def reload_stats():
+    logger.info("Reloading stats")
+    st.session_state.stats = StatsModel(
+        total_jobs=get_data_service().get_count(),
+        new_jobs=get_data_service().get_count(status=NEW),
+        excluded_jobs=get_data_service().get_count(status=EXCLUDED),
+        summarized_jobs=get_data_service().get_count(not_summarizer=NA),
+        scored_jobs=get_data_service().get_count(not_classifier=NA),
+    )
 
 
 def reload_working_df():
@@ -84,6 +95,7 @@ def get_working_count() -> int:
 def get_jobs() -> list[Job]:
     return st.session_state.jobs
 
+
 def set_jobs_df(df):
     get_session().jobs_df = df
 
@@ -102,6 +114,7 @@ def update_by_id(df: pd.DataFrame, job_id: str, new_data: dict) -> pd.DataFrame:
         logger.error(f"Job {job_id} not found.")
     return df
 
+
 def get_selected_records() -> list[dict]:
     if not get_session().selected_records:
         return []
@@ -118,9 +131,6 @@ def set_selected_data(record_ids: list[str]):
 
 def get_current_prompt() -> str:
     return get_session().current_prompt
-
-
-
 
 
 def chat_enabled() -> bool:
@@ -210,4 +220,3 @@ def get_backend() -> Backend:
 #     if update_cols is None:
 #         update_cols = _DEFAULT_UPDATE_COLS
 #     get_jobs_df().loc[df.index, update_cols] = df[update_cols]
-

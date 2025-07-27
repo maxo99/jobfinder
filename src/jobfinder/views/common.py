@@ -37,11 +37,11 @@ def _render_stats():
     logger.info("Rendering display stats")
     st.subheader("Statistics")
     col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Total Jobs", get_data_service().get_count())
-    col2.metric("New Jobs", get_data_service().get_count(status=NEW))
-    col3.metric("Excluded Jobs", get_data_service().get_count(status=EXCLUDED))
-    col4.metric("Summarized Jobs", get_data_service().get_count(not_summarizer=NA))
-    col5.metric("Scored Jobs", get_data_service().get_count(not_classifier=NA))
+    col1.metric("Total Jobs", st.session_state.stats.total_jobs)
+    col2.metric("New Jobs", st.session_state.stats.new_jobs)
+    col3.metric("Excluded Jobs", st.session_state.stats.excluded_jobs)
+    col4.metric("Summarized Jobs", st.session_state.stats.summarized_jobs)
+    col5.metric("Scored Jobs", st.session_state.stats.scored_jobs)
 
 
 def render_sidebar():

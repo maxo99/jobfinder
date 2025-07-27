@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from numpy import ndarray
 from sqlalchemy import TextClause, create_engine, func, inspect, select, text
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import not_
+from sqlmodel import cast, not_
+import sqlmodel
 
 from jobfinder import config
 from jobfinder.domain.models import Job, SQLModel
@@ -111,6 +112,8 @@ class PostgresClient:
             logger.error(f"Error getting jobs: {e}")
             raise e
 
+
+
     def get_job_by_id(self, job_id: str) -> Job | None:
         try:
             with self.session_maker() as session:
@@ -118,10 +121,21 @@ class PostgresClient:
         except Exception as e:
             raise e
 
-    def get_count(self, **kwargs) -> int:
+    def get_count(self, **filters) -> int:
         try:
-            return len(self.get_jobs(**kwargs))
+            with self.session_maker() as session:
+                query = select(func.count(cast(Job.id, sqlmodel.String)))
+                if filters:
+                    for key, value in filters.items():
+                        if key.startswith("not_"):
+                            actual_key = key[4:]
+                            query = query.where(getattr(Job, actual_key) != value)
+                        else:
+                            query = query.where(getattr(Job, key) == value)
+                result = session.execute(query).scalar_one()
+                return result
         except Exception as e:
+            logger.error(f"Error getting job count: {e}")
             raise e
 
     def delete_job(self, job_id: str):

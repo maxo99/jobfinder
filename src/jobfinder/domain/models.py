@@ -1,8 +1,9 @@
 import logging
+from dataclasses import dataclass
 from typing import Self
 
-from numpy import ndarray
 import pandas as pd
+from numpy import ndarray
 from pgvector.sqlalchemy import Vector
 from pydantic import (
     BaseModel,
@@ -86,7 +87,7 @@ class SummarizationResponse(BaseModel):
 
 class Job(SQLModel, table=True):
     # Primary fields
-    id: str = Field(primary_key=True,nullable=False)
+    id: str = Field(primary_key=True, nullable=False)
     site: str | None = None
     job_url: str | None = None
     job_url_direct: str | None = None
@@ -147,8 +148,9 @@ class Job(SQLModel, table=True):
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
 
-
-    @field_validator("title_vector", "qualifications_vector", "summary_vector", mode="before")
+    @field_validator(
+        "title_vector", "qualifications_vector", "summary_vector", mode="before"
+    )
     @classmethod
     def validate_vectors(cls, v):
         if isinstance(v, ndarray):
@@ -167,7 +169,6 @@ class Job(SQLModel, table=True):
         except Exception as e:
             logger.error(f"Error in serialize_vectors: {e}")
             raise
-
 
     def __str__(self) -> str:
         return f"Job(ID: {self.id}, Name: {self.name})"
@@ -410,7 +411,7 @@ def validate_df_defaults(df: pd.DataFrame) -> None:
     df.loc[:, "summary"] = df["summary"].astype(str)
     df.loc[:, "date_posted"] = df["date_posted"].astype(str)
     # Drop Naukri specific columns
-    df.drop(
+    df = df.drop(
         columns=[
             "skills",
             "experience_range",
@@ -420,11 +421,18 @@ def validate_df_defaults(df: pd.DataFrame) -> None:
             "work_from_home_type",
         ],
         errors="ignore",
-        inplace=True,
     )
     # Drop Undesired columns
-    df.drop(
+    df = df.drop(
         columns=["company_logo", "emails", "company_url_direct"],
         errors="ignore",
-        inplace=True,
     )
+
+
+@dataclass
+class StatsModel:
+    total_jobs: int = 0
+    new_jobs: int = 0
+    excluded_jobs: int = 0
+    summarized_jobs: int = 0
+    scored_jobs: int = 0

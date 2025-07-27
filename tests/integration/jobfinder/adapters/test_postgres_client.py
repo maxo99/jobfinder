@@ -50,3 +50,20 @@ def test_get_jobs_with_filters(fix_postgresclient, jobs_testdata):
         )
     except Exception as e:
         raise e
+
+
+def test_get_count(fix_postgresclient, jobs_testdata):
+    try:
+        jobs_testdata[0].status = EXCLUDED
+        fix_postgresclient.upsert_jobs(jobs_testdata)
+        time.sleep(1)
+        total_count = fix_postgresclient.get_count()
+        assert total_count == len(jobs_testdata), "Total count mismatch."
+        excluded_count = fix_postgresclient.get_count(status=EXCLUDED)
+        assert excluded_count >= 1, "Excluded count should be at least 1."
+        non_excluded_count = fix_postgresclient.get_count(not_status=EXCLUDED)
+        assert non_excluded_count == len(jobs_testdata) - excluded_count, (
+            "Non-excluded count mismatch."
+        )
+    except Exception as e:
+        raise e
