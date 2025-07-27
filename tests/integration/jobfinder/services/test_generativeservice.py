@@ -2,7 +2,7 @@ import logging
 
 from jinja2 import Template
 
-from jobfinder.constants import PRESET_TEMPLATES
+from jobfinder.domain.constants import PRESET_TEMPLATES
 from jobfinder.domain.models import ScoringResponse, jobs_to_df
 from jobfinder.utils.service_helpers import render_jinja
 
@@ -48,7 +48,7 @@ def test_extract_qualifications(jobs_testdata, fix_generativeservice):
         fix_generativeservice.extract_qualifications(test_jobs)
         assert len(test_jobs[0].qualifications) > 0
         logger.info(f"Output:\n{test_jobs[0].qualifications}")
-        jobs_to_df(test_jobs).head(count).to_csv("test_qualifications.csv", index=False)
+        # jobs_to_df(test_jobs).head(count).to_csv("test_qualifications.csv", index=False)
         logger.info("Qualifications extracted successfully.")
 
     except Exception as e:

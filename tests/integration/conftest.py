@@ -9,7 +9,7 @@ import pytest
 import requests
 from streamlit.testing.v1 import AppTest
 
-from jobfinder import PROJECT_ROOT, config
+from jobfinder import JOBFINDER_ROOT, PROJECT_ROOT, config
 from jobfinder.adapters.db.postgres_client import PostgresClient
 from jobfinder.services.data_service import DataService
 from jobfinder.services.generative_service import GenerativeService
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope="session")
 def at():
-    _at = AppTest.from_file("main.py", default_timeout=30).run(timeout=60)
+    _at = AppTest.from_file(JOBFINDER_ROOT / "main.py", default_timeout=30).run(timeout=60)
     yield _at
     # print("Test session completed, cleaning up...")
 

@@ -1,11 +1,40 @@
 import logging
 import time
 
-import pytest
-
 from jobfinder.domain.models import Qualification
 
 logger = logging.getLogger(__name__)
+
+
+
+FAKE_SKILLS = [
+    "Python",
+    "SQL",
+    "JavaScript",
+    "Java",
+    "C++",
+    "Ruby",
+    "Go",
+    "Swift",
+    "PHP",
+    "HTML/CSS",
+]
+REQUIREMENTS = ["required", "preferred", "optional"]
+EXPERIENCE_LEVELS = ["1 year", "2+ years", "5 years", "10+ years"]
+
+def _build_fake_qualifications(job_id, count=2):
+    qualifications = []
+    for i in range(count):
+        qualifications.append(
+            Qualification(
+                id=f"{job_id}_qual{i+1}",
+                skill=FAKE_SKILLS[i % len(FAKE_SKILLS)],
+                requirement=REQUIREMENTS[i % len(REQUIREMENTS)],
+                experience=EXPERIENCE_LEVELS[i % len(EXPERIENCE_LEVELS)],
+            )
+        )
+    return qualifications
+
 
 
 def test_populate_index(fix_dataservice, jobs_testdata):
@@ -19,57 +48,50 @@ def test_populate_index(fix_dataservice, jobs_testdata):
     assert populated_count >= len(jobs_testdata)
 
 
-def test_embed_populated_job(fix_dataservice, jobs_testdata):
-    try:
-        test_id = "test_job_id"
-        jobs_testdata = jobs_testdata.copy()[0:1]
-        jobs_testdata[0].id = test_id
-        jobs_testdata[0].qualifications = [
-            Qualification(
-                id=test_id, skill="Python", requirement="required", experience="5 years"
-            )
-        ]
-        fix_dataservice.embed_populated_jobs(jobs_testdata)
-        time.sleep(1)
-        fix_dataservice.store_jobs(jobs_testdata)
 
-        results = fix_dataservice.search_similar_jobs(jobs_testdata[0].title[0:5])
-        assert len(results) > 0, "No similar jobs found after embedding."
-        assert results[0].id == jobs_testdata[0].id, (
-            "The first job in the search results should match the stored job."
-        )
-        print("finished")
+
+# @pytest.mark.usefixtures("fix_populated_index")
+def test_qualifications_search(fix_dataservice, fix_generativeservice, jobs_testdata):
+    try:
+        test_jobs = jobs_testdata.copy()[0:2]
+        # fix_generativeservice.extract_qualifications(test_jobs)
+        jobs_1 = [test_jobs[0]]
+        jobs_1[0].id = "job123"
+
+        quals = _build_fake_qualifications(jobs_1[0].id, count=3)
+        jobs_1[0].qualifications = quals
+        fix_dataservice.embed_populated_jobs(jobs_1)
+        fix_dataservice.store_jobs(jobs_1)
+
+        jobs_2 = [test_jobs[1]]
+        jobs_2[0].id = "job456"
+        jobs_2[0].qualifications = _build_fake_qualifications(jobs_2[0].id, count=2)
+
+        results = fix_dataservice.search_by_qualifications(jobs_2[0])
+        assert len(results.jobs) > 0, "No similar jobs found."
     except Exception as e:
         raise e
 
 
 
+# @pytest.mark.usefixtures("fix_populated_index")
+def test_title_search(fix_dataservice, fix_generativeservice, jobs_testdata):
+    try:
+        test_jobs = jobs_testdata.copy()[0:2]
+        jobs_1 = [test_jobs[0]]
+        jobs_1[0].id = "job123"
+        fix_dataservice.embed_populated_jobs(jobs_1)
+        fix_dataservice.store_jobs(jobs_1)
 
-# # @pytest.mark.usefixtures("fix_populated_index")
-# def test_similar_job_search(fix_dataservice, fix_generativeservice, jobs_testdata):
-#     try:
-#         test_jobs = jobs_testdata.copy()[0:2]
-#         fix_generativeservice.extract_qualifications(test_jobs)
-#         jobs_1 = [test_jobs[0]]
-#         jobs_2 = [test_jobs[1]]
-#         jobs_1[0].id = "job123"
-#         jobs_2[0].id = "job456"
 
-#         fix_dataservice.embed_populated_jobs(jobs_1)
-#         fix_dataservice.store_jobs(jobs_1)
+        jobs_2 = [test_jobs[1]]
+        jobs_2[0].id = "job456"
 
-#         test_jobs[1].qualifications = [
-#             Qualification(
-#                 id=test_jobs[1].id,
-#                 skill="Python",
-#                 requirement="required",
-#                 experience="5 years",
-#             )
-#         ]
-#         results = fix_dataservice.search_by_qualifications(test_jobs[1])
-#         assert len(results.jobs) > 0, "No similar jobs found."
-#     except Exception as e:
-#         raise e
+        results = fix_dataservice.search_by_title(jobs_2[0])
+        assert len(results.jobs) > 0, "No similar jobs found."
+    except Exception as e:
+        raise e
+
 
 
 # def test_updating_summary(

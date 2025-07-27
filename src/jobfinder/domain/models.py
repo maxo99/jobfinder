@@ -1,10 +1,13 @@
 import logging
+from dataclasses import dataclass
 from typing import Self
 
 import pandas as pd
+from numpy import ndarray
 from pgvector.sqlalchemy import Vector
 from pydantic import (
     BaseModel,
+    field_serializer,
     field_validator,
 )
 from sqlalchemy import Column, event
@@ -12,6 +15,14 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 from sqlmodel import Field, SQLModel
 
+from jobfinder.domain.constants import (
+    DEFAULT_STATUS_FILTERS,
+    EMBEDDINGS_DIMENSION,
+    NA,
+    NEW,
+    STATUS_TYPES,
+    USER_TYPES,
+)
 from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)
@@ -32,23 +43,6 @@ def serialize_qualifications_before_flush(session: Session, flush_context, insta
 event.listen(Session, "before_flush", serialize_qualifications_before_flush)
 
 
-# Vector dimension for embeddings
-EMBEDDINGS_DIMENSION = 768
-
-NEW = "new"
-VIEWED = "viewed"
-EXCLUDED = "excluded"
-APPLIED = "applied"
-STATUS_TYPES = {NEW, VIEWED, EXCLUDED, APPLIED}
-USER = "User"
-AI = "AI"
-NA = "N/A"
-USER_TYPES = {USER, AI, NA}
-
-
-DEFAULT_STATUS_FILTERS = [s for s in STATUS_TYPES if s != EXCLUDED]
-
-
 class DataFilters(BaseModel):
     status_filters: list[str] = DEFAULT_STATUS_FILTERS
     title_filters: list[str] = []
@@ -57,14 +51,21 @@ class DataFilters(BaseModel):
 
 class Qualification(BaseModel):
     id: str = Field(description="The jobID which this qualification belongs to")
-    skill: str = Field(description="The skill or technologies representing the qualification")
+    skill: str = Field(
+        description="The skill or technologies representing the qualification"
+    )
     experience: str = Field(description="The experience level for the skill")
-    requirement: str = Field(description="Whether the skill is required, preferred, or desired")
+    requirement: str = Field(
+        description="Whether the skill is required, preferred, or desired"
+    )
 
 
 class ScoringResponse(BaseModel):
     score: float = Field(
-        default=0.0, ge=-1.0, le=1.0, description="The score of the job based on the AI analysis"
+        default=0.0,
+        ge=-1.0,
+        le=1.0,
+        description="The score of the job based on the AI analysis",
     )
     pros: str = Field(default="N/A", description="Pros of the job")
     cons: str = Field(default="N/A", description="Cons of the job")
@@ -76,7 +77,6 @@ class SummarizationResponse(BaseModel):
         description="List of qualifications extracted from job postings",
     )
 
-
     def get_qualifications(self, job_id: str) -> list[Qualification] | list:
         try:
             return [q for q in self.summaries if q.id == job_id]
@@ -87,7 +87,7 @@ class SummarizationResponse(BaseModel):
 
 class Job(SQLModel, table=True):
     # Primary fields
-    id: str = Field(primary_key=True)
+    id: str = Field(primary_key=True, nullable=False)
     site: str | None = None
     job_url: str | None = None
     job_url_direct: str | None = None
@@ -129,16 +129,16 @@ class Job(SQLModel, table=True):
     # Company details
     company_industry: str | None = None
     company_url: str | None = None
-    company_logo: str | None = None
-    company_url_direct: str | None = None
+    # company_logo: str | None = None
+    # company_url_direct: str | None = None
 
-    # Experience fields
-    experience_range: str | None = None
+    # experience_range: str | None = None
+    # LinkedIn Only
     job_level: str | None = None
     job_function: str | None = None
 
     # Vector fields for embeddings (pgvector)
-    title_vector: list[float]  | None = Field(
+    title_vector: list[float] | None = Field(
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
     qualifications_vector: list[float] | None = Field(
@@ -147,6 +147,28 @@ class Job(SQLModel, table=True):
     summary_vector: list[float] | None = Field(
         default=None, sa_column=Column(Vector(EMBEDDINGS_DIMENSION))
     )
+
+    @field_validator(
+        "title_vector", "qualifications_vector", "summary_vector", mode="before"
+    )
+    @classmethod
+    def validate_vectors(cls, v):
+        if isinstance(v, ndarray):
+            v = v.tolist()
+        return v
+
+    @field_serializer("title_vector", "qualifications_vector", "summary_vector")
+    @classmethod
+    def serialize_vectors(cls, v) -> list[float] | None:
+        try:
+            if v is None:
+                return None
+            if isinstance(v, ndarray):
+                return v.tolist()
+            return v
+        except Exception as e:
+            logger.error(f"Error in serialize_vectors: {e}")
+            raise
 
     def __str__(self) -> str:
         return f"Job(ID: {self.id}, Name: {self.name})"
@@ -166,8 +188,15 @@ class Job(SQLModel, table=True):
     @classmethod
     def allow_none(cls, v):
         try:
-            if v is None or (isinstance(v, pd.Series) and pd.isna(v).any()):
+            if isinstance(v, pd.Series) and pd.isna(v).all():
+                return []
+            elif isinstance(v, str) and v.strip() == "":
                 return None
+            elif isinstance(v, list | dict) and not v:
+                return v
+            elif isinstance(v, int | float) and pd.isna(v):
+                return None
+
             return v
         except Exception as e:
             logger.error(f"Error in allow_none validator: {e}")
@@ -319,13 +348,36 @@ class Job(SQLModel, table=True):
 
             texts = []
             for qual in self.qualifications:
-                text = f"Skill: {qual.skill}, Requirement: {qual.requirement}, Experience: {qual.experience}"
+                if isinstance(qual, dict):
+                    skill = qual.get("skill", "N/A")
+                    requirement = qual.get("requirement", "N/A")
+                    experience = qual.get("experience", "N/A")
+                else:
+                    skill = qual.skill
+                    requirement = qual.requirement
+                    experience = qual.experience
+                text = f"Skill: {skill}, Requirement: {requirement}, Experience: {experience}"
                 texts.append(text)
 
             return " | ".join(texts)
         except Exception as e:
             logger.error(f"Error creating qualifications text: {e}")
             raise
+
+
+    def reset_job(self):
+        """Reset job fields to default values."""
+        self.status = NEW
+        self.pros = None
+        self.cons = None
+        self.score = 0.0
+        self.summary = None
+        self.classifier = NA
+        self.summarizer = NA
+        self.date_scraped = get_now()
+        self.modified = get_now()
+        self.qualifications = []
+        self.qualifications_vector = None
 
 def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     if not jobs:
@@ -335,7 +387,7 @@ def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     df = pd.DataFrame(data)
 
     # Ensure all columns are present
-    for field in Job.__fields__.keys():
+    for field in Job.model_fields.keys():
         if field not in df.columns:
             df[field] = None
 
@@ -356,11 +408,6 @@ def df_to_jobs(df: pd.DataFrame) -> list[Job]:
 
 
 def validate_df_defaults(df: pd.DataFrame) -> None:
-    # Ensure Proper column types
-    df.loc[:, "pros"] = df["pros"].astype(str)
-    df.loc[:, "cons"] = df["cons"].astype(str)
-    df.loc[:, "summary"] = df["summary"].astype(str)
-    df.loc[:, "date_posted"] = df["date_posted"].astype(str)
     # Set defaults
     if "date_scraped" not in df.columns:
         df["date_scraped"] = get_now()
@@ -380,3 +427,34 @@ def validate_df_defaults(df: pd.DataFrame) -> None:
         df["classifier"] = NA
     if "summarizer" not in df.columns:
         df["summarizer"] = NA
+        # Ensure Proper column types
+    df.loc[:, "pros"] = df["pros"].astype(str)
+    df.loc[:, "cons"] = df["cons"].astype(str)
+    df.loc[:, "summary"] = df["summary"].astype(str)
+    df.loc[:, "date_posted"] = df["date_posted"].astype(str)
+    # Drop Naukri specific columns
+    df = df.drop(
+        columns=[
+            "skills",
+            "experience_range",
+            "company_rating",
+            "company_reviews_count",
+            "vacancy_count",
+            "work_from_home_type",
+        ],
+        errors="ignore",
+    )
+    # Drop Undesired columns
+    df = df.drop(
+        columns=["company_logo", "emails", "company_url_direct"],
+        errors="ignore",
+    )
+
+
+@dataclass
+class StatsModel:
+    total_jobs: int = 0
+    new_jobs: int = 0
+    excluded_jobs: int = 0
+    summarized_jobs: int = 0
+    scored_jobs: int = 0

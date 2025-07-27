@@ -33,6 +33,7 @@ def load_raw_jobs_df(state: Literal["raw", "processed"] = "processed") -> pd.Dat
             df = pd.DataFrame()
         validate_df_defaults(df)
         logger.info(f"Loaded {len(df)} records from raw data.")
+        df = df.drop_duplicates(subset=["id"], keep="last")
         return df
     except Exception as e:
         logger.warning(f"Error loading existing data: {e}")

@@ -106,13 +106,91 @@ TEMPLATE_HELP_MD = """
             ```
             """
 
-
-_DEFAULT_UPDATE_COLS = [
-    "status",
-    "score",
-    "summarypros",
-    "cons",
-    "classifier",
-    "summarizer",
+DEFAULT_COLS = [
     "modified",
+    "date_posted",
+    "company",
+    "title",
+    "site",
+    "status",
+    "summarizer",
+    "classifier",
+    "score",
+    # "is_remote",
+    "job_type",
 ]
+EXTRA_COLS = ["id", "pros", "cons", "summary"]
+
+# JOBSPY_COLS = [
+#     "id",
+#     "job_url",
+#     "job_url_direct",
+#     "location",
+#     "salary_source",
+#     "interval",
+#     "min_amount",
+#     "max_amount",
+#     "currency",
+#     "job_level",
+#     "job_function",
+#     "description",
+#     "company_industry",
+#     "company_url",
+#     "listing_type",
+#     "emails",
+#     "company_logo",
+#     "company_url_direct",
+#     "company_addresses",
+#     "company_num_employees",
+#     "company_revenue",
+#     "company_description",
+#     "skills",
+#     "experience_range",
+#     "company_rating",
+#     "company_reviews_count",
+#     "vacancy_count",
+#     "work_from_home_type",
+# ]
+
+DISPLAY_COLS = [
+    *DEFAULT_COLS,
+    #   *JOBSPY_COLS,
+    *EXTRA_COLS,
+]
+
+
+SCORING_UTIL_DESCRIPTION = """
+    Select a listing to use for evaluation.
+    Select records to populate as prompt context using Jinja2 templates.
+"""
+
+
+EMBEDDINGS_DIMENSION = 768
+
+NEW = "new"
+VIEWED = "viewed"
+EXCLUDED = "excluded"
+APPLIED = "applied"
+STATUS_TYPES = {NEW, VIEWED, EXCLUDED, APPLIED}
+USER = "User"
+AI = "AI"
+NA = "N/A"
+USER_TYPES = {USER, AI, NA}
+
+
+DEFAULT_STATUS_FILTERS = [s for s in STATUS_TYPES if s != EXCLUDED]
+
+DEFAULT_PAGE_DESCRIPTION = """
+        ### Getting Started:
+        1. **Configure your search** in the sidebar
+        2. **Select a job site** (Indeed, LinkedIn)
+        3. **Enter search terms** and location
+        4. **Click 'Scrape Jobs'** to start collecting job listings
+        5. **View and manage** your jobs in the tabs above
+        ### Features:
+        - 🔍 **Job Scraping**: Collect jobs from multiple sites
+        - 📊 **Overview**: View all jobs with filtering options
+        - 📋 **Details**: Focus on individual jobs with notes
+        - ✅ **Tracking**: Mark jobs as viewed and add personal notes
+        - 💾 **Persistence**: Data is automatically saved between sessions
+        """
