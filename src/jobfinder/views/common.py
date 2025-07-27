@@ -3,8 +3,7 @@ import logging
 import streamlit as st
 
 from jobfinder import __version__
-from jobfinder.domain.constants import EXCLUDED, NA, NEW
-from jobfinder.session import get_data_service, get_working_df
+from jobfinder.session import get_working_df
 from jobfinder.utils import get_now
 
 logger = logging.getLogger(__name__)
@@ -17,6 +16,7 @@ def render_header():
     if not get_working_df().empty:
         _render_stats()
     render_sidebar()
+
 
 def check_working_df():
     if get_working_df().empty:

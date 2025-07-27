@@ -10,7 +10,6 @@ from jobfinder.session import (
     get_generative_service,
     get_working_count,
     get_working_df,
-    set_jobs_df,
     update_by_id,
 )
 from jobfinder.utils import get_now
@@ -50,7 +49,6 @@ def _details(job: Job):
                 get_generative_service().extract_qualifications(_jobs)
                 get_data_service().embed_populated_jobs(_jobs)
                 st.success("Record summarized successfully!")
-                get_data_service().store_jobs(_jobs)
                 st.rerun()
 
     with st.expander("📖 Job Details", expanded=expand_details):

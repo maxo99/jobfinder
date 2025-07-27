@@ -5,7 +5,8 @@ import streamlit as st
 
 from jobfinder import JOBS_DATA_FILE
 from jobfinder.domain.constants import DEFAULT_COLS
-from jobfinder.session import get_working_df
+from jobfinder.domain.models import Job, df_to_jobs
+from jobfinder.session import get_data_service, get_generative_service, get_working_df
 from jobfinder.utils import get_now
 from jobfinder.views import common
 
@@ -40,19 +41,32 @@ def _manage_data():
             st.rerun()
 
 
-def _bulk_actions():
+def _bulk_actions(jobs: list[Job]):
     st.subheader("Bulk Actions")
     # TODO: Update to mark all as new (just clear status/pros/cons vs new date as well?)
 
-    (col1,) = st.columns(1)
+    col1, col2 = st.columns(2)
     with col1:
-        if st.button("Mark All as new"):
-            # TODO: Readd
-            # update_results(get_jobs_df())
-            # save_data2(get_jobs_df())
-            st.success("All jobs marked as new!")
-            st.rerun()
+        if st.button("Summarize Jobs"):
+            for job in jobs:
+                if not job.description:
+                    st.warning(f"Job {job.id} has no description to summarize.")
+                    continue
+                with st.spinner(f"Summarizing {job.name}..."):
+                    jobs = [job]
+                    get_generative_service().extract_qualifications(jobs)
+                    get_data_service().embed_populated_jobs(jobs)
+                    st.success("Record summarized successfully!")
 
+            st.success("Jobs summarized successfully!")
+            st.rerun()
+    with col2:
+        if st.button("Reset Jobs"):
+            for job in jobs:
+                job.reset_job()
+            get_data_service().store_jobs(jobs)
+            st.success("Jobs have been reset")
+            st.rerun()
 
 
 common.render_header()
@@ -73,15 +87,16 @@ _s_rows = st.dataframe(
     column_order=DEFAULT_COLS,
     key="data_management_dataframe",
 )
-_selected_data = []
+_selected_jobs = []
 if _s_rows and "selection" in _s_rows and "rows" in _s_rows["selection"]:
     _s_ids = _s_rows["selection"]["rows"]
-    _selected_data = [_working.iloc[i]["id"] for i in _s_ids]
+    _selected_jobs = df_to_jobs(_working.loc[_working["id"].isin(_s_ids)])
+
 
 st.markdown("---")
-if _selected_data:
+if _selected_jobs:
     st.subheader("Selected Records")
-    st.write(f"Selected {_selected_data}")
-    st.write(f"Total Selected: {len(_selected_data)}")
-_bulk_actions()
+    st.write(f"Selected {[job.id for job in _selected_jobs]}")
+    st.write(f"Total Selected: {len(_selected_jobs)}")
+_bulk_actions(_selected_jobs)
 common.render_footer()

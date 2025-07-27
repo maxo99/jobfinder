@@ -357,6 +357,20 @@ class Job(SQLModel, table=True):
             raise
 
 
+    def reset_job(self):
+        """Reset job fields to default values."""
+        self.status = NEW
+        self.pros = None
+        self.cons = None
+        self.score = 0.0
+        self.summary = None
+        self.classifier = NA
+        self.summarizer = NA
+        self.date_scraped = get_now()
+        self.modified = get_now()
+        self.qualifications = []
+        self.qualifications_vector = None
+
 def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     if not jobs:
         return pd.DataFrame()

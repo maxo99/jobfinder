@@ -1,11 +1,11 @@
 import logging
 from dataclasses import dataclass
 
+import sqlmodel
 from numpy import ndarray
 from sqlalchemy import TextClause, create_engine, func, inspect, select, text
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import cast, not_
-import sqlmodel
 
 from jobfinder import config
 from jobfinder.domain.models import Job, SQLModel
@@ -112,8 +112,6 @@ class PostgresClient:
             logger.error(f"Error getting jobs: {e}")
             raise e
 
-
-
     def get_job_by_id(self, job_id: str) -> Job | None:
         try:
             with self.session_maker() as session:
@@ -169,9 +167,7 @@ class PostgresClient:
                 )
                 if job_exclusion_id is not None:
                     query = query.where(not_(Job.id == job_exclusion_id))
-                results = session.execute(
-                    query.order_by(dist).limit(limit)
-                ).all()
+                results = session.execute(query.order_by(dist).limit(limit)).all()
 
                 logger.info(f"Found {len(results)} jobs matching title embedding")
                 return SimilarityResponse(
@@ -219,3 +215,65 @@ class PostgresClient:
             embedding = embedding.tolist()
         _embedding_str = ",".join([f"{float(x):.10f}" for x in embedding])
         return text(f"ARRAY[{_embedding_str}]::vector")
+
+    # def search_by_combined_criteria(
+    #     self,
+    #     title_embedding: list[float] | None = None,
+    #     qualifications_embedding: list[float] | None = None,
+    #     title_weight: float = 0.4,
+    #     qualifications_weight: float = 0.6,
+    #     limit: int = 5,
+    #     similarity_threshold: float = 0.7
+    # ) -> list[Job]:
+    #     try:
+    #         logger.info("Searching jobs by combined title and qualifications embeddings")
+
+    #         with self.session_maker() as session:
+    #             query = session.query(Job)
+
+    #             # Build distance calculation based on available embeddings
+    #             distance_expressions = []
+
+    #             if title_embedding and qualifications_embedding:
+    #                 title_str = str(title_embedding).replace("[", "").replace("]", "")
+    #                 qual_str = str(qualifications_embedding).replace("[", "").replace("]", "")
+    #                 title_sql = text(f"ARRAY[{title_str}]::vector")
+    #                 qual_sql = text(f"ARRAY[{qual_str}]::vector")
+
+    #                 combined_distance = (
+    #                     title_weight * func.cosine_distance(Job.title_vector, title_sql) +
+    #                     qualifications_weight * func.cosine_distance(Job.qualifications_vector, qual_sql)
+    #                 )
+    #                 query = query.filter(
+    #                     Job.title_vector.isnot(None),
+    #                     Job.qualifications_vector.isnot(None)
+    #                 )
+
+    #             elif title_embedding:
+    #                 title_str = str(title_embedding).replace("[", "").replace("]", "")
+    #                 title_sql = text(f"ARRAY[{title_str}]::vector")
+    #                 combined_distance = func.cosine_distance(Job.title_vector, title_sql)
+    #                 query = query.filter(Job.title_vector.isnot(None))
+
+    #             elif qualifications_embedding:
+    #                 qual_str = str(qualifications_embedding).replace("[", "").replace("]", "")
+    #                 qual_sql = text(f"ARRAY[{qual_str}]::vector")
+    #                 combined_distance = func.cosine_distance(Job.qualifications_vector, qual_sql)
+    #                 query = query.filter(Job.qualifications_vector.isnot(None))
+
+    #             else:
+    #                 raise ValueError("At least one embedding must be provided")
+
+    #             results = (
+    #                 query
+    #                 .filter(combined_distance < similarity_threshold)
+    #                 .order_by(combined_distance)
+    #                 .limit(limit)
+    #                 .all()
+    #             )
+
+    #             logger.info(f"Found {len(results)} jobs matching combined criteria")
+    #             return results
+    #     except Exception as e:
+    #         logger.error(f"Error searching jobs by combined criteria: {e}")
+    #         raise e
