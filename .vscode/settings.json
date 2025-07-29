@@ -18,13 +18,6 @@
     "python.testing.pytestEnabled": true,
     "references.preferredLocation": "view",
     "workbench.panel.defaultLocation": "bottom",
-    "workbench.colorCustomizations": {
-        "window.titleBarStyle": "custom",
-        "window.activeBorder": "#970606",
-        // "sideBar.background": "#444444"
-        "titleBar.activeBackground": "#130546", // Change this color to your desired color
-        "titleBar.inactiveBackground": "#FF0000" // Change this color to your desired color
-    },
     "pylint.args": [
         "--rcfile=pyproject.toml",
         "-j"
