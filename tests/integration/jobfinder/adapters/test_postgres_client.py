@@ -31,9 +31,9 @@ def test_populate_jobs(fix_postgresclient, jobs_testdata):
     fix_postgresclient.upsert_jobs(jobs_testdata)
     time.sleep(2)
     populated_count = len(fix_postgresclient.get_jobs())
-    assert populated_count == len(jobs_testdata), (
-        "Not all documents were indexed correctly."
-    )
+    assert populated_count == len(
+        jobs_testdata
+    ), "Not all documents were indexed correctly."
 
 
 def test_get_jobs_with_filters(fix_postgresclient, jobs_testdata):
@@ -45,9 +45,9 @@ def test_get_jobs_with_filters(fix_postgresclient, jobs_testdata):
         assert len(total_jobs) == len(jobs_testdata), "Total jobs count mismatch."
         non_excluded_jobs = fix_postgresclient.get_jobs(not_status=EXCLUDED)
         assert len(non_excluded_jobs) < len(total_jobs)
-        assert all(job.status != EXCLUDED for job in non_excluded_jobs), (
-            "Excluded jobs should not be present in the filtered results."
-        )
+        assert all(
+            job.status != EXCLUDED for job in non_excluded_jobs
+        ), "Excluded jobs should not be present in the filtered results."
     except Exception as e:
         raise e
 
@@ -62,8 +62,8 @@ def test_get_count(fix_postgresclient, jobs_testdata):
         excluded_count = fix_postgresclient.get_count(status=EXCLUDED)
         assert excluded_count >= 1, "Excluded count should be at least 1."
         non_excluded_count = fix_postgresclient.get_count(not_status=EXCLUDED)
-        assert non_excluded_count == len(jobs_testdata) - excluded_count, (
-            "Non-excluded count mismatch."
-        )
+        assert (
+            non_excluded_count == len(jobs_testdata) - excluded_count
+        ), "Non-excluded count mismatch."
     except Exception as e:
         raise e

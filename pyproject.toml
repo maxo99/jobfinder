@@ -41,6 +41,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-docker",
     "pytest-env>=1.1.5",
+    "pre-commit>=3.7.0", 
 ]
 streamlit-cloud = [
     "jobfinder",
