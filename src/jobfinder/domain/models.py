@@ -364,7 +364,6 @@ class Job(SQLModel, table=True):
             logger.error(f"Error creating qualifications text: {e}")
             raise
 
-
     def reset_job(self):
         """Reset job fields to default values."""
         self.status = NEW
@@ -378,6 +377,7 @@ class Job(SQLModel, table=True):
         self.modified = get_now()
         self.qualifications = []
         self.qualifications_vector = None
+
 
 def jobs_to_df(jobs: list[Job]) -> pd.DataFrame:
     if not jobs:

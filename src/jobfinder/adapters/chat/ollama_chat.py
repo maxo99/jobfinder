@@ -35,7 +35,9 @@ class OllamaChatClient(ChatClient):
                 stream=False,
                 # options={"temperature": 0.0}
             )
-            logger.info(f"Returned chat completion {json.dumps(response.model_dump(), indent=1)}")
+            logger.info(
+                f"Returned chat completion {json.dumps(response.model_dump(), indent=1)}"
+            )
             return response
         except Exception as e:
             raise e
@@ -46,7 +48,8 @@ class OllamaChatClient(ChatClient):
         return CompletionResponse(
             id=response.created_at if response.created_at else get_now(),
             content=json.loads(response.message.content),
-            prompt_tokens=response.prompt_eval_count if response.prompt_eval_count else 0,
+            prompt_tokens=response.prompt_eval_count
+            if response.prompt_eval_count
+            else 0,
             total_tokens=response.eval_count if response.eval_count else 0,
         )
-

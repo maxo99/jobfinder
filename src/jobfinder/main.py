@@ -15,18 +15,19 @@ from jobfinder.views import common
 logger = logging.getLogger(__name__)
 
 
-
-
-
 def main():
     logging.info("Starting up main()")
-    st.set_page_config(page_title="jobfinder", page_icon="💼", layout="wide", initial_sidebar_state="expanded")
+    st.set_page_config(
+        page_title="jobfinder",
+        page_icon="💼",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
 
     if "initialized" not in st.session_state:
         _setup_logging()
         _init_session()
     _init_working_df()
-
 
     common.render_header()
     if not get_working_df().empty:

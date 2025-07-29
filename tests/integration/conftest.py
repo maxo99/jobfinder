@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope="session")
 def at():
-    _at = AppTest.from_file(JOBFINDER_ROOT / "main.py", default_timeout=30).run(timeout=60)
+    _at = AppTest.from_file(JOBFINDER_ROOT / "main.py", default_timeout=30).run(
+        timeout=60
+    )
     yield _at
     # print("Test session completed, cleaning up...")
 

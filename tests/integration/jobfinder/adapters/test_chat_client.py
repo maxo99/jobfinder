@@ -1,6 +1,3 @@
-
-
-
 # def test_completions(fix_ollamachatclient):
 #     try:
 #         response =  fix_ollamachatclient.completions("Test message")

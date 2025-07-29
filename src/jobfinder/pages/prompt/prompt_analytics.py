@@ -7,13 +7,15 @@ def _render_history_chart():
 
     with col_chart1:
         st.subheader("Word Count Trend")
-        st.line_chart(data=[v['word_count'] for v in reversed(
-                    st.session_state.prompt_history)])
+        st.line_chart(
+            data=[v["word_count"] for v in reversed(st.session_state.prompt_history)]
+        )
 
     with col_chart2:
         st.subheader("Character Count Trend")
-        st.line_chart(data=[v['char_count'] for v in reversed(
-                    st.session_state.prompt_history)])
+        st.line_chart(
+            data=[v["char_count"] for v in reversed(st.session_state.prompt_history)]
+        )
 
 
 def render():
@@ -23,13 +25,17 @@ def render():
         # Create analytics data
         history_data = []
         for i, version in enumerate(st.session_state.prompt_history):
-            history_data.append({
-                'Version': f"v{len(st.session_state.prompt_history) - i}",
-                'Date': datetime.fromisoformat(version['timestamp']).strftime('%Y-%m-%d %H:%M'),
-                'Words': version['word_count'],
-                'Characters': version['char_count'],
-                'Description': version['description'] or 'No description'
-            })
+            history_data.append(
+                {
+                    "Version": f"v{len(st.session_state.prompt_history) - i}",
+                    "Date": datetime.fromisoformat(version["timestamp"]).strftime(
+                        "%Y-%m-%d %H:%M"
+                    ),
+                    "Words": version["word_count"],
+                    "Characters": version["char_count"],
+                    "Description": version["description"] or "No description",
+                }
+            )
 
         # Display as dataframe
         st.dataframe(history_data, use_container_width=True)
@@ -40,4 +46,4 @@ def render():
     else:
         st.info(
             "No prompt versions saved yet. Save a version in the Edit tab to see analytics."
-            )
+        )

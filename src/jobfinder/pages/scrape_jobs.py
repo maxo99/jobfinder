@@ -11,8 +11,6 @@ from jobfinder.views import common
 SITES = ["indeed", "linkedin"]
 
 
-
-
 def _find_jobs(
     st,
     site_name: list[str],
@@ -42,6 +40,7 @@ def _find_jobs(
     except Exception as e:
         st.error(f"Error scraping jobs: {e}")
         return pd.DataFrame()
+
 
 common.render_header()
 # Search parameters

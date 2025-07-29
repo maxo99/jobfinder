@@ -39,8 +39,11 @@ class OpenAIChatClient(ChatClient):
             raise e
 
     def _to_completion_response(self, response: ChatCompletion) -> CompletionResponse:
+        if not response.choices or not response.choices[0].message.content:
+            raise ValueError("No content in the response from OpenAI.")
         return CompletionResponse(
-            id=response.id, content=str(response.choices[0].message.content),
+            id=response.id,
+            content=str(response.choices[0].message.content),
             prompt_tokens=response.usage.prompt_tokens if response.usage else 0,
             total_tokens=response.usage.total_tokens if response.usage else 0,
         )

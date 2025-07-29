@@ -1,4 +1,3 @@
-
 # import streamlit as st
 
 # from jobfinder.constants import TEMPLATE_HELP_MD
@@ -6,12 +5,12 @@
 
 
 # def render():
-    
-    
+
+
 #     with st.expander("📖 Template Help & Variables"):
 
 #         st.markdown(TEMPLATE_HELP_MD)
-    
+
 #     col1, col2 = st.columns([2, 1])
 
 #     with col1:
@@ -57,12 +56,6 @@
 #                     st.success("✅ Version saved successfully!")
 #                 else:
 #                     st.info("ℹ️ This prompt version already exists")
-
-
-
-
-
-
 
 
 #     with col2:

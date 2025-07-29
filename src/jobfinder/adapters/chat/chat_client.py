@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CompletionResponse:
     id: str
-    content:  dict
+    content: dict
     prompt_tokens: int = 0
     total_tokens: int = 0
 

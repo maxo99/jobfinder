@@ -91,6 +91,7 @@ def get_working_df() -> pd.DataFrame:
 def get_working_count() -> int:
     return len(get_working_df().index)
 
+
 # def get_jobs() -> list[Job]:
 #     return st.session_state.jobs
 

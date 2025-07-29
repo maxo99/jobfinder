@@ -1,4 +1,3 @@
-
 import pytest
 
 from jobfinder.domain.models import Job
@@ -11,8 +10,9 @@ from jobfinder.utils.loader import load_raw_jobs_df
 
 @pytest.fixture(scope="session")
 def raw_jobs_df():
-    raw =  load_raw_jobs_df()
+    raw = load_raw_jobs_df()
     return raw
+
 
 @pytest.fixture(scope="session")
 def jobs_testdata(raw_jobs_df) -> list[Job]:

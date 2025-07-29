@@ -6,7 +6,6 @@ from jobfinder.domain.models import Qualification
 logger = logging.getLogger(__name__)
 
 
-
 FAKE_SKILLS = [
     "Python",
     "SQL",
@@ -22,19 +21,19 @@ FAKE_SKILLS = [
 REQUIREMENTS = ["required", "preferred", "optional"]
 EXPERIENCE_LEVELS = ["1 year", "2+ years", "5 years", "10+ years"]
 
+
 def _build_fake_qualifications(job_id, count=2):
     qualifications = []
     for i in range(count):
         qualifications.append(
             Qualification(
-                id=f"{job_id}_qual{i+1}",
+                id=f"{job_id}_qual{i + 1}",
                 skill=FAKE_SKILLS[i % len(FAKE_SKILLS)],
                 requirement=REQUIREMENTS[i % len(REQUIREMENTS)],
                 experience=EXPERIENCE_LEVELS[i % len(EXPERIENCE_LEVELS)],
             )
         )
     return qualifications
-
 
 
 def test_populate_index(fix_dataservice, jobs_testdata):
@@ -46,8 +45,6 @@ def test_populate_index(fix_dataservice, jobs_testdata):
     populated_count = len(fix_dataservice.get_jobs())
     logger.info("Populated count of jobs in index: %d", populated_count)
     assert populated_count >= len(jobs_testdata)
-
-
 
 
 # @pytest.mark.usefixtures("fix_populated_index")
@@ -73,7 +70,6 @@ def test_qualifications_search(fix_dataservice, fix_generativeservice, jobs_test
         raise e
 
 
-
 # @pytest.mark.usefixtures("fix_populated_index")
 def test_title_search(fix_dataservice, fix_generativeservice, jobs_testdata):
     try:
@@ -83,7 +79,6 @@ def test_title_search(fix_dataservice, fix_generativeservice, jobs_testdata):
         fix_dataservice.embed_populated_jobs(jobs_1)
         fix_dataservice.store_jobs(jobs_1)
 
-
         jobs_2 = [test_jobs[1]]
         jobs_2[0].id = "job456"
 
@@ -91,7 +86,6 @@ def test_title_search(fix_dataservice, fix_generativeservice, jobs_testdata):
         assert len(results.jobs) > 0, "No similar jobs found."
     except Exception as e:
         raise e
-
 
 
 # def test_updating_summary(

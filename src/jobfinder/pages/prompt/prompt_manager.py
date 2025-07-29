@@ -15,23 +15,18 @@
 # # Initialize session state
 # if 'prompt_history' not in st.session_state:
 #     st.session_state.prompt_history = []
-    
+
 # if 'saved_prompts' not in st.session_state:
 #     st.session_state.saved_prompts = PRESET_TEMPLATES
-    
+
 # if 'current_prompt' not in st.session_state:
 #     st.session_state.current_prompt = next(
 #         iter(st.session_state.saved_prompts.values()), ""
 #     )
 
 
-
 # if 'selected_instructions' not in st.session_state:
 #     st.session_state.selected_instructions = []
-
-
-
-
 
 
 # def load_prompt_from_history(version_id: str):
@@ -42,9 +37,6 @@
 #             st.rerun()
 
 
-
-
-
 # # Main UI
 # st.title("🤖 System Prompt Manager")
 # st.markdown(
@@ -53,9 +45,9 @@
 
 # # Create tabs
 # tab1, tab2, tab3, tab4 = st.tabs(
-#     ["📝 Edit Prompt", 
-#      "📊 Analytics", 
-#      "📚 History", 
+#     ["📝 Edit Prompt",
+#      "📊 Analytics",
+#      "📚 History",
 #      "🔧 Template Builder"]
 #     )
 
