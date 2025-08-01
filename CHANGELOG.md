@@ -1,6 +1,30 @@
 # CHANGELOG
 
 
+## v0.12.1 (2025-08-01)
+
+### Bug Fixes
+
+- Updating scoring results display + session cleanup
+  ([`0acf0c3`](https://github.com/maxo99/jobfinder/commit/0acf0c3b5d961009207664bf33a51bfb4018bd75))
+
+### Chores
+
+- Formating repo code with ruff
+  ([`1a6e69d`](https://github.com/maxo99/jobfinder/commit/1a6e69d3b227f8919f4c81bd83967c46ecf42615))
+
+- Moving of vscode settings to profile level
+  ([`f398e0b`](https://github.com/maxo99/jobfinder/commit/f398e0b0b79028186d1e618eb63335053bf7bd3d))
+
+- Updates to copilot instructions
+  ([`40722c6`](https://github.com/maxo99/jobfinder/commit/40722c61d10733289af241e6a9bae1ff04023197))
+
+### Continuous Integration
+
+- Including ruff format as precommit hook
+  ([`c7104f2`](https://github.com/maxo99/jobfinder/commit/c7104f229e76c47624647b390ac63571cfa93d77))
+
+
 ## v0.12.0 (2025-07-27)
 
 ### Bug Fixes
