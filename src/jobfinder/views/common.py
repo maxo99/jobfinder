@@ -1,6 +1,8 @@
 import logging
 
 import streamlit as st
+from streamlit import session_state as ss
+from streamlit import sidebar as sb
 
 from jobfinder import __version__
 from jobfinder.session import get_working_df
@@ -37,20 +39,20 @@ def _render_stats():
     logger.info("Rendering display stats")
     st.subheader("Statistics")
     col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Total Jobs", st.session_state.stats.total_jobs)
-    col2.metric("New Jobs", st.session_state.stats.new_jobs)
-    col3.metric("Excluded Jobs", st.session_state.stats.excluded_jobs)
-    col4.metric("Summarized Jobs", st.session_state.stats.summarized_jobs)
-    col5.metric("Scored Jobs", st.session_state.stats.scored_jobs)
+    col1.metric("Total Jobs", ss.stats.total_jobs)
+    col2.metric("New Jobs", ss.stats.new_jobs)
+    col3.metric("Excluded Jobs", ss.stats.excluded_jobs)
+    col4.metric("Summarized Jobs", ss.stats.summarized_jobs)
+    col5.metric("Scored Jobs", ss.stats.scored_jobs)
 
 
 def render_sidebar():
-    st.sidebar.page_link("main.py", label="Home", icon="🏠")
-    st.sidebar.page_link("pages/scrape_jobs.py", label="Scrape New Jobs", icon="🔍")
-    st.sidebar.page_link("pages/job_details.py", label="Job Details", icon="📋")
-    st.sidebar.page_link("pages/scoring_util.py", label="Scoring Utility", icon="🤖")
-    st.sidebar.page_link("pages/insert_record.py", label="Insert Record", icon="➕")
-    st.sidebar.page_link("pages/data_management.py", label="Data Management", icon="⚙️")
+    sb.page_link("main.py", label="Home", icon="🏠")
+    sb.page_link("pages/scrape_jobs.py", label="Scrape New Jobs", icon="🔍")
+    sb.page_link("pages/job_details.py", label="Job Details", icon="📋")
+    sb.page_link("pages/scoring_util.py", label="Scoring Utility", icon="🤖")
+    sb.page_link("pages/insert_record.py", label="Insert Record", icon="➕")
+    sb.page_link("pages/data_management.py", label="Data Management", icon="⚙️")
 
 
 # MAIN_TABS = [

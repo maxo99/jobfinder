@@ -4,7 +4,7 @@ import streamlit as st
 
 from jobfinder.domain.constants import NA, USER
 from jobfinder.domain.models import Job
-from jobfinder.session import get_data_service
+from jobfinder.session import get_data_service, reload_working_df
 from jobfinder.utils import get_now
 from jobfinder.views import common
 
@@ -51,7 +51,8 @@ with st.form("my_form"):
             summarizer=_summarizer,
             modified=get_now(),
         )
-        get_data_service().store_jobs([_new_record])
+        get_data_service().store_job(_new_record)
         st.success("Record added successfully!")
+        reload_working_df()
         st.rerun()
 common.render_footer()

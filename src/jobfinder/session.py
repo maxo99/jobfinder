@@ -11,6 +11,7 @@ from jobfinder.domain.models import DataFilters, Job, StatsModel, jobs_to_df
 from jobfinder.services.data_service import DataService
 from jobfinder.services.generative_service import GenerativeService
 from jobfinder.utils.loader import load_raw_jobs
+from streamlit import session_state as ss
 
 logger = logging.getLogger(__name__)
 
@@ -23,46 +24,45 @@ def _init_session():
 
     logger.info("Initializing session")
 
-    if "backend" not in st.session_state:
-        st.session_state.backend = Backend()
+    if "backend" not in ss:
+        ss.backend = Backend()
 
-    if "saved_prompts" not in st.session_state:
-        st.session_state.saved_prompts = PRESET_TEMPLATES
+    if "saved_prompts" not in ss:
+        ss.saved_prompts = PRESET_TEMPLATES
 
-    if "current_prompt" not in st.session_state:
-        st.session_state.current_prompt = next(
-            iter(st.session_state.saved_prompts.values()), ""
-        )
-    if "selected_records" not in st.session_state:
-        st.session_state.selected_records = []
+    if "current_prompt" not in ss:
+        ss.current_prompt = next(iter(ss.saved_prompts.values()), "")
+    if "selected_records" not in ss:
+        ss.selected_records = []
 
-    if "data_filters" not in st.session_state:
-        st.session_state.data_filters = DataFilters()
+    if "data_filters" not in ss:
+        ss.data_filters = DataFilters()
 
-    # if "filtered_jobs" not in st.session_state:
+    # if "filtered_jobs" not in ss:
     #     reset_filtered_jobs_df()
-    st.session_state.initialized = True
+    ss.initialized = True
 
 
 def _init_working_df():
     logger.info("Initializing working DataFrame")
-    if "working_df" not in st.session_state:
-        st.session_state.working_df = pd.DataFrame()
+    if "working_df" not in ss:
+        ss.working_df = pd.DataFrame()
 
-    if st.session_state.working_df.empty:
+    if ss.working_df.empty:
         logger.info(f"Startup DB count:{get_data_service().get_count()}")
     reload_working_df()
     reload_stats()
-    if st.session_state.working_df.empty:
+    if ss.working_df.empty:
         logger.warning("No jobs found in the database. Loading from file.")
         raw_jobs = load_raw_jobs()
         if raw_jobs:
             get_data_service().store_jobs(raw_jobs)
+            reload_working_df()
 
 
 def reload_stats():
     logger.info("Reloading stats")
-    st.session_state.stats = StatsModel(
+    ss.stats = StatsModel(
         total_jobs=get_data_service().get_count(),
         new_jobs=get_data_service().get_count(status=NEW),
         excluded_jobs=get_data_service().get_count(status=EXCLUDED),
@@ -78,14 +78,14 @@ def reload_working_df():
         not_status="excluded",
         # **get_data_filters().model_dump()
     )
-    st.session_state.working_df = jobs_to_df(_jobs)
+    ss.working_df = jobs_to_df(_jobs)
     logger.info(f"Working DF reloaded with {len(get_working_df())} records.")
 
 
 def get_working_df() -> pd.DataFrame:
-    if "working_df" not in st.session_state:
+    if "working_df" not in ss:
         _init_working_df()
-    return st.session_state.working_df
+    return ss.working_df
 
 
 def get_working_count() -> int:
@@ -93,7 +93,7 @@ def get_working_count() -> int:
 
 
 # def get_jobs() -> list[Job]:
-#     return st.session_state.jobs
+#     return ss.jobs
 
 
 # def set_jobs_df(df):
@@ -153,7 +153,7 @@ def get_generative_service() -> GenerativeService:
 
 
 def get_session():
-    return st.session_state
+    return ss
 
 
 def get_backend() -> Backend:

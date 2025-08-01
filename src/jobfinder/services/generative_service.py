@@ -85,6 +85,32 @@ class GenerativeService:
                 logger.error(f"Error processing job ID {job.id}: {e2}")
                 continue
 
+    def extract_qualifications_for_job(self, job: Job) -> None:
+        try:
+            logger.info("Extracting qualifications...")
+            rendered_prompt = get_summarization_instruction_from_jobs([job])
+            _completion = self._chat_client.completions(
+                content=rendered_prompt,
+                format=SummarizationResponse.model_json_schema(),
+            )
+
+            if not _completion.content:
+                logger.error("No content returned from AI completion")
+                raise ValueError("No content returned from AI completion")
+            sr = SummarizationResponse.model_validate(_completion.content)
+        except Exception as e:
+            raise e
+
+        try:
+            if sr.summaries:
+                job.qualifications = sr.summaries
+                job.summarizer = AI
+                job.modified = get_now()
+            else:
+                logger.warning(f"No qualifications extracted for job ID: {job.id}")
+        except Exception as e2:
+            logger.error(f"Error processing job ID {job.id}: {e2}")
+
 
 def get_summarization_instruction_from_jobs(jobs: list[Job]):
     _instruction = (

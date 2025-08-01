@@ -119,6 +119,21 @@ DEFAULT_COLS = [
     # "is_remote",
     "job_type",
 ]
+
+SCORED_COLS = [
+    "similarity",
+    "modified",
+    "date_posted",
+    "company",
+    "title",
+    "site",
+    "status",
+    "summarizer",
+    "classifier",
+    # "is_remote",
+    "job_type",
+]
+
 EXTRA_COLS = ["id", "pros", "cons", "summary"]
 
 # JOBSPY_COLS = [

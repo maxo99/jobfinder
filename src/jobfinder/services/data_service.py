@@ -16,9 +16,13 @@ class DataService:
         else:
             self.embeddings_enabled = False
 
-    def store_jobs(self, jobs: list[Job]):
-        self.db_client.upsert_jobs(jobs=jobs)
+    def store_jobs(self, jobs: list[Job], allow_reset: bool = False):
+        self.db_client.upsert_jobs(jobs=jobs, allow_reset=allow_reset)
         logger.info(f"Added {len(jobs)} jobs.")
+
+    def store_job(self, job: Job, allow_reset: bool = False):
+        self.db_client.upsert_job(job=job, allow_reset=allow_reset)
+        logger.info(f"Added job {job.id}.")
 
     def get_by_id(self, job_id: str) -> Job | None:
         try:
@@ -60,6 +64,20 @@ class DataService:
             logger.error(f"Error embedding populated jobs: {e}")
             raise e
 
+    def embed_job(self, job: Job):
+        try:
+            if job.title and not job.title_vector:
+                job.title_vector = self.embedding_client.embed(job.title)
+            if job.qualifications and not job.qualifications_vector:
+                job.qualifications_vector = self.embedding_client.embed(
+                    job.create_qualifications_text()
+                )
+            self.store_job(job)
+            logger.info(f"Embedded job {job.id}.")
+        except Exception as e:
+            logger.error(f"Error embedding job {job.id}: {e}")
+            raise e
+
     def search_by_title(self, job: Job, **filters) -> SimilarityResponse | None:
         try:
             if not job.title:
@@ -67,7 +85,7 @@ class DataService:
             if not job.title_vector:
                 logger.info(f"Embedding title for job {job.id}")
                 job.title_vector = self.embedding_client.embed(job.title)
-                self.store_jobs([job])
+                self.store_job(job)
             return self.db_client.search_by_title_embeddings(
                 title_embedding=job.title_vector,
                 job_exclusion_id=job.id,
@@ -89,7 +107,7 @@ class DataService:
                 logger.info(f"Embedding qualifications for job {job.id}")
                 _v = self.embedding_client.embed(job.create_qualifications_text())
                 job.qualifications_vector = _v
-                self.store_jobs([job])
+                self.store_job(job)
             _results = self.db_client.search_by_qualifications_embeddings(
                 qe=job.qualifications_vector,
                 job_exclusion_id=job.id,

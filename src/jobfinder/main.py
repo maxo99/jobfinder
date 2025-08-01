@@ -1,6 +1,7 @@
 import logging
 
 import streamlit as st
+from streamlit import session_state as ss
 
 from jobfinder import _setup_logging
 from jobfinder.domain.constants import DEFAULT_PAGE_DESCRIPTION
@@ -24,7 +25,7 @@ def main():
         initial_sidebar_state="expanded",
     )
 
-    if "initialized" not in st.session_state:
+    if "initialized" not in ss:
         _setup_logging()
         _init_session()
     _init_working_df()

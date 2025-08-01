@@ -401,6 +401,12 @@ def df_to_jobs(df: pd.DataFrame) -> list[Job]:
     jobs = []
     for _, row in df.iterrows():
         job_data = row.to_dict()
+        if not all(
+            field in job_data and job_data[field]
+            for field in ["id", "title", "company"]
+        ):
+            logger.warning(f"Skipping job with missing required fields: {job_data}")
+            continue
         job = Job.from_dict(job_data)
         jobs.append(job)
 

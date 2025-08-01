@@ -1,10 +1,11 @@
 import pandas as pd
 import streamlit as st
 from jobspy import scrape_jobs
+from streamlit import session_state as ss
 
 from jobfinder.domain.constants import EXCLUDED
 from jobfinder.domain.models import df_to_jobs, validate_df_defaults
-from jobfinder.session import get_data_service
+from jobfinder.session import get_data_service, reload_working_df
 from jobfinder.utils.persistence import save_data2
 from jobfinder.views import common
 
@@ -54,8 +55,8 @@ fulltime_only = st.checkbox("Fulltime Only", value=True)
 
 
 new_jobs = pd.DataFrame()
-if "new_jobs" in st.session_state:
-    new_jobs = st.session_state.new_jobs
+if "new_jobs" in ss:
+    new_jobs = ss.new_jobs
 # Scrape button
 if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
     new_jobs = _find_jobs(
@@ -81,12 +82,13 @@ if st.button("🚀 Scrape Jobs", type="primary", key="scrape_job"):
         st.metric("Pulled Jobs", len(new_jobs.index))
 
         st.dataframe(new_jobs, use_container_width=True)
-        st.session_state.new_jobs = new_jobs
+        ss.new_jobs = new_jobs
 if not new_jobs.empty:
     if st.button("Save Scraped Jobs", type="primary", key="save_scraped_jobs"):
         save_data2(new_jobs, state="raw")
         get_data_service().store_jobs(df_to_jobs(new_jobs))
-        st.session_state.new_jobs = pd.DataFrame()  # Clear after saving
+        ss.new_jobs = pd.DataFrame()  # Clear after saving
         st.success("Jobs saved successfully!")
+        reload_working_df()
         st.rerun()
 common.render_footer()

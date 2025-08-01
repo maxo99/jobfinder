@@ -2,8 +2,9 @@ import logging
 
 import pandas as pd
 import streamlit as st
+from streamlit import session_state as ss
 
-from jobfinder.domain.constants import NEW, STATUS_TYPES, USER, VIEWED
+from jobfinder.domain.constants import AI, NEW, STATUS_TYPES, USER, VIEWED
 from jobfinder.domain.models import Job, df_to_jobs
 from jobfinder.session import (
     get_data_service,
@@ -37,7 +38,7 @@ def _details(job: Job):
         #     st.write(job.score)
 
         if st.button("🤖 AI Score Job", key="score_job"):
-            st.session_state.scoring_selection = job.id
+            ss.scoring_selection = job.id
             st.switch_page("pages/scoring_util.py")
 
     else:
@@ -45,6 +46,7 @@ def _details(job: Job):
 
         if st.button("🤖 AI Extract Summarization", key="add_qualifications"):
             with st.spinner("Extracting Qualifications...", show_time=True):
+                job.summarizer = AI
                 _jobs = [job]
                 get_generative_service().extract_qualifications(_jobs)
                 get_data_service().embed_populated_jobs(_jobs)

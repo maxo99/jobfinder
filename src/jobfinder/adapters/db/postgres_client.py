@@ -56,10 +56,40 @@ class PostgresClient:
             logger.error(f"Error closing Postgres client connection: {e}")
             raise e
 
-    def upsert_job(self, job: Job):
-        self.upsert_jobs([job])
+    def upsert_job(self, job: Job, allow_reset: bool = False):
+        try:
+            logger.info(f"Upserting job {job.id}.")
+            with self.session_maker() as session:
+                updated_job = None
+                existing_job = session.get(Job, job.id)
+                if existing_job:
+                    for key, value in job.model_dump().items():
+                        if hasattr(job, key) and "vector" in key:
+                            # Handle vector fields specifically
+                            vector_value = getattr(job, key)
+                            if allow_reset or (
+                                vector_value is not None and len(vector_value) > 0
+                            ):
+                                setattr(existing_job, key, vector_value)
+                        else:
+                            # Handle non-vector fields
+                            if allow_reset or (value is not None and value != ""):
+                                setattr(existing_job, key, value)
+                    updated_job = existing_job
+                else:
+                    session.add(job)
+                    updated_job = job
+                session.commit()
+                # Only refresh the jobs that are actually in this session
+                if updated_job:
+                    logger.info(f"Refreshing job {updated_job.id} in session.")
+                    session.refresh(updated_job)
+            logger.info(f"Upserted job {updated_job.id} successfully.")
+        except Exception as e:
+            logger.error(f"Error upserting jobs: {e}")
+            raise e
 
-    def upsert_jobs(self, jobs: list[Job]):
+    def upsert_jobs(self, jobs: list[Job], allow_reset: bool = False):
         try:
             logger.info(f"Upserting {len(jobs)} jobs.")
             with self.session_maker() as session:
@@ -71,11 +101,13 @@ class PostgresClient:
                             if hasattr(job, key) and "vector" in key:
                                 # Handle vector fields specifically
                                 vector_value = getattr(job, key)
-                                if vector_value is not None and len(vector_value) > 0:
+                                if allow_reset or (
+                                    vector_value is not None and len(vector_value) > 0
+                                ):
                                     setattr(existing_job, key, vector_value)
                             else:
                                 # Handle non-vector fields
-                                if value is not None and value != "":
+                                if allow_reset or (value is not None and value != ""):
                                     setattr(existing_job, key, value)
                         updated_jobs.append(existing_job)
                     else:
@@ -171,7 +203,7 @@ class PostgresClient:
 
                 logger.info(f"Found {len(results)} jobs matching title embedding")
                 return SimilarityResponse(
-                    jobs=[r[0] for r in results], scores=[r[1] for r in results]
+                    jobs=[r[0] for r in results], scores=[1.0 - r[1] for r in results]
                 )
         except Exception as e:
             logger.error(f"Error searching jobs by title: {e}")
@@ -190,19 +222,15 @@ class PostgresClient:
 
             with self.session_maker() as session:
                 dist = func.cosine_distance(Job.qualifications_vector, embedding_sql)
-
-                results = (
-                    session.query(Job, dist.label("cosine_distance"))
-                    .filter(dist < similarity_threshold)
-                    .order_by(dist)
-                    .limit(limit)
-                    .all()
+                query = select(Job, dist.label("cosine_distance")).where(
+                    dist < similarity_threshold
                 )
-                logger.info(
-                    f"Found {len(results)} jobs matching qualifications embedding"
-                )
+                if job_exclusion_id is not None:
+                    query = query.where(not_(Job.id == job_exclusion_id))
+                results = session.execute(query.order_by(dist).limit(limit)).all()
+                logger.info(f"Found {len(results)} jobs similar jobs")
                 return SimilarityResponse(
-                    jobs=[r[0] for r in results], scores=[r[1] for r in results]
+                    jobs=[r[0] for r in results], scores=[1.0 - r[1] for r in results]
                 )
         except Exception as e:
             logger.error(f"Error searching jobs by qualifications: {e}")
