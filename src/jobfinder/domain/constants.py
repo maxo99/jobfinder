@@ -35,7 +35,7 @@ user reviewed existing records.
 - Return a score from -1.0 to 1.0, where -1.0 is the lowest and 1.0 is the highest.
 - Return pros and cons from the listing description to support your score.
 - Pros and cons should be a single string response of bullet points.
-- Format the response as json with keys: score, pros, cons.
+- Format the response as json with required keys: score, pros, cons.
 ## Listing:
 ### Title: {{ listing.title }}
 ### Description: {{ listing.description }}
