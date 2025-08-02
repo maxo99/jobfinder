@@ -1,11 +1,14 @@
+import asyncio
 import logging
 import os
 
 import streamlit as st
 
 from jobfinder import JOBS_DATA_FILE
-from jobfinder.domain.constants import AI, DEFAULT_COLS
+from jobfinder.domain.constants import DEFAULT_COLS
 from jobfinder.domain.models import Job, df_to_jobs
+from jobfinder.services.data_service import DataService
+from jobfinder.services.generative_service import GenerativeService
 from jobfinder.session import (
     get_data_service,
     get_generative_service,
@@ -16,6 +19,52 @@ from jobfinder.utils import get_now
 from jobfinder.views import common
 
 logger = logging.getLogger(__name__)
+
+
+async def _process_job_async(
+    job: Job, generative_service: GenerativeService, data_service: DataService
+) -> None:
+    logger.info(f"Processing job {job.id} for summarization...")
+    try:
+        if not job.description:
+            return
+
+        await asyncio.to_thread(generative_service.extract_qualifications_for_job, job)
+        st.success(f"Record {job.id} summarized successfully!")
+        await asyncio.to_thread(data_service.embed_job, job)
+        st.success(f"Record {job.id} embedded successfully!")
+
+    except Exception as e:
+        logger.error(f"Error processing job {job.id}: {e}")
+        raise
+
+
+async def _summarize_jobs_async(
+    jobs: list[Job], generative_service: GenerativeService, data_service
+) -> list[str]:
+    try:
+        results = []
+        logger.info(f"Summarizing {len(jobs)} jobs...")
+
+        # Process jobs concurrently
+        tasks = []
+        for job in jobs:
+            if not job.description:
+                results.append(f"Job {job.id} has no description to summarize.")
+                continue
+            tasks.append(_process_job_async(job, generative_service, data_service))
+
+        # Wait for all tasks to complete
+        await asyncio.gather(*tasks)
+
+        for job in jobs:
+            if job.description:
+                results.append(f"Record {job.id} summarized successfully!")
+        return results
+
+    except Exception as e:
+        logger.error(f"Error in _summarize_jobs_async: {e}")
+        raise
 
 
 def _manage_data():
@@ -51,14 +100,11 @@ def _bulk_actions(jobs: list[Job]):
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Summarize Jobs"):
-            for job in jobs:
-                if not job.description:
-                    st.warning(f"Job {job.id} has no description to summarize.")
-                    continue
-                with st.spinner(f"Summarizing {job.name}..."):
-                    get_generative_service().extract_qualifications_for_job(job)
-                    get_data_service().embed_job(job)
-                    st.success(f"Record {job.id} summarized successfully!")
+            asyncio.run(
+                _summarize_jobs_async(
+                    jobs, get_generative_service(), get_data_service()
+                )
+            )
 
             st.success("Jobs summarized successfully!")
             reload_working_df()
