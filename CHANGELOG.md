@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.13.0 (2025-08-11)
+
+### Features
+
+- Asyncio implementation in data management page for chat and embedding calls
+  ([`14c8091`](https://github.com/maxo99/jobfinder/commit/14c8091d06433aded3683d9f07efc49978e650e6))
+
+### Testing
+
+- Updating default prompt with requirement clarity
+  ([`0757d06`](https://github.com/maxo99/jobfinder/commit/0757d063a954001872f6f7b539b6420028c3b32d))
+
+
 ## v0.12.1 (2025-08-01)
 
 ### Bug Fixes
